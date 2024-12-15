@@ -1,0 +1,184 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: black;
+    color: #00ff00;
+    margin: 0;
+    padding: 0;
+    font-size: large;
+    line-height: 1.5em;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1em;
+}
+
+header {
+    background-color: #0d1117;
+    color: #39ff14;
+    padding: 1em 0;
+    text-align: center;
+    text-shadow: 0 0 5px #39ff14;
+    border-bottom: 3px solid #ff6700;
+    animation: glitch 8s linear 2s infinite alternate;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #121212;
+    border-top: 3px solid #00f7ff;
+}
+
+nav a {
+    color: #00ffcc;
+    text-decoration: none;
+    padding: 0.5em;
+    display: block;
+    font-weight: bold;
+    border: 2px solid transparent;
+}
+
+nav a:hover {
+    background-color: #ff6700;
+    color: black;
+    border: 2px solid #00f7ff;
+}
+
+section {
+    padding: 2em;
+    border-left: 5px solid #ffff00;
+    margin: 1em 0;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    section {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+section .image-container {
+    flex: 0 0 100%;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    section .image-container {
+        flex: 0 0 30%;
+        margin-right: 2em;
+        margin-bottom: 0;
+    }
+}
+
+section .image-container img {
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid #39ff14;
+    box-shadow: 0 0 10px #00f7ff;
+}
+
+section .content-container h2 {
+    margin-top: 0;
+}
+
+section p,
+section ul {
+    flex: 1;
+}
+
+footer {
+    background-color: #0d1117;
+    color: #39ff14;
+    text-align: center;
+    padding: 1em 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    border-top: 3px solid #00f7ff;
+    animation: glitch 8s linear 2s infinite alternate;
+}
+
+ul {
+    list-style: "*";
+    padding: 0;
+}
+
+ul li {
+    padding-left: 0.4em;
+    margin: 1em 1em;
+}
+
+a {
+    color: #00ffcc;
+}
+
+a:hover {
+    color: #ff00ff;
+}
+
+.flashing-cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 1em;
+    background-color: #00ff00;
+    animation: blink 1s steps(2, start) infinite;
+}
+
+marquee span {
+    margin: 0;
+}
+
+marquee span a {
+    color: #00ff00;
+    text-decoration: none;
+}
+
+marquee span a:hover {
+    animation: glitch 1s linear infinite;
+}
+
+/*** Animations ***/
+
+@keyframes glitch {
+    0% {
+        text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+    }
+
+    5% {
+        text-shadow: -2px -2px 0 #00ff00, 2px 2px 0 #0000ff;
+    }
+
+    10% {
+        text-shadow: 4px 4px 0 #ff0000, -4px -4px 0 #00ff00;
+    }
+
+    15% {
+        text-shadow: -4px -4px 0 #0000ff, 4px 4px 0 #ff0000;
+    }
+
+    20% {
+        text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+    }
+
+    25% {
+        text-shadow: 0 0 0 transparent;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}

@@ -5,201 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Hampshire Emerging Technologies Caucus</title>
-    <style>
-        @keyframes glitch {
-            0% {
-                text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
-            }
-
-            5% {
-                text-shadow: -2px -2px 0 #00ff00, 2px 2px 0 #0000ff;
-            }
-
-            10% {
-                text-shadow: 4px 4px 0 #ff0000, -4px -4px 0 #00ff00;
-            }
-
-            15% {
-                text-shadow: -4px -4px 0 #0000ff, 4px 4px 0 #ff0000;
-            }
-
-            20% {
-                text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
-            }
-
-            25% {
-                text-shadow: 0 0 0 transparent;
-            }
-        }
-
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: black;
-            color: #00ff00;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1em;
-        }
-
-        header {
-            background-color: #0d1117;
-            color: #39ff14;
-            padding: 1em 0;
-            text-align: center;
-            text-shadow: 0 0 5px #39ff14;
-            border-bottom: 3px solid #ff6700;
-            animation: glitch 8s linear 2s infinite alternate;
-        }
-
-        nav {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: #121212;
-            border-top: 3px solid #00f7ff;
-        }
-
-        nav a {
-            color: #00ffcc;
-            text-decoration: none;
-            padding: 1em;
-            display: block;
-            font-weight: bold;
-            border: 2px solid transparent;
-        }
-
-        nav a:hover {
-            background-color: #ff6700;
-            color: black;
-            border: 2px solid #00f7ff;
-        }
-
-        section {
-            padding: 2em;
-            border-left: 5px solid #ffff00;
-            margin: 1em 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @media (min-width: 768px) {
-            section {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-
-        section .image-container {
-            flex: 0 0 100%;
-            margin-bottom: 1em;
-            text-align: center;
-        }
-
-        @media (min-width: 768px) {
-            section .image-container {
-                flex: 0 0 40%;
-                margin-right: 2em;
-                margin-bottom: 0;
-            }
-        }
-
-        section .image-container img {
-            width: 100%;
-            max-width: 400px;
-            border: 2px solid #39ff14;
-            box-shadow: 0 0 10px #00f7ff;
-        }
-
-        section p,
-        section ul {
-            flex: 1;
-        }
-
-        footer {
-            background-color: #0d1117;
-            color: #39ff14;
-            text-align: center;
-            padding: 1em 0;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            border-top: 3px solid #00f7ff;
-            animation: glitch 8s linear 2s infinite alternate;
-        }
-
-        ul {
-            list-style: "*";
-            padding: 0;
-        }
-
-        ul li {
-            padding-left: 0.4em;
-            margin: 1em 1em;
-        }
-
-        a {
-            color: #00ffcc;
-        }
-
-        a:hover {
-            color: #ff00ff;
-        }
-
-        .scrolling-list {
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            max-width: 100%;
-        }
-
-        .scrolling-list ul {
-            list-style-type: none;
-            display: inline-flex;
-            padding: 0;
-            margin: 0;
-            animation: marquee 60s linear 2s infinite;
-        }
-
-        .scrolling-list ul li {
-            display: inline;
-            margin-right: 2em;
-        }
-
-        @keyframes marquee {
-            0% {
-                transform: translateX(0);
-            }
-
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-
-        .flashing-cursor {
-            display: inline-block;
-            width: 0.5em;
-            height: 1em;
-            background-color: #00ff00;
-            animation: blink 1s steps(2, start) infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">    
 </head>
 
 <body>
@@ -218,56 +24,29 @@
             <a href="#contact">Contact</a>
         </nav>
 
+        <section>
+            <marquee id="tech-list" scrollamount="15" scrolldelay="20" onmouseover="this.stop();" onmouseout="this.start();">
+                <span><img src="img/pac-man-fortnite.gif" height="20"/>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Emerging Technologies...</strong></span>
+            </marquee>
+        </section>
+
         <section id="mission">
             <div class="image-container">
                 <img src="img/about.webp" alt="About Us Technology">
             </div>
-            <div>
+            <div class="content-container">
                 <h2>Mission</h2>
                 <p>The Emerging Technologies Caucus is dedicated to fostering a bipartisan, bicameral commitment to
                     establishing New Hampshire as a leading jurisdiction for emerging technologies. The Caucus focuses
-                    on educating policymakers and regulators about the rapidly evolving innovation landscape, supporting
+                    on educating policymakers and regulators about the rapidly evolving innovation landscape,
+                    supporting
                     workforce development, and safeguarding consumer privacy through robust protections.</p>
                 <p>In addition, the Caucus emphasizes a “techno-optimist” approach, embracing technological progress and
                     innovation while ensuring thoughtful governance to maximize societal and economic benefits. By
-                    promoting collaboration and forward-thinking policymaking, the Caucus aims to position New Hampshire
+                    promoting collaboration and forward-thinking policymaking, the Caucus aims to position New
+                    Hampshire
                     as a national leader in technology-driven economic growth and responsible innovation.
                 </p>
-            </div>
-        </section>
-
-        <section>
-            <div class="scrolling-list">
-                <ul>
-                    <li><strong>Emerging Technologies:</strong></li>
-                    <li>Advanced Nuclear Energy</li>
-                    <li>Advanced Regenerative Manufacturing</li>
-                    <li>Advanced Robotics and Automation</li>
-                    <li>Air Mobility (Flying Cars, eVTOLs)</li>
-                    <li>Artificial Intelligence (AI) and Machine Learning (ML)</li>
-                    <li>Augmented Reality (AR) and Virtual Reality (VR)</li>
-                    <li>Autonomous Vehicles and Drones</li>
-                    <li>Battery Technology and Energy Innovations</li>
-                    <li>Biotech and Genetic Engineering</li>
-                    <li>Blockchain and Distributed Ledger Technology</li>
-                    <li>Cybersecurity</li>
-                    <li>Decentralized Finance (DeFi)</li>
-                    <li>Digital Twins and Simulation Technology</li>
-                    <li>Edge Computing</li>
-                    <li>Emerging Healthcare Technologies</li>
-                    <li>Internet of Things (IoT)</li>
-                    <li>Nanotechnology</li>
-                    <li>Neurotechnology</li>
-                    <li>Next-Generation Communication Networks</li>
-                    <li>Additive Manufacturing (3D Printing and Advanced Manufacturing Techniques)</li>
-                    <li>Quantum Computing</li>
-                    <li>Smart Cities and Infrastructure</li>
-                    <li>Smart Grid Technologies</li>
-                    <li>Sustainable Agriculture and Food Technology</li>
-                    <li>Space Technology and Commercial Space Ventures</li>
-                    <li>Tokenization of Real-World Assets</li>
-                    <li>Quantum Computing</li>
-                </ul>
             </div>
         </section>
 
@@ -275,7 +54,7 @@
             <div class="image-container">
                 <img src="img/initiatives.webp" alt="Technology Initiatives">
             </div>
-            <div>
+            <div class="content-container">
                 <h2>Our Initiatives</h2>
                 <ul>
                     <li>Promoting blockchain technology and its applications.</li>
@@ -290,7 +69,7 @@
             <div class="image-container">
                 <img src="img/events.webp" alt="Technology Events">
             </div>
-            <div>
+            <div class="content-container">
                 <h2>Upcoming Events</h2>
                 <p>Join us at our upcoming meetings and seminars where policymakers, industry leaders, and academics
                     discuss the future of technology.</p>
@@ -306,7 +85,7 @@
             <div class="image-container">
                 <img src="img/resources.webp" alt="Technology Resources">
             </div>
-            <div>
+            <div class="content-container">
                 <h2>Resources</h2>
                 <p>Access research papers, legislative updates, and white papers on emerging technologies.</p>
                 <ul>
@@ -321,51 +100,20 @@
             <div class="image-container">
                 <img src="img/contact.webp" alt="Contact Us">
             </div>
-            <div>
+            <div class="content-container">
                 <h2>Contact Us</h2>
                 <p>If you have questions or wish to get involved, please reach out:</p>
-                <p><span class="flashing-cursor"></span>&nbsp;Email: <a
-                        href="mailto:info@emergingtechcaucus.org">info@emergingtechcaucus.org</a></p>
+                <p><span class="flashing-cursor"></span>&nbsp;E-mail: <a
+                        href="mailto:info@emergingtechnh.org">info@emergingtechnh.org</a></p>
             </div>
         </section>
 
         <footer>
-            <p class="copyright"></p>
-            <p>Made with &#129505; by <a href="https://chatgpt.com/">&#129302;</a>.</p>
+            <p>&copy; <span class="copyright-year"></span> New Hampshire Emerging Technologies Caucus. All rights reserved.</p>
+            <p>Made with &#129505; using <a href="https://chatgpt.com/">&#129302;</a></p>
         </footer>
     </div>
 
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const footer = document.querySelector('p.copyright');
-        const currentYear = new Date().getFullYear();
-        footer.innerHTML = `&copy; ${currentYear} New Hampshire Emerging Technologies Caucus. All rights reserved.`;
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const list = document.querySelector('.scrolling-list ul');
-        const items = Array.from(list.children);
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 1; i--) {
-                const j = Math.floor(Math.random() * (i - 1)) + 1;
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function randomizeList() {
-            const shuffledItems = shuffle([...items]);
-            list.innerHTML = '';
-            shuffledItems.forEach(item => list.appendChild(item));
-        }
-
-        randomizeList();
-
-    });
-</script>
-
+<script src="js/index.js"></script>
 </html>
