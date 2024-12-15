@@ -1,10 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Hampshire Emerging Technology Caucus</title>
+    <title>New Hampshire Emerging Technologies Caucus</title>
     <style>
+        @keyframes glitch {
+            0% {
+                text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+            }
+
+            5% {
+                text-shadow: -2px -2px 0 #00ff00, 2px 2px 0 #0000ff;
+            }
+
+            10% {
+                text-shadow: 4px 4px 0 #ff0000, -4px -4px 0 #00ff00;
+            }
+
+            15% {
+                text-shadow: -4px -4px 0 #0000ff, 4px 4px 0 #ff0000;
+            }
+
+            20% {
+                text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+            }
+
+            25% {
+                text-shadow: 0 0 0 transparent;
+            }
+        }
+
         body {
             font-family: 'Courier New', Courier, monospace;
             background-color: black;
@@ -26,10 +53,12 @@
             text-align: center;
             text-shadow: 0 0 5px #39ff14;
             border-bottom: 3px solid #ff6700;
+            animation: glitch 8s linear 2s infinite alternate;
         }
 
         nav {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             background-color: #121212;
             border-top: 3px solid #00f7ff;
@@ -55,22 +84,39 @@
             border-left: 5px solid #ffff00;
             margin: 1em 0;
             display: flex;
-            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            section {
+                flex-direction: row;
+                align-items: flex-start;
+            }
         }
 
         section .image-container {
-            flex: 0 0 20%;
-            margin-right: 2em;
+            flex: 0 0 100%;
+            margin-bottom: 1em;
             text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            section .image-container {
+                flex: 0 0 40%;
+                margin-right: 2em;
+                margin-bottom: 0;
+            }
         }
 
         section .image-container img {
             width: 100%;
+            max-width: 400px;
             border: 2px solid #39ff14;
             box-shadow: 0 0 10px #00f7ff;
         }
 
-        section p, section ul {
+        section p,
+        section ul {
             flex: 1;
         }
 
@@ -83,14 +129,17 @@
             bottom: 0;
             width: 100%;
             border-top: 3px solid #00f7ff;
+            animation: glitch 8s linear 2s infinite alternate;
         }
 
         ul {
-            list-style-type: none;
+            list-style: "*";
+            padding: 0;
         }
 
         ul li {
-            margin: 1em 0;
+            padding-left: 0.4em;
+            margin: 1em 1em;
         }
 
         a {
@@ -100,96 +149,174 @@
         a:hover {
             color: #ff00ff;
         }
+
+        .scrolling-list {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            max-width: 100%;
+        }
+
+        .scrolling-list ul {
+            list-style-type: none;
+            display: inline-flex;
+            padding: 0;
+            margin: 0;
+            animation: marquee 20s linear infinite;
+        }
+
+        .scrolling-list ul li {
+            display: inline;
+            margin-right: 1em;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .flashing-cursor {
+            display: inline-block;
+            width: 0.5em;
+            height: 1em;
+            background-color: #00ff00;
+            animation: blink 1s steps(2, start) infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <h1>New Hampshire Emerging Technology Caucus</h1>
-        <p>Fostering Innovation, Collaboration, and Progress</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>New Hampshire Emerging Technologies Caucus</h1>
+            <p>Fostering Innovation, Collaboration, and Progress</p>
+        </header>
 
-    <nav>
-        <a href="#about">About</a>
-        <a href="#initiatives">Initiatives</a>
-        <a href="#events">Events</a>
-        <a href="#resources">Resources</a>
-        <a href="#contact">Contact</a>
-    </nav>
+        <nav>
+            <a href="#about">About</a>
+            <a href="#initiatives">Initiatives</a>
+            <a href="#events">Events</a>
+            <a href="#resources">Resources</a>
+            <a href="#contact">Contact</a>
+        </nav>
 
-    <section id="about">
-        <div class="image-container">
-            <img src="img/about.webp" alt="About Us Technology">
-        </div>
-        <div>
-            <h2>About Us</h2>
-            <p>The New Hampshire Emerging Technology Caucus is a bipartisan group dedicated to understanding and fostering policies that promote innovation in emerging technologies. Our mission is to educate lawmakers, support innovative businesses, and ensure the responsible integration of new technologies into society.</p>
-        </div>
-    </section>
+        <section id="about">
+            <div class="image-container">
+                <img src="img/about.webp" alt="About Us Technology">
+            </div>
+            <div>
+                <h2>About Us</h2>
+                <p>The New Hampshire Emerging Technologies Caucus is a bipartisan group dedicated to understanding and
+                    fostering policies that promote innovation in emerging technologies. Our mission is to educate
+                    lawmakers, support innovative businesses, and ensure the responsible integration of new technologies
+                    into society.</p>
+            </div>
+        </section>
 
-    <section id="initiatives">
-        <div class="image-container">
-            <img src="img/initiatives.webp" alt="Technology Initiatives">
-        </div>
-        <div>
-            <h2>Our Initiatives</h2>
-            <ul>
-                <li>Promoting blockchain technology and its applications.</li>
-                <li>Advancing the adoption of artificial intelligence and machine learning.</li>
-                <li>Supporting the development of small modular reactors (SMRs) and clean energy technologies.</li>
-                <li>Encouraging cybersecurity best practices across industries.</li>
-            </ul>
-        </div>
-    </section>
+        <section>
+            <div class="scrolling-list">
+                <ul>
+                    <li>Blockchain Technology</li>
+                    <li>Artificial Intelligence</li>
+                    <li>Quantum Computing</li>
+                    <li>5G Networks</li>
+                    <li>Renewable Energy Innovations</li>
+                    <li>IoT (Internet of Things)</li>
+                    <li>Augmented and Virtual Reality</li>
+                    <li>Cybersecurity Advances</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="events">
-        <div class="image-container">
-            <img src="img/events.webp" alt="Technology Events">
-        </div>
-        <div>
-            <h2>Upcoming Events</h2>
-            <p>Join us at our upcoming meetings and seminars where policymakers, industry leaders, and academics discuss the future of technology.</p>
-            <ul>
-                <li><strong>Blockchain Policy Roundtable</strong> - January 15, 2025</li>
-                <li><strong>AI in Government Workshop</strong> - February 20, 2025</li>
-                <li><strong>Clean Energy Summit</strong> - March 10, 2025</li>
-            </ul>
-        </div>
-    </section>
+        <section id="initiatives">
+            <div class="image-container">
+                <img src="img/initiatives.webp" alt="Technology Initiatives">
+            </div>
+            <div>
+                <h2>Our Initiatives</h2>
+                <ul>
+                    <li>Promoting blockchain technology and its applications.</li>
+                    <li>Advancing the adoption of artificial intelligence and machine learning.</li>
+                    <li>Supporting the development of small modular reactors (SMRs) and clean energy technologies.</li>
+                    <li>Encouraging cybersecurity best practices across industries.</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="resources">
-        <div class="image-container">
-            <img src="img/resources.webp" alt="Technology Resources">
-        </div>
-        <div>
-            <h2>Resources</h2>
-            <p>Access research papers, legislative updates, and white papers on emerging technologies.</p>
-            <ul>
-                <li><a href="#">Blockchain Regulatory Framework</a></li>
-                <li><a href="#">AI Ethics Guidelines</a></li>
-                <li><a href="#">SMR Deployment Strategies</a></li>
-            </ul>
-        </div>
-    </section>
+        <section id="events">
+            <div class="image-container">
+                <img src="img/events.webp" alt="Technology Events">
+            </div>
+            <div>
+                <h2>Upcoming Events</h2>
+                <p>Join us at our upcoming meetings and seminars where policymakers, industry leaders, and academics
+                    discuss the future of technology.</p>
+                <ul>
+                    <li><strong>Blockchain Policy Roundtable</strong> - January 15, 2025</li>
+                    <li><strong>AI in Government Workshop</strong> - February 20, 2025</li>
+                    <li><strong>Clean Energy Summit</strong> - March 10, 2025</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="contact">
-        <div class="image-container">
-            <img src="img/contact.webp" alt="Contact Us">
-        </div>
-        <div>
-            <h2>Contact Us</h2>
-            <p>If you have questions or wish to get involved, please reach out:</p>
-            <p>Email: <a href="mailto:info@emergingtechcaucus.org">info@emergingtechcaucus.org</a></p>
-            <p>Phone: (555) 123-4567</p>
-            <p>Mail: New Hampshire Emerging Technology Caucus, 123 Innovation Way, Tech City, ST 00000</p>
-        </div>
-    </section>
+        <section id="resources">
+            <div class="image-container">
+                <img src="img/resources.webp" alt="Technology Resources">
+            </div>
+            <div>
+                <h2>Resources</h2>
+                <p>Access research papers, legislative updates, and white papers on emerging technologies.</p>
+                <ul>
+                    <li><a href="#">Blockchain Regulatory Framework</a></li>
+                    <li><a href="#">AI Ethics Guidelines</a></li>
+                    <li><a href="#">SMR Deployment Strategies</a></li>
+                </ul>
+            </div>
+        </section>
 
-    <footer>
-        <p>&copy; 2024 New Hampshire Emerging Technology Caucus. All rights reserved.</p>
-    </footer>
-</div>
+        <section id="contact">
+            <div class="image-container">
+                <img src="img/contact.webp" alt="Contact Us">
+            </div>
+            <div>
+                <h2>Contact Us</h2>
+                <p>If you have questions or wish to get involved, please reach out:</p>
+                <p><span class="flashing-cursor"></span>&nbsp;Email: <a
+                        href="mailto:info@emergingtechcaucus.org">info@emergingtechcaucus.org</a></p>
+            </div>
+        </section>
+
+        <footer>
+            <p class="copyright"></p>
+            <p>Made with &#129505; by <a href="https://chatgpt.com/">&#129302;</a>.</p>
+        </footer>
+    </div>
 
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const footer = document.querySelector('p.copyright');
+        const currentYear = new Date().getFullYear();
+        footer.innerHTML = `&copy; ${currentYear} New Hampshire Emerging Technologies Caucus. All rights reserved.`;
+    });
+</script>
+
 </html>
