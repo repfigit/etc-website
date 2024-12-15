@@ -26,9 +26,9 @@ function loadEmergingTechList() {
                 link.href = row[1];
                 link.textContent = row[0];
                 link.target = '_blank';
-                m.appendChild(document.createTextNode('[ '));
+                m.appendChild(document.createTextNode('< '));
                 m.appendChild(span);
-                m.appendChild(document.createTextNode(' ]...'));
+                m.appendChild(document.createTextNode(' >...'));
             });
         });
 }

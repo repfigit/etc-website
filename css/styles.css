@@ -143,6 +143,10 @@ marquee span a:hover {
     animation: glitch 1s linear infinite;
 }
 
+img.logo {
+    width: 10px;
+}
+
 /*** Animations ***/
 
 @keyframes glitch {
