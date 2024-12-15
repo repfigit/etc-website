@@ -211,7 +211,7 @@
         </header>
 
         <nav>
-            <a href="#mission">About</a>
+            <a href="#mission">Mission</a>
             <a href="#initiatives">Initiatives</a>
             <a href="#events">Events</a>
             <a href="#resources">Resources</a>
@@ -341,6 +341,30 @@
         const footer = document.querySelector('p.copyright');
         const currentYear = new Date().getFullYear();
         footer.innerHTML = `&copy; ${currentYear} New Hampshire Emerging Technologies Caucus. All rights reserved.`;
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const list = document.querySelector('.scrolling-list ul');
+        const items = Array.from(list.children);
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 1; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function randomizeList() {
+            const shuffledItems = shuffle([...items]);
+            list.innerHTML = '';
+            shuffledItems.forEach(item => list.appendChild(item));
+        }
+
+        randomizeList();
+
     });
 </script>
 
