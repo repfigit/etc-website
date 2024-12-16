@@ -17,7 +17,6 @@ function loadEmergingTechList() {
             const frag = document.createDocumentFragment();
 
             const pacman = document.createElement('span');
-            frag.appendChild(pacman);
             pacman.className="pacman";
 
             const pacmanimg = document.createElement('img');
@@ -46,9 +45,7 @@ function loadEmergingTechList() {
                 frag.appendChild(document.createTextNode(' |···'));
             });
 
-            const mspackman = pacman.cloneNode(true);
-            mspackman.querySelector('img').src = "/img/ms-pac-man.gif";
-            frag.appendChild(mspackman);
+            frag.appendChild(pacman);
 
             m.append(frag);
         });

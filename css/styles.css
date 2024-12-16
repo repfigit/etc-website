@@ -1,7 +1,17 @@
+/* unifontex-latin-400-normal */
+@font-face {
+    font-family: 'UnifontEX';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url(https://cdn.jsdelivr.net/fontsource/fonts/unifontex@latest/latin-400-normal.woff2) format('woff2'), url(https://cdn.jsdelivr.net/fontsource/fonts/unifontex@latest/latin-400-normal.woff) format('woff');
+}
+
 body {
-    font-family: 'Courier New', Courier, monospace;
-    background-color: black;
-    color: #00ff00;
+    font-family: UnifontEX, 'Courier New', Courier, monospace;
+    background-color: rgb(5, 31, 0);
+    color: #d4d8d5;
+    /* color: #00ff00; */
     margin: 0;
     padding: 0;
     font-size: large;
@@ -15,14 +25,18 @@ body {
 }
 
 header {
-    background-color: #0d1117;
+    background-color: rgb(5, 31, 0);
     color: #39ff14;
     line-height: 2em;
     padding: 1em 0;
-    text-align: center;    
+    text-align: center;
     text-shadow: 0 0 5px #39ff14;
-    border-bottom: 3px solid #ff6700;
     animation: glitch 8s linear 2s infinite alternate;
+}
+
+.nav-container {
+    border-top: 3px solid #ff6700;
+    border-bottom: 3px solid #ff6700;
 }
 
 nav {
@@ -31,6 +45,7 @@ nav {
     justify-content: center;
     background-color: #121212;
     border-top: 3px solid #00f7ff;
+    border-bottom: 3px solid #00f7ff;
 }
 
 nav a {
@@ -94,7 +109,8 @@ section .content-container p {
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     -ms-hyphens: auto;
-    hyphens: auto;    text-align: justify;
+    hyphens: auto;
+    text-align: justify;
 }
 
 section .content-container h2 {
@@ -107,7 +123,6 @@ section ul {
 }
 
 footer {
-    background-color: #0d1117;
     color: #39ff14;
     text-align: center;
     padding: 1em 0;
@@ -142,7 +157,7 @@ a:hover {
     width: 0.5em;
     height: 1em;
     margin-bottom: -0.2em;
-    background-color: #00ff00;
+    background-color: #d4d8d5;
     animation: blink 1s steps(2, start) infinite;
 }
 
@@ -151,7 +166,6 @@ marquee span {
 }
 
 marquee span a {
-    color: #00ff00;
     text-decoration: none;
 }
 
@@ -207,4 +221,8 @@ img.logo {
     50% {
         opacity: 0;
     }
+}
+
+@keyframes {
+    
 }
