@@ -159,8 +159,10 @@ marquee span a:hover {
     animation: glitch 1s linear infinite;
 }
 
-img.pacman {
+.pacman img {
     height: 20px;
+    margin-right: 1em;
+    margin-bottom: -0.2em;
 }
 
 img.logo {

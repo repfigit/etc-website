@@ -14,35 +14,41 @@ function loadEmergingTechList() {
     fetch('data/tech_list.csv')
         .then(response => response.text())
         .then(data => {
+            const frag = document.createDocumentFragment();
+
+            const pacman = document.createElement('span');
+            frag.appendChild(pacman);
+            pacman.className="pacman";
+
+            const pacmanimg = document.createElement('img');
+            pacman.appendChild(pacmanimg);
+            pacmanimg.src = "img/pac-man.gif";
+
             // parse and shuffle tech list data
             const rows = data.split('\n');
             let result = rows.map(row => row.split('|'));
             result = shuffleArray(result);
 
-            let frag = document.createDocumentFragment();
-
-            let lead = document.createElement('span');
+            const lead = document.createElement('span');
             lead.innerHTML = '<strong>Emerging Technologies:</strong> |···';
             frag.appendChild(lead);
             
             result.forEach(row => {
                 const span = document.createElement('span');
                 const link = document.createElement('a');
+                span.appendChild(link);
                 link.href = row[1];
                 link.textContent = row[0];
                 link.target = '_blank';
-                span.appendChild(link);
 
                 frag.appendChild(document.createTextNode('| '));
                 frag.appendChild(span);
                 frag.appendChild(document.createTextNode(' |···'));
             });
 
-            let pacman = document.createElement('img');
-            pacman.className="pacman";
-            pacman.src = "img/pac-man-fortnite.gif";
-
-            frag.appendChild(pacman);
+            const mspackman = pacman.cloneNode(true);
+            mspackman.querySelector('img').src = "/img/ms-pac-man.gif";
+            frag.appendChild(mspackman);
 
             m.append(frag);
         });
