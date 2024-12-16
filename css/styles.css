@@ -17,8 +17,9 @@ body {
 header {
     background-color: #0d1117;
     color: #39ff14;
+    line-height: 2em;
     padding: 1em 0;
-    text-align: center;
+    text-align: center;    
     text-shadow: 0 0 5px #39ff14;
     border-bottom: 3px solid #ff6700;
     animation: glitch 8s linear 2s infinite alternate;
@@ -55,6 +56,12 @@ section {
     flex-direction: column;
 }
 
+@media (max-width: 767px) {
+    section {
+        padding: 1em 0.5em;
+    }
+}
+
 @media (min-width: 768px) {
     section {
         flex-direction: row;
@@ -83,6 +90,13 @@ section .image-container img {
     box-shadow: 0 0 10px #00f7ff;
 }
 
+section .content-container p {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;    text-align: justify;
+}
+
 section .content-container h2 {
     margin-top: 0;
 }
@@ -106,6 +120,7 @@ footer {
 
 ul {
     list-style: "*";
+    font-size: 1.1em;
     padding: 0;
 }
 
@@ -126,6 +141,7 @@ a:hover {
     display: inline-block;
     width: 0.5em;
     height: 1em;
+    margin-bottom: -0.2em;
     background-color: #00ff00;
     animation: blink 1s steps(2, start) infinite;
 }
@@ -141,6 +157,10 @@ marquee span a {
 
 marquee span a:hover {
     animation: glitch 1s linear infinite;
+}
+
+img.pacman {
+    height: 20px;
 }
 
 img.logo {
