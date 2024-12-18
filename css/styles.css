@@ -161,15 +161,27 @@ a:hover {
     animation: blink 1s steps(2, start) infinite;
 }
 
-marquee span {
-    margin: 0;
+.marquee {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 1.2em;
 }
 
-marquee span a {
+.marquee-content {
+    animation: marquee 40s linear 3s infinite;
+    display: inline-block;
+}
+
+.marquee-content:hover {
+    animation-play-state: paused;
+}
+
+.marquee span a {
+    padding: 0 .5em;
     text-decoration: none;
 }
 
-marquee span a:hover {
+.marquee span a:hover {
     animation: glitch 1s linear infinite;
 }
 
@@ -212,17 +224,21 @@ img.logo {
 }
 
 @keyframes blink {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
     50% {
         opacity: 0;
     }
+
+    100% {
+        opacity: 1;
+    }
 }
 
-@keyframes {
-    
+@keyframes marquee {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(-100%, 0);
+    }
 }

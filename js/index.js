@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     setCopyrightYear();
-    loadEmergingTechList();
+    initMarquee();
 });
 
 function setCopyrightYear() {
@@ -8,20 +8,15 @@ function setCopyrightYear() {
     document.querySelector('.copyright-year').textContent = year;
 }
 
-function loadEmergingTechList() {
-    const m = document.querySelector('marquee#tech-list');
-    
+function initMarquee() {
+    const marquee = document.getElementById('marquee');
+    const marqueeContent = marquee.querySelector('.marquee-content');
+
+    // load marquee data
     fetch('data/tech_list.csv')
         .then(response => response.text())
         .then(data => {
             const frag = document.createDocumentFragment();
-
-            const pacman = document.createElement('span');
-            pacman.className="pacman";
-
-            const pacmanimg = document.createElement('img');
-            pacman.appendChild(pacmanimg);
-            pacmanimg.src = "img/pac-man.gif";
 
             // parse and shuffle tech list data
             const rows = data.split('\n');
@@ -36,18 +31,25 @@ function loadEmergingTechList() {
                 const span = document.createElement('span');
                 const link = document.createElement('a');
                 span.appendChild(link);
-                link.href = row[1];
-                link.textContent = row[0];
+                link.href = row[1].trim();
+                link.textContent = row[0].trim();
                 link.target = '_blank';
 
-                frag.appendChild(document.createTextNode('| '));
+                frag.appendChild(document.createTextNode('|'));
                 frag.appendChild(span);
-                frag.appendChild(document.createTextNode(' |···'));
+                frag.appendChild(document.createTextNode('|···'));
             });
+
+            const pacman = document.createElement('span');
+            pacman.className="pacman";
+
+            const pacmanimg = document.createElement('img');
+            pacman.appendChild(pacmanimg);
+            pacmanimg.src = "img/pac-man.gif";
 
             frag.appendChild(pacman);
 
-            m.append(frag);
+            marqueeContent.append(frag);
         });
 }
 
