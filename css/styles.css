@@ -164,11 +164,11 @@ a:hover {
 .marquee {
     white-space: nowrap;
     overflow: hidden;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 
 .marquee-content {
-    animation: marquee 40s linear 3s infinite;
+    animation: marquee 60s linear 3s infinite;
     display: inline-block;
 }
 
