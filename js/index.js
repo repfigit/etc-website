@@ -26,7 +26,7 @@ function initMarquee() {
             const lead = document.createElement('span');
             lead.innerHTML = '<strong>Emerging Technologies:</strong> |···';
             frag.appendChild(lead);
-            
+
             result.forEach(row => {
                 const span = document.createElement('span');
                 const link = document.createElement('a');
@@ -41,7 +41,7 @@ function initMarquee() {
             });
 
             const pacman = document.createElement('span');
-            pacman.className="pacman";
+            pacman.className = "pacman";
 
             const pacmanimg = document.createElement('img');
             pacman.appendChild(pacmanimg);
@@ -51,12 +51,12 @@ function initMarquee() {
 
             marqueeContent.append(frag);
         });
-}
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
-    return array;
 }
