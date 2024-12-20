@@ -30,7 +30,7 @@ header {
     line-height: 2em;
     padding: 1em 0;
     text-align: center;
-    animation: glitch 8s linear 2s infinite alternate;
+    animation: glitch 8s linear 20s infinite alternate;
 }
 
 .nav-container {
@@ -129,7 +129,7 @@ footer {
     bottom: 0;
     width: 100%;
     border-top: 3px solid #00f7ff;
-    animation: glitch 8s linear 2s infinite alternate;
+    animation: glitch 8s linear 20s infinite alternate;
 }
 
 ul {
@@ -193,7 +193,7 @@ img.logo {
     height: 1em;
     margin: 0 .5em;
     margin-bottom: -0.2em;
-    animation: rumble 8s linear 2s infinite alternate;
+    animation: rumble 8s linear 20s infinite alternate;
 }
 
 /*** Animations ***/
