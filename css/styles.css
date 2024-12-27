@@ -26,7 +26,7 @@ body {
 
 header {
     background-color: rgb(5, 31, 0);
-    color: #39ff14;
+    /* color: #39ff14; */
     line-height: 2em;
     padding: 1em 0;
     text-align: center;
@@ -122,7 +122,7 @@ section ul {
 }
 
 footer {
-    color: #39ff14;
+    /* color: #39ff14; */
     text-align: center;
     padding: 1em 0;
     position: relative;
@@ -200,23 +200,23 @@ img.logo {
 
 @keyframes glitch {
     0% {
-        text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+        text-shadow: 1px 1px 0 #00ff00, -2px -2px 0 #ff0000;
     }
 
     5% {
-        text-shadow: -2px -2px 0 #00ff00, 2px 2px 0 #0000ff;
+        text-shadow: -1px -1px 0 #00ff00, 2px 2px 0 #0000ff;
     }
 
     10% {
-        text-shadow: 4px 4px 0 #ff0000, -4px -4px 0 #00ff00;
+        text-shadow: 2px 2px 0 #ff0000, -4px -4px 0 #00ff00;
     }
 
     15% {
-        text-shadow: -4px -4px 0 #0000ff, 4px 4px 0 #ff0000;
+        text-shadow: -2px -2px 0 #0000ff, 4px 4px 0 #ff0000;
     }
 
     20% {
-        text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff0000;
+        text-shadow: 1px 1px 0 #00ff00, -2px -2px 0 #ff0000;
     }
 
     25% {
