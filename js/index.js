@@ -13,7 +13,7 @@ function initMarquee() {
     const marqueeContent = marquee.querySelector('.marquee-content');
 
     // load marquee data
-    fetch('data/tech_list.csv')
+    fetch('data/tech_list.txt')
         .then(response => response.text())
         .then(data => {
             const frag = document.createDocumentFragment();
