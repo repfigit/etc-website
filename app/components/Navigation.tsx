@@ -16,7 +16,7 @@ export default function Navigation() {
           onMouseEnter={() => setShowEventsMenu(true)}
           onMouseLeave={() => setShowEventsMenu(false)}
         >
-          <a href="#events" style={{ cursor: 'pointer' }}>
+          <a href="/#events" style={{ cursor: 'pointer' }}>
             Events ▼
           </a>
           {showEventsMenu && (
@@ -31,7 +31,7 @@ export default function Navigation() {
               boxShadow: '0 4px 8px rgba(0, 247, 255, 0.3)'
             }}>
               <a 
-                href="#events" 
+                href="/#events" 
                 style={{ 
                   display: 'block',
                   padding: '0.5em 1em',
