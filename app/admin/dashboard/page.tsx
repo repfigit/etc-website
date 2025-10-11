@@ -70,6 +70,21 @@ export default function AdminDashboard() {
             <h2 style={{ marginTop: 0 }}>🔬 Manage Tech List</h2>
             <p>Add, edit, or delete technology items</p>
           </Link>
+
+          <Link
+            href="/admin/resources"
+            style={{
+              display: 'block',
+              padding: '2em',
+              border: '2px solid #00ffcc',
+              background: '#121212',
+              textDecoration: 'none',
+              transition: 'all 0.3s'
+            }}
+          >
+            <h2 style={{ marginTop: 0 }}>📚 Manage Resources</h2>
+            <p>Add, edit, or delete resource links</p>
+          </Link>
         </div>
 
         <p style={{ marginTop: '2em', textAlign: 'center' }}>

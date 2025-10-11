@@ -1,0 +1,312 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+interface Resource {
+  _id: string;
+  title: string;
+  url: string;
+  description?: string;
+  order: number;
+  isVisible: boolean;
+}
+
+export default function AdminResources() {
+  const router = useRouter();
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    url: '',
+    description: '',
+    order: 0,
+    isVisible: true
+  });
+
+  useEffect(() => {
+    const isAuth = sessionStorage.getItem('adminAuth');
+    if (!isAuth) {
+      router.push('/admin');
+      return;
+    }
+    fetchResources();
+  }, [router]);
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch('/api/resources');
+      const data = await response.json();
+      if (data.success) {
+        setResources(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const url = editingId ? `/api/resources/${editingId}` : '/api/resources';
+      const method = editingId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        await fetchResources();
+        resetForm();
+      } else {
+        alert('Failed to save resource');
+      }
+    } catch (error) {
+      console.error('Error saving resource:', error);
+      alert('Error saving resource');
+    }
+  };
+
+  const handleEdit = (resource: Resource) => {
+    setFormData({
+      title: resource.title,
+      url: resource.url,
+      description: resource.description || '',
+      order: resource.order,
+      isVisible: resource.isVisible
+    });
+    setEditingId(resource._id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this resource?')) return;
+    
+    try {
+      const response = await fetch(`/api/resources/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        await fetchResources();
+      } else {
+        alert('Failed to delete resource');
+      }
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      alert('Error deleting resource');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      url: '',
+      description: '',
+      order: 0,
+      isVisible: true
+    });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  if (loading) return <div className="container">Loading...</div>;
+
+  return (
+    <div className="container" style={{ paddingTop: '2em', paddingBottom: '2em' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+          <h1>Manage Resources</h1>
+          <Link href="/admin/dashboard">← Back to Dashboard</Link>
+        </div>
+
+        <button
+          onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
+          style={{
+            padding: '0.75em 1.5em',
+            marginBottom: '2em',
+            background: '#00ffcc',
+            color: '#000',
+            border: '2px solid #00f7ff',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontFamily: 'inherit'
+          }}
+        >
+          {showForm ? 'Cancel' : '+ Add New Resource'}
+        </button>
+
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ marginBottom: '3em', padding: '2em', border: '2px solid #00ffcc', background: '#121212' }}>
+            <h2>{editingId ? 'Edit Resource' : 'New Resource'}</h2>
+            
+            <div style={{ marginBottom: '1em' }}>
+              <label style={{ display: 'block', marginBottom: '0.5em' }}>Title *</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.5em',
+                  background: '#000',
+                  color: '#00ffcc',
+                  border: '2px solid #00ffcc',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1em' }}>
+              <label style={{ display: 'block', marginBottom: '0.5em' }}>URL *</label>
+              <input
+                type="url"
+                value={formData.url}
+                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.5em',
+                  background: '#000',
+                  color: '#00ffcc',
+                  border: '2px solid #00ffcc',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1em' }}>
+              <label style={{ display: 'block', marginBottom: '0.5em' }}>Description (optional)</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+                style={{
+                  width: '100%',
+                  padding: '0.5em',
+                  background: '#000',
+                  color: '#00ffcc',
+                  border: '2px solid #00ffcc',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '2em', alignItems: 'center' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5em' }}>Order</label>
+                <input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+                  style={{
+                    width: '100px',
+                    padding: '0.5em',
+                    background: '#000',
+                    color: '#00ffcc',
+                    border: '2px solid #00ffcc',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.isVisible}
+                    onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                    style={{ marginRight: '0.5em' }}
+                  />
+                  Visible
+                </label>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                marginTop: '1.5em',
+                padding: '0.75em 2em',
+                background: '#00ffcc',
+                color: '#000',
+                border: '2px solid #00f7ff',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontFamily: 'inherit'
+              }}
+            >
+              {editingId ? 'Update Resource' : 'Create Resource'}
+            </button>
+          </form>
+        )}
+
+        <h2>All Resources ({resources.length})</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1em' }}>
+          {resources.map((resource) => (
+            <div
+              key={resource._id}
+              style={{
+                padding: '1em',
+                border: '2px solid #00ffcc',
+                background: resource.isVisible ? '#121212' : '#333',
+                opacity: resource.isVisible ? 1 : 0.6
+              }}
+            >
+              <div>
+                <strong style={{ fontSize: '1.1em' }}>{resource.title}</strong>
+                {resource.description && (
+                  <div style={{ fontSize: '0.9em', marginTop: '0.5em', color: '#d4d8d5' }}>
+                    {resource.description}
+                  </div>
+                )}
+                <div style={{ fontSize: '0.9em', marginTop: '0.5em', wordBreak: 'break-all' }}>
+                  <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a>
+                </div>
+                {!resource.isVisible && <div style={{ color: '#ff6700', marginTop: '0.5em' }}>⚠️ Hidden</div>}
+              </div>
+              <div style={{ display: 'flex', gap: '0.5em', marginTop: '1em' }}>
+                <button
+                  onClick={() => handleEdit(resource)}
+                  style={{
+                    flex: 1,
+                    padding: '0.5em',
+                    background: '#ffff00',
+                    color: '#000',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(resource._id)}
+                  style={{
+                    flex: 1,
+                    padding: '0.5em',
+                    background: '#ff0000',
+                    color: '#fff',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+

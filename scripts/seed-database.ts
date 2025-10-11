@@ -26,8 +26,17 @@ const TechItemSchema = new mongoose.Schema({
   isVisible: { type: Boolean, default: true },
 }, { timestamps: true });
 
+const ResourceSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  url: { type: String, required: true },
+  description: String,
+  order: { type: Number, default: 0 },
+  isVisible: { type: Boolean, default: true },
+}, { timestamps: true });
+
 const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
 const TechItem = mongoose.models.TechItem || mongoose.model('TechItem', TechItemSchema);
+const Resource = mongoose.models.Resource || mongoose.model('Resource', ResourceSchema);
 
 async function seedDatabase() {
   const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/etc_caucus';
@@ -39,6 +48,7 @@ async function seedDatabase() {
     // Clear existing data
     await Event.deleteMany({});
     await TechItem.deleteMany({});
+    await Resource.deleteMany({});
     console.log('Cleared existing data');
 
     // Seed Tech Items from tech_list.txt
@@ -149,6 +159,33 @@ async function seedDatabase() {
 
     await Event.insertMany(events);
     console.log(`Seeded ${events.length} events`);
+
+    // Seed Resources
+    const resources = [
+      {
+        title: 'Stanford Emerging Technology Review',
+        url: 'https://setr.stanford.edu/',
+        order: 1,
+      },
+      {
+        title: 'U.S. Department of Energy - New Horizons',
+        url: 'https://www.energy.gov/#:~:text=Exploring%20New%20Horizons',
+        order: 2,
+      },
+      {
+        title: 'White House Working Group Digital Assets Report',
+        url: 'https://www.whitehouse.gov/crypto/',
+        order: 3,
+      },
+      {
+        title: 'AI Ethics Guidelines',
+        url: 'https://oecd.ai/en/ai-principles/',
+        order: 4,
+      },
+    ];
+
+    await Resource.insertMany(resources);
+    console.log(`Seeded ${resources.length} resources`);
 
     console.log('Database seeding completed successfully!');
   } catch (error) {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 export default function Navigation() {
   const [showEventsMenu, setShowEventsMenu] = useState(false);
+  const [showResourcesMenu, setShowResourcesMenu] = useState(false);
 
   return (
     <div className="nav-container">
@@ -52,7 +53,47 @@ export default function Navigation() {
             </div>
           )}
         </div>
-        <a href="#resources">Resources</a>
+        <div 
+          style={{ position: 'relative', display: 'inline-block' }}
+          onMouseEnter={() => setShowResourcesMenu(true)}
+          onMouseLeave={() => setShowResourcesMenu(false)}
+        >
+          <a href="/#resources" style={{ cursor: 'pointer' }}>
+            Resources ▼
+          </a>
+          {showResourcesMenu && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              background: '#121212',
+              border: '2px solid #00f7ff',
+              minWidth: '200px',
+              zIndex: 1000,
+              boxShadow: '0 4px 8px rgba(0, 247, 255, 0.3)'
+            }}>
+              <a 
+                href="/#resources" 
+                style={{ 
+                  display: 'block',
+                  padding: '0.5em 1em',
+                  borderBottom: '1px solid #00ffcc'
+                }}
+              >
+                Featured Resources
+              </a>
+              <Link 
+                href="/resources"
+                style={{ 
+                  display: 'block',
+                  padding: '0.5em 1em'
+                }}
+              >
+                All Resources
+              </Link>
+            </div>
+          )}
+        </div>
         <a href="#contact">Contact</a>
       </nav>
     </div>
