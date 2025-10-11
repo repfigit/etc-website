@@ -30,6 +30,8 @@ const ResourceSchema = new mongoose.Schema({
   title: { type: String, required: true },
   url: { type: String, required: true },
   description: String,
+  thumbnail: String,
+  featured: { type: Boolean, default: false },
   order: { type: Number, default: 0 },
   isVisible: { type: Boolean, default: true },
 }, { timestamps: true });
