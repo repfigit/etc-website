@@ -303,7 +303,7 @@ export default function AdminResources() {
                   <div style={{ 
                     marginBottom: '0.75em', 
                     textAlign: 'center',
-                    background: '#051f00',
+                    background: '#0f5200',
                     padding: '0.5em',
                     border: '1px solid #00ffcc'
                   }}>
