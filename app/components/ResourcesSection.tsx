@@ -77,7 +77,13 @@ export default function ResourcesSection() {
                   }}
                 >
                   {resource.thumbnail && (
-                    <div style={{ marginBottom: '0.75em', textAlign: 'center' }}>
+                    <div style={{ 
+                      marginBottom: '0.75em', 
+                      textAlign: 'center',
+                      background: '#051f00',
+                      padding: '0.5em',
+                      border: '1px solid #00ffcc'
+                    }}>
                       <Image 
                         src={resource.thumbnail} 
                         alt={resource.title}
@@ -85,8 +91,7 @@ export default function ResourcesSection() {
                         height={150}
                         style={{ 
                           maxWidth: '100%', 
-                          height: 'auto',
-                          border: '1px solid #00ffcc'
+                          height: 'auto'
                         }}
                       />
                     </div>

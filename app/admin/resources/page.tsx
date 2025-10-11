@@ -300,15 +300,20 @@ export default function AdminResources() {
             >
               <div>
                 {resource.thumbnail && (
-                  <div style={{ marginBottom: '0.75em', textAlign: 'center' }}>
+                  <div style={{ 
+                    marginBottom: '0.75em', 
+                    textAlign: 'center',
+                    background: '#051f00',
+                    padding: '0.5em',
+                    border: '1px solid #00ffcc'
+                  }}>
                     <img 
                       src={resource.thumbnail} 
                       alt={resource.title}
                       style={{ 
                         maxWidth: '100%', 
                         height: 'auto',
-                        maxHeight: '100px',
-                        border: '1px solid #00ffcc'
+                        maxHeight: '100px'
                       }}
                     />
                   </div>
