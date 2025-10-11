@@ -13,21 +13,23 @@ npm install
 
 ### Step 2: Set Up MongoDB
 
-**Option A: Local MongoDB (Quick Start)**
-```bash
-# Install MongoDB from https://www.mongodb.com/try/download/community
-# Or use Docker:
-docker run -d -p 27017:27017 --name mongodb mongo:latest
-```
+**⚠️ IMPORTANT: Always use separate databases for development and production!**
 
-**Option B: MongoDB Atlas (Cloud, Free)**
+**Recommended: MongoDB Atlas (Cloud, Free)**
 1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 2. Create a free cluster
-3. Get your connection string
-4. Create a `.env.local` file with:
+3. **Create TWO databases:**
+   - `etc-website-dev` (for development)
+   - `etc-website` (for production)
+4. Create a `.env.local` file with your **development** database:
    ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/etc_caucus
+   # Development database
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/etc-website-dev?retryWrites=true&w=majority
+   ADMIN_PASSWORD=dev123
+   NODE_ENV=development
    ```
+
+📖 **For detailed setup instructions, see [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)**
 
 ### Step 3: Seed the Database
 ```bash
@@ -102,9 +104,16 @@ npm i -g vercel
 
 # Deploy
 vercel
-
-# Add your MONGODB_URI in Vercel dashboard
 ```
+
+**Then in Vercel Dashboard:**
+1. Add environment variables:
+   - `MONGODB_URI` → Your **production** database (e.g., `etc-website`)
+   - `ADMIN_PASSWORD` → Strong production password
+   - `NODE_ENV` → `production`
+2. ⚠️ Make sure it's different from your local dev database!
+
+📖 See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for complete deployment guide
 
 ### Deploy to Netlify, Railway, or DigitalOcean
 See detailed instructions in [README.md](./README.md)
@@ -130,8 +139,10 @@ your-project/
 ## 🆘 Troubleshooting
 
 ### "Cannot connect to MongoDB"
-- Check MongoDB is running: `mongosh` (local) or test Atlas connection
-- Verify `.env.local` has correct `MONGODB_URI`
+- Verify `.env.local` exists with correct `MONGODB_URI`
+- Check your IP is whitelisted in MongoDB Atlas (Network Access)
+- Test connection string in MongoDB Compass or mongosh
+- Make sure database name includes `-dev` suffix for development
 
 ### "Module not found"
 ```bash

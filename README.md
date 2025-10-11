@@ -25,20 +25,30 @@ A Next.js-based website for the New Hampshire Emerging Technologies Caucus with 
 
 2. **Set Up Environment Variables**
    
-   Create a `.env.local` file in the root directory:
+   Create a `.env.local` file in the root directory for **development**:
    ```bash
-   cp .env.local.example .env.local
+   cp .env.example .env.local
    ```
 
    Edit `.env.local` with your MongoDB connection string:
+   
+   **⚠️ IMPORTANT: Use a separate database for development!**
    ```
-   MONGODB_URI=mongodb://localhost:27017/etc_caucus
+   # Development database (notice the -dev suffix)
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/etc-website-dev?retryWrites=true&w=majority
+   ADMIN_PASSWORD=dev123
+   NODE_ENV=development
    ```
 
-   Or for MongoDB Atlas:
+   **For production**, set environment variables in your hosting provider (e.g., Vercel):
    ```
-   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/etc_caucus?retryWrites=true&w=majority
+   # Production database (different database name!)
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/etc-website?retryWrites=true&w=majority
+   ADMIN_PASSWORD=your-secure-production-password
+   NODE_ENV=production
    ```
+
+   📖 **See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed instructions on setting up separate dev/prod databases.**
 
 3. **Seed the Database**
    
@@ -159,14 +169,24 @@ etc-website/
 ### Vercel (Recommended)
 1. Push your code to GitHub
 2. Import the project in Vercel
-3. Add `MONGODB_URI` environment variable in Vercel settings
+3. Add environment variables in Vercel settings:
+   - `MONGODB_URI` (pointing to your **production** database, e.g., `etc-website`)
+   - `ADMIN_PASSWORD` (strong password for production)
+   - `NODE_ENV=production`
 4. Deploy!
+
+⚠️ **Important**: Make sure your production `MONGODB_URI` points to a different database than your local development environment!
 
 ### MongoDB Atlas Setup
 1. Create a free cluster at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 2. Whitelist your IP address (or 0.0.0.0/0 for development)
 3. Create a database user
-4. Get your connection string and add it to `.env.local`
+4. **Create TWO separate databases**: 
+   - `etc-website-dev` for development
+   - `etc-website` for production
+5. Get your connection string and add it to `.env.local` (for dev) or hosting provider (for prod)
+
+📖 **See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for complete setup instructions.**
 
 ## 🔧 Development Notes
 
