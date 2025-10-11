@@ -1,0 +1,261 @@
+/* unifontex-latin-400-normal */
+@font-face {
+    font-family: 'UnifontEX';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url(https://cdn.jsdelivr.net/fontsource/fonts/unifontex@latest/latin-400-normal.woff2) format('woff2'), url(https://cdn.jsdelivr.net/fontsource/fonts/unifontex@latest/latin-400-normal.woff) format('woff');
+}
+
+body {
+    font-family: UnifontEX, 'Courier New', Courier, monospace;
+    background-color: rgb(5, 31, 0);
+    color: #d4d8d5;
+    margin: 0;
+    padding: 0;
+    font-size: large;
+    line-height: 1.5em;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1em;
+}
+
+header {
+    background-color: rgb(5, 31, 0);
+    line-height: 2em;
+    padding: 1em 0;
+    text-align: center;
+    animation: glitch 8s linear 20s infinite alternate;
+}
+
+.nav-container {
+    border-top: 3px solid #ff6700;
+    border-bottom: 3px solid #ff6700;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #121212;
+    border-top: 3px solid #00f7ff;
+    border-bottom: 3px solid #00f7ff;
+}
+
+nav a {
+    color: #00ffcc;
+    text-decoration: none;
+    padding: 0.5em;
+    display: block;
+    font-weight: bold;
+    border: 2px solid transparent;
+}
+
+nav a:hover {
+    background-color: #ff6700;
+    color: black;
+    border: 2px solid #00f7ff;
+}
+
+section {
+    padding: 2em;
+    border-left: 5px solid #ffff00;
+    margin: .5em 0;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 767px) {
+    section {
+        padding: 1em 0.5em;
+    }
+}
+
+@media (min-width: 768px) {
+    section {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+section .image-container {
+    flex: 0 0 100%;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    section .image-container {
+        flex: 0 0 30%;
+        margin-right: 2em;
+        margin-bottom: 0;
+    }
+}
+
+section .image-container img {
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid #39ff14;
+    box-shadow: 0 0 10px #00f7ff;
+}
+
+section .content-container p {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    text-align: justify;
+}
+
+section .content-container h2 {
+    margin-top: 0;
+}
+
+section p,
+section ul {
+    flex: 1;
+}
+
+footer {
+    text-align: center;
+    padding: 1em 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    border-top: 3px solid #00f7ff;
+    animation: glitch 8s linear 20s infinite alternate;
+}
+
+ul {
+    list-style: "*";
+    font-size: 1.1em;
+    padding: 0;
+}
+
+ul li {
+    padding-left: 0.4em;
+    margin: 1em 1em;
+}
+
+a {
+    color: #00ffcc;
+}
+
+a:hover {
+    color: #ff00ff;
+}
+
+.flashing-cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 1em;
+    margin-bottom: -0.2em;
+    background-color: #d4d8d5;
+    animation: blink 1s steps(2, start) infinite;
+}
+
+.marquee {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.marquee-content {
+    animation: marquee 40s linear 2s infinite;
+    display: inline-block;
+}
+
+.marquee-content:hover {
+    animation-play-state: paused;
+}
+
+.marquee span a {
+    padding: 0 .5em;
+    text-decoration: none;
+}
+
+.marquee span a:hover {
+    animation: glitch 1s linear infinite;
+}
+
+.pacman img {
+    height: 1em;
+    margin-bottom: -0.2em;
+}
+
+img.logo {
+    height: 1em;
+    margin: 0 .5em;
+    margin-bottom: -0.2em;
+    animation: rumble 8s linear 20s infinite alternate;
+}
+
+/*** Animations ***/
+
+@keyframes glitch {
+    0% {
+        text-shadow: 1px 1px 0 #00ff00, -2px -2px 0 #ff0000;
+    }
+
+    5% {
+        text-shadow: -1px -1px 0 #00ff00, 2px 2px 0 #0000ff;
+    }
+
+    10% {
+        text-shadow: 2px 2px 0 #ff0000, -4px -4px 0 #00ff00;
+    }
+
+    15% {
+        text-shadow: -2px -2px 0 #0000ff, 4px 4px 0 #ff0000;
+    }
+
+    20% {
+        text-shadow: 1px 1px 0 #00ff00, -2px -2px 0 #ff0000;
+    }
+
+    25% {
+        text-shadow: 0 0 0 transparent;
+    }
+}
+
+@keyframes rumble {
+    0% {
+        transform: scale(1);
+    }
+
+    10% {
+        transform: scale(1.1);
+    }
+
+    15% {
+        transform: scale(1);
+    }
+
+    20% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
