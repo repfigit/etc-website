@@ -8,11 +8,18 @@ export async function GET(request: Request) {
     
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit');
+    const featured = searchParams.get('featured');
     
-    let query = Resource.find({ isVisible: true }).sort({ order: 1 });
+    // Build query filters
+    const filters: any = { isVisible: true };
+    if (featured === 'true') {
+      filters.featured = true;
+    }
     
-    // Get total count
-    const total = await Resource.countDocuments({ isVisible: true });
+    let query = Resource.find(filters).sort({ order: 1 });
+    
+    // Get total count with same filters
+    const total = await Resource.countDocuments(filters);
     
     // Apply limit if specified
     if (limit) {

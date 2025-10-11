@@ -11,6 +11,8 @@ interface Resource {
   title: string;
   url: string;
   description?: string;
+  thumbnail?: string;
+  featured: boolean;
 }
 
 export default function ResourcesPage() {
@@ -49,18 +51,75 @@ export default function ResourcesPage() {
         {loading ? (
           <p>Loading resources...</p>
         ) : resources.length > 0 ? (
-          <ul>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+            gap: '1.5em',
+            margin: '1.5em 0'
+          }}>
             {resources.map((resource) => (
-              <li key={resource._id}>
-                <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                  {resource.title}
-                </a>
-                {resource.description && (
-                  <> - {resource.description}</>
+              <a 
+                key={resource._id}
+                href={resource.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  border: '2px solid #00ffcc',
+                  padding: '1em',
+                  textDecoration: 'none',
+                  background: '#121212',
+                  transition: 'all 0.3s',
+                  position: 'relative'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.borderColor = '#ff6700';
+                  e.currentTarget.style.boxShadow = '0 0 10px #00f7ff';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.borderColor = '#00ffcc';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {resource.featured && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '0.5em',
+                    right: '0.5em',
+                    background: '#ffff00',
+                    color: '#000',
+                    padding: '0.25em 0.5em',
+                    fontSize: '0.75em',
+                    fontWeight: 'bold'
+                  }}>
+                    FEATURED
+                  </div>
                 )}
-              </li>
+                {resource.thumbnail && (
+                  <div style={{ marginBottom: '0.75em', textAlign: 'center' }}>
+                    <img 
+                      src={resource.thumbnail} 
+                      alt={resource.title}
+                      style={{ 
+                        maxWidth: '100%', 
+                        height: 'auto',
+                        maxHeight: '150px',
+                        border: '1px solid #00ffcc'
+                      }}
+                    />
+                  </div>
+                )}
+                <strong style={{ display: 'block', marginBottom: '0.5em' }}>
+                  {resource.title}
+                </strong>
+                {resource.description && (
+                  <p style={{ fontSize: '0.9em', margin: 0 }}>
+                    {resource.description}
+                  </p>
+                )}
+              </a>
             ))}
-          </ul>
+          </div>
         ) : (
           <p>No resources found.</p>
         )}

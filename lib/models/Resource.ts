@@ -4,6 +4,8 @@ export interface IResource extends Document {
   title: string;
   url: string;
   description?: string;
+  thumbnail?: string;
+  featured: boolean;
   order: number;
   isVisible: boolean;
   createdAt: Date;
@@ -22,6 +24,13 @@ const ResourceSchema = new Schema<IResource>(
     },
     description: {
       type: String,
+    },
+    thumbnail: {
+      type: String,
+    },
+    featured: {
+      type: Boolean,
+      default: false,
     },
     order: {
       type: Number,

@@ -165,22 +165,40 @@ async function seedDatabase() {
       {
         title: 'Stanford Emerging Technology Review',
         url: 'https://setr.stanford.edu/',
+        description: 'Comprehensive review of emerging technologies and their societal impact',
+        thumbnail: 'https://placehold.co/400x300/051f00/00ffcc?text=Stanford+Tech+Review',
+        featured: true,
         order: 1,
       },
       {
         title: 'U.S. Department of Energy - New Horizons',
         url: 'https://www.energy.gov/#:~:text=Exploring%20New%20Horizons',
+        description: 'Exploring new frontiers in energy technology and innovation',
+        thumbnail: 'https://placehold.co/400x300/051f00/00ffcc?text=DOE+New+Horizons',
+        featured: true,
         order: 2,
       },
       {
         title: 'White House Working Group Digital Assets Report',
         url: 'https://www.whitehouse.gov/crypto/',
+        description: 'Policy framework for digital assets and blockchain technology',
+        thumbnail: 'https://placehold.co/400x300/051f00/00ffcc?text=Digital+Assets',
+        featured: true,
         order: 3,
       },
       {
         title: 'AI Ethics Guidelines',
         url: 'https://oecd.ai/en/ai-principles/',
+        description: 'OECD principles for responsible AI development and deployment',
+        featured: false,
         order: 4,
+      },
+      {
+        title: 'MIT Technology Review',
+        url: 'https://www.technologyreview.com/',
+        description: 'Latest news and analysis on emerging technologies',
+        featured: false,
+        order: 5,
       },
     ];
 

@@ -9,6 +9,8 @@ interface Resource {
   title: string;
   url: string;
   description?: string;
+  thumbnail?: string;
+  featured: boolean;
   order: number;
   isVisible: boolean;
 }
@@ -23,6 +25,8 @@ export default function AdminResources() {
     title: '',
     url: '',
     description: '',
+    thumbnail: '',
+    featured: false,
     order: 0,
     isVisible: true
   });
@@ -80,6 +84,8 @@ export default function AdminResources() {
       title: resource.title,
       url: resource.url,
       description: resource.description || '',
+      thumbnail: resource.thumbnail || '',
+      featured: resource.featured,
       order: resource.order,
       isVisible: resource.isVisible
     });
@@ -108,6 +114,8 @@ export default function AdminResources() {
       title: '',
       url: '',
       description: '',
+      thumbnail: '',
+      featured: false,
       order: 0,
       isVisible: true
     });
@@ -199,6 +207,27 @@ export default function AdminResources() {
               />
             </div>
 
+            <div style={{ marginBottom: '1em' }}>
+              <label style={{ display: 'block', marginBottom: '0.5em' }}>Thumbnail URL (optional)</label>
+              <input
+                type="url"
+                value={formData.thumbnail}
+                onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                placeholder="https://example.com/image.jpg or /img/resource-thumb.jpg"
+                style={{
+                  width: '100%',
+                  padding: '0.5em',
+                  background: '#000',
+                  color: '#00ffcc',
+                  border: '2px solid #00ffcc',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <small style={{ fontSize: '0.85em', color: '#d4d8d5', display: 'block', marginTop: '0.25em' }}>
+                Enter a URL to an image (external or /img/filename.jpg for images in public folder)
+              </small>
+            </div>
+
             <div style={{ display: 'flex', gap: '2em', alignItems: 'center' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5em' }}>Order</label>
@@ -218,6 +247,15 @@ export default function AdminResources() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: '1em' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.featured}
+                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                    style={{ marginRight: '0.5em' }}
+                  />
+                  Featured
+                </label>
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -261,7 +299,26 @@ export default function AdminResources() {
               }}
             >
               <div>
+                {resource.thumbnail && (
+                  <div style={{ marginBottom: '0.75em', textAlign: 'center' }}>
+                    <img 
+                      src={resource.thumbnail} 
+                      alt={resource.title}
+                      style={{ 
+                        maxWidth: '100%', 
+                        height: 'auto',
+                        maxHeight: '100px',
+                        border: '1px solid #00ffcc'
+                      }}
+                    />
+                  </div>
+                )}
                 <strong style={{ fontSize: '1.1em' }}>{resource.title}</strong>
+                {resource.featured && (
+                  <div style={{ display: 'inline-block', marginLeft: '0.5em', background: '#ffff00', color: '#000', padding: '0.1em 0.4em', fontSize: '0.7em', fontWeight: 'bold' }}>
+                    FEATURED
+                  </div>
+                )}
                 {resource.description && (
                   <div style={{ fontSize: '0.9em', marginTop: '0.5em', color: '#d4d8d5' }}>
                     {resource.description}
