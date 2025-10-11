@@ -38,7 +38,7 @@ export default function Navigation() {
                   borderBottom: '1px solid #00ffcc'
                 }}
               >
-                Upcoming Events
+                Upcoming & Recent Events
               </a>
               <Link 
                 href="/events"
