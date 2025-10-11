@@ -62,7 +62,9 @@ export default function EventsSection() {
             <ul>
               {events.map((event) => (
                 <li key={event._id}>
-                  <strong>{formatDate(event.date)} at {event.time}</strong>
+                  <strong>{event.topic}</strong>
+                  <br />
+                  {formatDate(event.date)} at {event.time}
                   {event.presenter && (
                     <>
                       <br />
@@ -73,8 +75,6 @@ export default function EventsSection() {
                       )}
                     </>
                   )}
-                  <br />
-                  Topic: {event.topic}
                   <br />
                   Location: {event.locationUrl ? (
                     <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
