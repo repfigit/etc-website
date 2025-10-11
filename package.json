@@ -10,20 +10,20 @@
     "seed": "tsx scripts/seed-database.ts"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.7.0",
     "next": "^15.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "mongodb": "^6.9.0",
-    "mongoose": "^8.7.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5",
     "eslint": "^8",
     "eslint-config-next": "^15.0.0",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "typescript": "^5"
   }
 }
-
