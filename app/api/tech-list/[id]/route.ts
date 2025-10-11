@@ -4,13 +4,14 @@ import TechItem from '@/lib/models/TechItem';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     const techItem = await TechItem.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true, runValidators: true }
     );
@@ -34,11 +35,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const techItem = await TechItem.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const techItem = await TechItem.findByIdAndDelete(id);
     
     if (!techItem) {
       return NextResponse.json(

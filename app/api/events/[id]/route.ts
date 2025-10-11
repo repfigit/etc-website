@@ -4,13 +4,14 @@ import Event from '@/lib/models/Event';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     const event = await Event.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true, runValidators: true }
     );
@@ -34,11 +35,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const event = await Event.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const event = await Event.findByIdAndDelete(id);
     
     if (!event) {
       return NextResponse.json(
