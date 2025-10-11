@@ -2,14 +2,26 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectDB();
-    const events = await Event.find({ isVisible: true })
-      .sort({ date: -1, order: 1 })
-      .lean();
     
-    return NextResponse.json({ success: true, data: events });
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get('limit');
+    
+    let query = Event.find({ isVisible: true }).sort({ date: -1, order: 1 });
+    
+    // Get total count
+    const total = await Event.countDocuments({ isVisible: true });
+    
+    // Apply limit if specified
+    if (limit) {
+      query = query.limit(parseInt(limit));
+    }
+    
+    const events = await query.lean();
+    
+    return NextResponse.json({ success: true, data: events, total });
   } catch (error) {
     console.error('Error fetching events:', error);
     return NextResponse.json(

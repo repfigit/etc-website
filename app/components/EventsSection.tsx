@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Event {
   _id: string;
@@ -16,14 +17,16 @@ interface Event {
 
 export default function EventsSection() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const response = await fetch('/api/events');
+        const response = await fetch('/api/events?limit=5');
         const data = await response.json();
         if (data.success) {
           setEvents(data.data);
+          setTotalCount(data.total || data.data.length);
         }
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -55,31 +58,40 @@ export default function EventsSection() {
           discuss the future of technology.
         </p>
         {events.length > 0 ? (
-          <ul>
-            {events.map((event) => (
-              <li key={event._id}>
-                <strong>{formatDate(event.date)} at {event.time}</strong>
-                {event.presenter && (
-                  <>
-                    <br />
-                    Presenter: {event.presenterUrl ? (
-                      <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
-                    ) : (
-                      event.presenter
-                    )}
-                  </>
-                )}
-                <br />
-                Topic: {event.topic}
-                <br />
-                Location: {event.locationUrl ? (
-                  <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
-                ) : (
-                  event.location
-                )}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul>
+              {events.map((event) => (
+                <li key={event._id}>
+                  <strong>{formatDate(event.date)} at {event.time}</strong>
+                  {event.presenter && (
+                    <>
+                      <br />
+                      Presenter: {event.presenterUrl ? (
+                        <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
+                      ) : (
+                        event.presenter
+                      )}
+                    </>
+                  )}
+                  <br />
+                  Topic: {event.topic}
+                  <br />
+                  Location: {event.locationUrl ? (
+                    <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
+                  ) : (
+                    event.location
+                  )}
+                </li>
+              ))}
+            </ul>
+            {totalCount > 5 && (
+              <p style={{ marginTop: '1em', fontSize: '1.1em' }}>
+                <Link href="/events" style={{ fontWeight: 'bold' }}>
+                  → View all {totalCount} events
+                </Link>
+              </p>
+            )}
+          </>
         ) : (
           <p>No upcoming events at this time. Check back soon!</p>
         )}
