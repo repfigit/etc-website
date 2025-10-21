@@ -9,9 +9,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit');
     const featured = searchParams.get('featured');
+    const admin = searchParams.get('admin');
     
     // Build query filters
-    const filters: any = { isVisible: true };
+    const filters: any = admin === 'true' ? {} : { isVisible: true };
     if (featured === 'true') {
       filters.featured = true;
     }
@@ -40,12 +41,22 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Verify authentication for admin operations
+    const { requireAuth } = await import('@/lib/auth');
+    await requireAuth(request as any);
+    
     await connectDB();
     const body = await request.json();
     const resource = await Resource.create(body);
     
     return NextResponse.json({ success: true, data: resource }, { status: 201 });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
     console.error('Error creating resource:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create resource' },

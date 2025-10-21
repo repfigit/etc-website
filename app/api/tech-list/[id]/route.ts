@@ -7,6 +7,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Verify authentication for admin operations
+    const { requireAuth } = await import('@/lib/auth');
+    await requireAuth(request as any);
+    
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -25,6 +29,12 @@ export async function PUT(
     
     return NextResponse.json({ success: true, data: techItem });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
     console.error('Error updating tech item:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update tech item' },
@@ -38,6 +48,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Verify authentication for admin operations
+    const { requireAuth } = await import('@/lib/auth');
+    await requireAuth(request as any);
+    
     await connectDB();
     const { id } = await params;
     const techItem = await TechItem.findByIdAndDelete(id);
@@ -51,6 +65,12 @@ export async function DELETE(
     
     return NextResponse.json({ success: true, data: techItem });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
     console.error('Error deleting tech item:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete tech item' },

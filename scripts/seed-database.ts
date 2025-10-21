@@ -15,14 +15,13 @@ const EventSchema = new mongoose.Schema({
   topic: { type: String, required: true },
   location: { type: String, required: true },
   locationUrl: String,
-  order: { type: Number, default: 0 },
   isVisible: { type: Boolean, default: true },
+  content: String, // Markdown content for detailed notes
 }, { timestamps: true });
 
 const TechItemSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   url: { type: String, required: true },
-  order: { type: Number, default: 0 },
   isVisible: { type: Boolean, default: true },
 }, { timestamps: true });
 
@@ -59,9 +58,9 @@ async function seedDatabase() {
     const techItems = techListContent
       .split('\n')
       .filter(line => line.trim())
-      .map((line, index) => {
+      .map((line) => {
         const [name, url] = line.split('|').map(s => s.trim());
-        return { name, url, order: index };
+        return { name, url };
       });
 
     await TechItem.insertMany(techItems);
@@ -76,7 +75,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.epibone.com/',
         topic: 'Generation of human bone and cartilage tissue for transplantation using advanced tissue engineering.',
         location: 'Online/Teams',
-        order: 1,
       },
       {
         date: new Date('2025-06-20'),
@@ -85,7 +83,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.tecogen.com/',
         topic: 'Efficient electricity and hot water from natural gas.',
         location: '76 Treble Cove Road, Building 1, North Billerica, MA 01862',
-        order: 2,
       },
       {
         date: new Date('2025-05-02'),
@@ -94,7 +91,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.linkedin.com/in/se-riveon/',
         topic: 'Smart grid technology and how it facilitates clean energy',
         location: 'Online/Teams',
-        order: 3,
       },
       {
         date: new Date('2025-04-18'),
@@ -103,7 +99,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.linkedin.com/in/jondipietro/',
         topic: 'Practical AI for legislators',
         location: 'Online/Teams',
-        order: 4,
       },
       {
         date: new Date('2025-04-04'),
@@ -112,7 +107,6 @@ async function seedDatabase() {
         presenterUrl: 'https://armiusa.org/',
         topic: 'Advanced tissue manufacturing and the future of biotechnology',
         location: '340 Commercial Street, Manchester, NH 03101',
-        order: 5,
       },
       {
         date: new Date('2025-03-21'),
@@ -121,7 +115,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.linkedin.com/in/marcusnichol/',
         topic: 'Nuclear Energy Institute - Presentation on the state of advanced nuclear technology',
         location: 'Online/Teams',
-        order: 6,
       },
       {
         date: new Date('2025-03-07'),
@@ -129,7 +122,6 @@ async function seedDatabase() {
         topic: "Eversource's Energy Park - energy grid management and the increasing role of AI",
         location: '780 N. Commercial Street in Manchester, NH',
         locationUrl: 'https://www.google.com/maps/uv?pb=!1s0x89e24f3048483f15%3A0x7b2a50387b74c02b',
-        order: 7,
       },
       {
         date: new Date('2025-02-21'),
@@ -138,7 +130,6 @@ async function seedDatabase() {
         presenterUrl: 'https://x.com/InnovateCharlie',
         topic: 'Blockchain technology from a non-technical perspective',
         location: 'Online/Teams',
-        order: 8,
       },
       {
         date: new Date('2025-02-07'),
@@ -147,7 +138,6 @@ async function seedDatabase() {
         presenterUrl: 'https://www.linkedin.com/in/jonathan-crane-73466b92/',
         topic: 'AI data centers and their energy requirements.',
         location: 'Online/Teams',
-        order: 9,
       },
       {
         date: new Date('2025-01-24'),
@@ -155,7 +145,6 @@ async function seedDatabase() {
         topic: 'Organizational Meeting',
         location: 'McAuliffe-Shephard Discovery Center, 2 Institute Drive, Concord, NH 03301',
         locationUrl: 'https://www.starhop.com/',
-        order: 10,
       },
     ];
 
@@ -186,21 +175,18 @@ async function seedDatabase() {
         description: 'Policy framework for digital assets and blockchain technology',
         thumbnail: 'https://placehold.co/400x300/051f00/00ffcc?text=Digital+Assets',
         featured: true,
-        order: 3,
       },
       {
         title: 'AI Ethics Guidelines',
         url: 'https://oecd.ai/en/ai-principles/',
         description: 'OECD principles for responsible AI development and deployment',
         featured: false,
-        order: 4,
       },
       {
         title: 'MIT Technology Review',
         url: 'https://www.technologyreview.com/',
         description: 'Latest news and analysis on emerging technologies',
         featured: false,
-        order: 5,
       },
     ];
 

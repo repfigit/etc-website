@@ -15,6 +15,7 @@ interface Event {
   topic: string;
   location: string;
   locationUrl?: string;
+  content?: string;
 }
 
 export default function EventsPage() {
@@ -65,8 +66,10 @@ export default function EventsPage() {
         ) : events.length > 0 ? (
           <ul>
             {events.map((event) => (
-              <li key={event._id}>
-                <strong>{event.topic}</strong>
+              <li key={event._id} style={{ marginBottom: '1.5em', padding: '1em', border: '1px solid #333', background: '#1a1a1a' }}>
+                <Link href={`/events/${event._id}`} style={{ color: '#00ffcc', textDecoration: 'none' }}>
+                  <strong style={{ textDecoration: 'underline', fontSize: '1.2em' }}>{event.topic}</strong>
+                </Link>
                 <br />
                 {formatDate(event.date)} at {event.time}
                 {event.presenter && (
@@ -84,6 +87,12 @@ export default function EventsPage() {
                   <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
                 ) : (
                   event.location
+                )}
+                {event.content && (
+                  <>
+                    <br />
+                    <span style={{ color: '#999', fontSize: '0.9em' }}>📝 Detailed information available</span>
+                  </>
                 )}
               </li>
             ))}

@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Modal from '../../components/Modal';
 
 interface TechItem {
   _id: string;
   name: string;
   url: string;
-  order: number;
   isVisible: boolean;
 }
 
@@ -16,27 +16,37 @@ export default function AdminTechList() {
   const router = useRouter();
   const [techItems, setTechItems] = useState<TechItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     url: '',
-    order: 0,
     isVisible: true
   });
 
   useEffect(() => {
-    const isAuth = sessionStorage.getItem('adminAuth');
-    if (!isAuth) {
-      router.push('/admin');
-      return;
-    }
-    fetchTechItems();
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/verify');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          router.push('/admin');
+          return;
+        }
+        fetchTechItems();
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/admin');
+      }
+    };
+    
+    checkAuth();
   }, [router]);
 
   const fetchTechItems = async () => {
     try {
-      const response = await fetch('/api/tech-list');
+      const response = await fetch('/api/tech-list?admin=true');
       const data = await response.json();
       if (data.success) {
         setTechItems(data.data);
@@ -77,11 +87,10 @@ export default function AdminTechList() {
     setFormData({
       name: item.name,
       url: item.url,
-      order: item.order,
       isVisible: item.isVisible
     });
     setEditingId(item._id);
-    setShowForm(true);
+    setShowModal(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -104,11 +113,10 @@ export default function AdminTechList() {
     setFormData({
       name: '',
       url: '',
-      order: 0,
       isVisible: true
     });
     setEditingId(null);
-    setShowForm(false);
+    setShowModal(false);
   };
 
   if (loading) return <div className="container">Loading...</div>;
@@ -122,7 +130,7 @@ export default function AdminTechList() {
         </div>
 
         <button
-          onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
+          onClick={() => setShowModal(true)}
           style={{
             padding: '0.75em 1.5em',
             marginBottom: '2em',
@@ -134,13 +142,16 @@ export default function AdminTechList() {
             fontFamily: 'inherit'
           }}
         >
-          {showForm ? 'Cancel' : '+ Add New Tech Item'}
+          + Add New Tech Item
         </button>
 
-        {showForm && (
-          <form onSubmit={handleSubmit} style={{ marginBottom: '3em', padding: '2em', border: '2px solid #00ffcc', background: '#121212' }}>
-            <h2>{editingId ? 'Edit Tech Item' : 'New Tech Item'}</h2>
-            
+        {/* Modal for Add/Edit Tech Item */}
+        <Modal
+          isOpen={showModal}
+          onClose={() => { resetForm(); setShowModal(false); }}
+          title={editingId ? 'Edit Tech Item' : 'New Tech Item'}
+        >
+          <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '1em' }}>
               <label style={{ display: 'block', marginBottom: '0.5em' }}>Name *</label>
               <input
@@ -177,54 +188,51 @@ export default function AdminTechList() {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '2em', alignItems: 'center' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5em' }}>Order</label>
+            <div style={{ marginTop: '1em', display: 'flex', alignItems: 'center' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                 <input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                  style={{
-                    width: '100px',
-                    padding: '0.5em',
-                    background: '#000',
-                    color: '#00ffcc',
-                    border: '2px solid #00ffcc',
-                    fontFamily: 'inherit'
-                  }}
+                  type="checkbox"
+                  checked={formData.isVisible}
+                  onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                  style={{ marginRight: '0.5em' }}
                 />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.isVisible}
-                    onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                    style={{ marginRight: '0.5em' }}
-                  />
-                  Visible
-                </label>
-              </div>
+                Visible
+              </label>
             </div>
 
-            <button
-              type="submit"
-              style={{
-                marginTop: '1.5em',
-                padding: '0.75em 2em',
-                background: '#00ffcc',
-                color: '#000',
-                border: '2px solid #00f7ff',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontFamily: 'inherit'
-              }}
-            >
-              {editingId ? 'Update Tech Item' : 'Create Tech Item'}
-            </button>
+            <div style={{ marginTop: '2em', display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => { resetForm(); setShowModal(false); }}
+                style={{
+                  padding: '0.75em 2em',
+                  background: '#666',
+                  color: '#fff',
+                  border: '2px solid #666',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontFamily: 'inherit'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={{
+                  padding: '0.75em 2em',
+                  background: '#00ffcc',
+                  color: '#000',
+                  border: '2px solid #00f7ff',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontFamily: 'inherit'
+                }}
+              >
+                {editingId ? 'Update Tech Item' : 'Create Tech Item'}
+              </button>
+            </div>
           </form>
-        )}
+        </Modal>
 
         <h2>All Tech Items ({techItems.length})</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1em' }}>

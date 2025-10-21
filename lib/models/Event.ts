@@ -8,8 +8,8 @@ export interface IEvent extends Document {
   topic: string;
   location: string;
   locationUrl?: string;
-  order: number;
   isVisible: boolean;
+  content?: string; // Markdown content for detailed notes
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,13 +41,12 @@ const EventSchema = new Schema<IEvent>(
     locationUrl: {
       type: String,
     },
-    order: {
-      type: Number,
-      default: 0,
-    },
     isVisible: {
       type: Boolean,
       default: true,
+    },
+    content: {
+      type: String,
     },
   },
   {
@@ -55,7 +54,7 @@ const EventSchema = new Schema<IEvent>(
   }
 );
 
-EventSchema.index({ date: -1, order: 1 });
+EventSchema.index({ date: -1 });
 
 export default mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema);
 

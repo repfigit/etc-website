@@ -8,14 +8,31 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const isAuth = sessionStorage.getItem('adminAuth');
-    if (!isAuth) {
-      router.push('/admin');
-    }
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/verify');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          router.push('/admin');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/admin');
+      }
+    };
+    
+    checkAuth();
   }, [router]);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('adminAuth');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/login', {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     router.push('/admin');
   };
 

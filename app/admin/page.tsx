@@ -9,17 +9,29 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
-    // Simple password check (you should use proper auth in production)
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
-    
-    if (password === adminPassword) {
-      sessionStorage.setItem('adminAuth', 'true');
-      router.push('/admin/dashboard');
-    } else {
-      setError('Invalid password');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        router.push('/admin/dashboard');
+      } else {
+        setError(data.error || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please try again.');
     }
   };
 

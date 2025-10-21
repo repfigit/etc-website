@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ITechItem extends Document {
   name: string;
   url: string;
-  order: number;
   isVisible: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -20,10 +19,6 @@ const TechItemSchema = new Schema<ITechItem>(
       type: String,
       required: true,
     },
-    order: {
-      type: Number,
-      default: 0,
-    },
     isVisible: {
       type: Boolean,
       default: true,
@@ -34,7 +29,7 @@ const TechItemSchema = new Schema<ITechItem>(
   }
 );
 
-TechItemSchema.index({ order: 1 });
+TechItemSchema.index({ name: 1 });
 
 export default mongoose.models.TechItem || mongoose.model<ITechItem>('TechItem', TechItemSchema);
 

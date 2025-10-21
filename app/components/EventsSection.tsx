@@ -62,7 +62,9 @@ export default function EventsSection() {
             <ul>
               {events.map((event) => (
                 <li key={event._id}>
-                  <strong>{event.topic}</strong>
+                  <Link href={`/events/${event._id}`} style={{ color: '#00ffcc', textDecoration: 'none' }}>
+                    <strong style={{ textDecoration: 'underline' }}>{event.topic}</strong>
+                  </Link>
                   <br />
                   {formatDate(event.date)} at {event.time}
                   {event.presenter && (
