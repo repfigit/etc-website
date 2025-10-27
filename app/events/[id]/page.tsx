@@ -20,6 +20,13 @@ interface Event {
   topic: string;
   location: string;
   locationUrl?: string;
+  presentations?: Array<{
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+    uploadedAt: Date;
+  }>;
   content?: string;
   isVisible: boolean;
 }
@@ -30,6 +37,8 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [selectedPresentation, setSelectedPresentation] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -55,6 +64,21 @@ export default function EventDetailPage() {
     }
   }, [params.id]);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showPdfModal) {
+        setShowPdfModal(false);
+        setSelectedPresentation(null);
+      }
+    };
+
+    if (showPdfModal) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [showPdfModal]);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -63,6 +87,14 @@ export default function EventDetailPage() {
       month: 'long', 
       day: 'numeric' 
     });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   if (loading) {
@@ -146,25 +178,99 @@ export default function EventDetailPage() {
                 <span>{event.location}</span>
               )}
             </div>
+            
+            {event.presentations && event.presentations.length > 0 && (
+              <div style={{ marginTop: '1em' }}>
+                <strong>Presentations ({event.presentations.length}):</strong>
+                <div style={{ marginTop: '0.5em' }}>
+                  {event.presentations.map((presentation, index) => (
+                    <div 
+                      key={index}
+                      style={{ 
+                        marginBottom: '0.5em',
+                        padding: '0.75em',
+                        background: '#001a1a',
+                        border: '1px solid #00ffcc',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                        <span style={{ color: '#ff4444', fontSize: '1.2em' }}>📄</span>
+                        <div>
+                          <div style={{ color: '#00ffcc', fontWeight: 'bold' }}>
+                            {presentation.filename}
+                          </div>
+                          <div style={{ color: '#888', fontSize: '0.8em' }}>
+                            {formatFileSize(presentation.size)}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5em' }}>
+                        <a 
+                          href={`/api/events/${event._id}/presentations/${index}?download=true`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ 
+                            color: '#00ffcc',
+                            textDecoration: 'underline',
+                            fontSize: '0.9em',
+                            padding: '0.25em 0.5em',
+                            border: '1px solid #00ffcc',
+                            borderRadius: '3px'
+                          }}
+                        >
+                          Download
+                        </a>
+                        <button
+                          onClick={() => {
+                            setSelectedPresentation(index.toString());
+                            setShowPdfModal(true);
+                          }}
+                          style={{
+                            background: '#00ffcc',
+                            color: '#000',
+                            border: '1px solid #00ffcc',
+                            padding: '0.25em 0.5em',
+                            cursor: 'pointer',
+                            fontFamily: 'inherit',
+                            fontWeight: 'bold',
+                            fontSize: '0.9em',
+                            borderRadius: '3px'
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </header>
 
           {event.content && (
             <div style={{ 
               marginTop: '2em',
               lineHeight: '1.6',
-              fontSize: '1.1em'
+              fontSize: '1.1em',
+              animation: 'none',
+              textShadow: 'none',
+              transform: 'none'
             }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
-                  h1: ({ children }) => <h1 style={{ color: '#00ffcc', marginTop: '2em', marginBottom: '1em' }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ color: '#00ffcc', marginTop: '1.5em', marginBottom: '0.8em' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ color: '#00ffcc', marginTop: '1.2em', marginBottom: '0.6em' }}>{children}</h3>,
-                  p: ({ children }) => <p style={{ marginBottom: '1em' }}>{children}</p>,
-                  ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em' }}>{children}</ul>,
-                  ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em' }}>{children}</ol>,
-                  li: ({ children }) => <li style={{ marginBottom: '0.5em' }}>{children}</li>,
+                  h1: ({ children }) => <h1 style={{ color: '#00ffcc', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ color: '#00ffcc', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: '#00ffcc', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
+                  p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
+                  ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
+                  ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
+                  li: ({ children }) => <li style={{ marginBottom: '0.5em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</li>,
                   code: ({ children, className }) => {
                     const isInline = !className;
                     return isInline ? (
@@ -198,7 +304,10 @@ export default function EventDetailPage() {
                       paddingLeft: '1em', 
                       marginLeft: '0',
                       marginBottom: '1em',
-                      fontStyle: 'italic'
+                      fontStyle: 'italic',
+                      animation: 'none',
+                      textShadow: 'none',
+                      transform: 'none'
                     }}>
                       {children}
                     </blockquote>
@@ -260,8 +369,113 @@ export default function EventDetailPage() {
               <p>No detailed information available for this event.</p>
             </div>
           )}
+
         </article>
       </section>
+
+      {/* PDF Modal */}
+      {showPdfModal && event.presentations && selectedPresentation !== null && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '2em'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowPdfModal(false);
+              setSelectedPresentation(null);
+            }
+          }}
+        >
+          <div style={{
+            backgroundColor: '#000',
+            border: '2px solid #00ffcc',
+            borderRadius: '8px',
+            width: '90%',
+            height: '90%',
+            maxWidth: '1200px',
+            maxHeight: '800px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              background: '#00ffcc',
+              color: '#000',
+              padding: '1em',
+              fontWeight: 'bold',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '2px solid #00ffcc'
+            }}>
+              <span style={{ fontSize: '1.1em' }}>
+                📄 {event.presentations[parseInt(selectedPresentation)].filename}
+              </span>
+              <div style={{ display: 'flex', gap: '0.5em' }}>
+                <a 
+                  href={`/api/events/${event._id}/presentations/${selectedPresentation}?download=true`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: '#000',
+                    textDecoration: 'underline',
+                    fontSize: '0.9em',
+                    padding: '0.25em 0.5em',
+                    border: '1px solid #000',
+                    borderRadius: '3px',
+                    background: '#fff'
+                  }}
+                >
+                  Download
+                </a>
+                <button
+                  onClick={() => {
+                    setShowPdfModal(false);
+                    setSelectedPresentation(null);
+                  }}
+                  style={{
+                    background: '#000',
+                    color: '#00ffcc',
+                    border: '2px solid #000',
+                    padding: '0.25em 0.5em',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9em',
+                    borderRadius: '3px'
+                  }}
+                >
+                  ✕ Close
+                </button>
+              </div>
+            </div>
+            
+            {/* PDF Viewer */}
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <iframe
+                src={`/api/events/${event._id}/presentations/${selectedPresentation}`}
+                width="100%"
+                height="100%"
+                style={{
+                  border: 'none',
+                  background: '#fff'
+                }}
+                title={`Presentation: ${event.presentations[parseInt(selectedPresentation)].filename}`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

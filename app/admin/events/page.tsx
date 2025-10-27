@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 
@@ -14,6 +15,12 @@ interface Event {
   topic: string;
   location: string;
   locationUrl?: string;
+  presentation?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
   isVisible: boolean;
   content?: string;
 }
@@ -21,12 +28,14 @@ interface Event {
 export default function AdminEvents() {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
+  // Force recompilation
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     date: '',
     time: '',
+    timezone: 'ET',
     presenter: '',
     presenterUrl: '',
     topic: '',
@@ -35,6 +44,14 @@ export default function AdminEvents() {
     isVisible: true,
     content: ''
   });
+  
+  const [presentations, setPresentations] = useState<Array<{
+    id: string;
+    file: File;
+    name: string;
+    size: number;
+    type: string;
+  }>>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -77,20 +94,69 @@ export default function AdminEvents() {
       const url = editingId ? `/api/events/${editingId}` : '/api/events';
       const method = editingId ? 'PUT' : 'POST';
       
+      // Combine time and timezone for the API
+      const submitData = {
+        ...formData,
+        time: `${formData.time} ${formData.timezone}`.trim()
+      };
+      
+      console.log('Form data before submission:', {
+        presentations: presentations.map(p => ({
+          name: p.name,
+          size: p.size,
+          type: p.type
+        }))
+      });
+      
+      // Remove timezone from the data sent to API
+      const { timezone, ...dataToSubmit } = submitData;
+      
+      // Always use FormData for editing events to handle presentations properly
+      const formDataToSend = new FormData();
+      
+      // Add all form fields
+      Object.entries(dataToSubmit).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formDataToSend.append(key, value.toString());
+        }
+      });
+      
+      // Add presentation files (only new files, not existing ones)
+      presentations.forEach(presentation => {
+        if (presentation.file) {
+          formDataToSend.append('presentations', presentation.file);
+        }
+      });
+      
+      // Add information about which presentations to keep (for editing)
+      if (editingId) {
+        const presentationsToKeep = presentations
+          .filter(p => p.file === null) // Only existing presentations (no file object)
+          .map(p => p.name);
+        
+        presentationsToKeep.forEach(filename => {
+          formDataToSend.append('keepPresentations', filename);
+        });
+      }
+      
+      console.log('Sending FormData with fields:', Array.from(formDataToSend.keys()));
+      console.log('Presentation files:', presentations.map(p => `${p.name} (${p.size} bytes)`));
       
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: formDataToSend
       });
-      
-      if (response.ok) {
-        await fetchEvents();
-        resetForm();
-      } else {
-        const errorData = await response.json();
-        alert('Failed to save event: ' + (errorData.error || 'Unknown error'));
-      }
+        
+        if (response.ok) {
+          await fetchEvents();
+          resetForm();
+        } else {
+          const errorText = await response.text();
+          console.error('Server error:', errorText);
+          console.error('Response status:', response.status);
+          console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+          alert('Failed to save event: ' + (errorText || 'Unknown error'));
+        }
     } catch (error) {
       console.error('Error saving event:', error);
       alert('Error saving event');
@@ -98,13 +164,87 @@ export default function AdminEvents() {
   };
 
   const handleEdit = (event: Event) => {
-    // Convert the date to local timezone for the form input
+    // Convert the stored date back to YYYY-MM-DD format for the form input
     const date = new Date(event.date);
-    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    
+    // Parse time and timezone from the stored time string
+    let timeValue = '';
+    let timezoneValue = 'ET';
+    
+    if (event.time) {
+      // Try to extract time in HH:MM format for HTML5 time input
+      const timeStr = event.time.trim();
+      
+      // Handle various time formats
+      if (timeStr.includes('AM') || timeStr.includes('PM')) {
+        // 12-hour format: "2:30 PM ET" or "2:30 PM"
+        const ampmMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)\s*(.*)$/i);
+        if (ampmMatch) {
+          let hours = parseInt(ampmMatch[1]);
+          const minutes = ampmMatch[2];
+          const ampm = ampmMatch[3].toUpperCase();
+          timezoneValue = ampmMatch[4].trim() || 'ET';
+          
+          // Convert to 24-hour format for HTML5 time input
+          if (ampm === 'PM' && hours !== 12) {
+            hours += 12;
+          } else if (ampm === 'AM' && hours === 12) {
+            hours = 0;
+          }
+          
+          timeValue = `${hours.toString().padStart(2, '0')}:${minutes}`;
+        } else {
+          // Fallback: try to extract just the time part
+          const simpleMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+          if (simpleMatch) {
+            let hours = parseInt(simpleMatch[1]);
+            const minutes = simpleMatch[2];
+            const ampm = simpleMatch[3].toUpperCase();
+            
+            if (ampm === 'PM' && hours !== 12) {
+              hours += 12;
+            } else if (ampm === 'AM' && hours === 12) {
+              hours = 0;
+            }
+            
+            timeValue = `${hours.toString().padStart(2, '0')}:${minutes}`;
+            timezoneValue = timeStr.replace(/^\d{1,2}:\d{2}\s*(AM|PM)\s*/i, '').trim() || 'ET';
+          }
+        }
+      } else {
+        // 24-hour format: "14:30 ET" or "14:30"
+        const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(.*)$/);
+        if (timeMatch) {
+          const hours = timeMatch[1].padStart(2, '0');
+          const minutes = timeMatch[2];
+          timeValue = `${hours}:${minutes}`;
+          timezoneValue = timeMatch[3].trim() || 'ET';
+        } else {
+          // Fallback: assume it's just time
+          timeValue = timeStr;
+        }
+      }
+    }
+    
+    console.log('Editing event:', {
+      id: event._id,
+      topic: event.topic,
+      presentations: event.presentations?.map(p => ({
+        filename: p.filename,
+        contentType: p.contentType,
+        size: p.size,
+        hasData: !!p.data
+      })) || []
+    });
     
     setFormData({
-      date: localDate.toISOString().split('T')[0],
-      time: event.time,
+      date: dateString,
+      time: timeValue,
+      timezone: timezoneValue,
       presenter: event.presenter || '',
       presenterUrl: event.presenterUrl || '',
       topic: event.topic,
@@ -113,6 +253,20 @@ export default function AdminEvents() {
       isVisible: event.isVisible,
       content: event.content || ''
     });
+    
+    // Load existing presentations for display
+    if (event.presentations && event.presentations.length > 0) {
+      const existingPresentations = event.presentations.map(p => ({
+        id: Math.random().toString(36).substr(2, 9), // Generate ID for display
+        file: null as any, // No file object for existing presentations
+        name: p.filename,
+        size: p.size,
+        type: p.contentType
+      }));
+      setPresentations(existingPresentations);
+    } else {
+      setPresentations([]);
+    }
     setEditingId(event._id);
     setShowModal(true);
   };
@@ -137,6 +291,7 @@ export default function AdminEvents() {
     setFormData({
       date: '',
       time: '',
+      timezone: 'ET',
       presenter: '',
       presenterUrl: '',
       topic: '',
@@ -145,6 +300,7 @@ export default function AdminEvents() {
       isVisible: true,
       content: ''
     });
+    setPresentations([]);
     setEditingId(null);
     setShowModal(false);
   };
@@ -189,7 +345,7 @@ export default function AdminEvents() {
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5em' }}>Date *</label>
+                <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Date *</label>
                 <input
                   type="date"
                   value={formData.date}
@@ -197,37 +353,64 @@ export default function AdminEvents() {
                   required
                   style={{
                     width: '100%',
-                    padding: '0.5em',
+                    padding: '0.75em',
                     background: '#000',
                     color: '#00ffcc',
                     border: '2px solid #00ffcc',
-                    fontFamily: 'inherit'
+                    borderRadius: '4px',
+                    fontFamily: 'inherit',
+                    fontSize: '1em',
+                    cursor: 'pointer'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5em' }}>Time *</label>
-                <input
-                  type="text"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  placeholder="10:00 AM ET"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.5em',
-                    background: '#000',
-                    color: '#00ffcc',
-                    border: '2px solid #00ffcc',
-                    fontFamily: 'inherit'
-                  }}
-                />
+                <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Time *</label>
+                <div style={{ display: 'flex', gap: '0.5em' }}>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    required
+                    style={{
+                      flex: '1',
+                      padding: '0.75em',
+                      background: '#000',
+                      color: '#00ffcc',
+                      border: '2px solid #00ffcc',
+                      borderRadius: '4px',
+                      fontFamily: 'inherit',
+                      fontSize: '1em',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="ET"
+                    value={formData.timezone || 'ET'}
+                    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                    style={{
+                      width: '60px',
+                      padding: '0.75em',
+                      background: '#000',
+                      color: '#00ffcc',
+                      border: '2px solid #00ffcc',
+                      borderRadius: '4px',
+                      fontFamily: 'inherit',
+                      fontSize: '1em',
+                      textAlign: 'center'
+                    }}
+                  />
+                </div>
+                <small style={{ color: '#888', fontSize: '0.8em', marginTop: '0.25em', display: 'block' }}>
+                  Use 24-hour format (e.g., 14:30)
+                </small>
               </div>
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Topic *</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Topic *</label>
               <input
                 type="text"
                 value={formData.topic}
@@ -235,51 +418,57 @@ export default function AdminEvents() {
                 required
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1em'
                 }}
               />
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Presenter</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Presenter</label>
               <input
                 type="text"
                 value={formData.presenter}
                 onChange={(e) => setFormData({ ...formData, presenter: e.target.value })}
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1em'
                 }}
               />
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Presenter URL</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Presenter URL</label>
               <input
                 type="url"
                 value={formData.presenterUrl}
                 onChange={(e) => setFormData({ ...formData, presenterUrl: e.target.value })}
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1em'
                 }}
               />
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Location *</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Location *</label>
               <input
                 type="text"
                 value={formData.location}
@@ -287,34 +476,38 @@ export default function AdminEvents() {
                 required
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1em'
                 }}
               />
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Location URL</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Location URL</label>
               <input
                 type="url"
                 value={formData.locationUrl}
                 onChange={(e) => setFormData({ ...formData, locationUrl: e.target.value })}
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1em'
                 }}
               />
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Detailed Notes (Markdown)</label>
+              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Detailed Notes (Markdown)</label>
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -322,11 +515,13 @@ export default function AdminEvents() {
                 rows={8}
                 style={{
                   width: '100%',
-                  padding: '0.5em',
+                  padding: '0.75em',
                   background: '#000',
                   color: '#00ffcc',
                   border: '2px solid #00ffcc',
+                  borderRadius: '4px',
                   fontFamily: 'inherit',
+                  fontSize: '1em',
                   resize: 'vertical'
                 }}
               />
@@ -346,6 +541,11 @@ export default function AdminEvents() {
                   Visible
                 </label>
             </div>
+
+            <PDFUploadSubform
+              presentations={presentations}
+              onPresentationsChange={setPresentations}
+            />
 
             <div style={{ marginTop: '2em', display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
               <button

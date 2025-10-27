@@ -34,7 +34,7 @@ export async function verifyAuth(request: NextRequest): Promise<AuthPayload | nu
       return null;
     }
     
-    return payload as AuthPayload;
+    return payload as unknown as AuthPayload;
     
   } catch (error) {
     console.error('Token verification error:', error);

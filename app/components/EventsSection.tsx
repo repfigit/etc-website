@@ -13,6 +13,12 @@ interface Event {
   topic: string;
   location: string;
   locationUrl?: string;
+  presentation?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
 }
 
 export default function EventsSection() {
@@ -82,6 +88,14 @@ export default function EventsSection() {
                     <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
                   ) : (
                     event.location
+                  )}
+                  {event.presentation && (
+                    <>
+                      <br />
+                      <span style={{ color: '#00ffcc', fontSize: '0.9em' }}>
+                        📄 {event.presentation.filename} available
+                      </span>
+                    </>
                   )}
                 </li>
               ))}

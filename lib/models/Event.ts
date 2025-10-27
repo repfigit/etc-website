@@ -8,6 +8,13 @@ export interface IEvent extends Document {
   topic: string;
   location: string;
   locationUrl?: string;
+  presentations?: Array<{
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+    uploadedAt: Date;
+  }>;
   isVisible: boolean;
   content?: string; // Markdown content for detailed notes
   createdAt: Date;
@@ -41,6 +48,28 @@ const EventSchema = new Schema<IEvent>(
     locationUrl: {
       type: String,
     },
+    presentations: [{
+      filename: {
+        type: String,
+        required: true,
+      },
+      data: {
+        type: Buffer,
+        required: true,
+      },
+      contentType: {
+        type: String,
+        required: true,
+      },
+      size: {
+        type: Number,
+        required: true,
+      },
+      uploadedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
     isVisible: {
       type: Boolean,
       default: true,

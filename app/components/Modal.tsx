@@ -61,11 +61,10 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
           border: '2px solid #00ffcc',
           borderRadius: '8px',
           padding: '2em',
-          maxWidth: '90vw',
+          maxWidth: '800px',
           maxHeight: '90vh',
           overflow: 'auto',
           width: '100%',
-          maxWidth: '800px',
           position: 'relative'
         }}
         onClick={(e) => e.stopPropagation()}

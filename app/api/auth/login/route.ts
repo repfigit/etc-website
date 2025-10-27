@@ -25,7 +25,9 @@ export async function POST(request: NextRequest) {
     const { password } = await request.json();
     
     // Get client IP for rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip') || 
+               'unknown';
     
     // Rate limiting check
     const now = Date.now();
