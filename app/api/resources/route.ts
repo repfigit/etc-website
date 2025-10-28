@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/lib/models/Resource';
+import { logger } from '@/lib/logger';
+import { CacheConfig, addCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: Request) {
   try {
@@ -29,9 +31,16 @@ export async function GET(request: Request) {
     
     const resources = await query.lean();
     
-    return NextResponse.json({ success: true, data: resources, total });
+    const response = NextResponse.json({ success: true, data: resources, total });
+    
+    // Add cache headers for public requests
+    if (admin !== 'true') {
+      return addCacheHeaders(response, CacheConfig.RESOURCES);
+    }
+    
+    return response;
   } catch (error) {
-    console.error('Error fetching resources:', error);
+    logger.error('Error fetching resources', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch resources' },
       { status: 500 }
@@ -57,7 +66,7 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    console.error('Error creating resource:', error);
+    logger.error('Error creating resource', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create resource' },
       { status: 500 }

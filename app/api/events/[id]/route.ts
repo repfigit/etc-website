@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: Request,
@@ -27,7 +28,7 @@ export async function GET(
     
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
-    console.error('Error fetching event:', error);
+    logger.error('Error fetching event', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch event' },
       { status: 500 }
@@ -97,7 +98,7 @@ export async function PUT(
               uploadedAt: new Date()
             });
           } catch (fileError) {
-            console.error('Error processing presentation file:', fileError);
+            logger.error('Error processing presentation file', fileError);
             // Continue without this file rather than failing the entire request
           }
         }
@@ -118,7 +119,7 @@ export async function PUT(
       }
     }
     
-    console.log('Updating event with body:', {
+    logger.debug('Updating event', {
       ...body,
       presentations: body.presentations ? body.presentations.map(p => ({
         filename: p.filename,
@@ -149,7 +150,7 @@ export async function PUT(
         { status: 401 }
       );
     }
-    console.error('Error updating event:', error);
+    logger.error('Error updating event', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update event' },
       { status: 500 }
@@ -185,7 +186,7 @@ export async function DELETE(
         { status: 401 }
       );
     }
-    console.error('Error deleting event:', error);
+    logger.error('Error deleting event', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete event' },
       { status: 500 }

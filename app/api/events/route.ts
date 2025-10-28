@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { logger } from '@/lib/logger';
+import { CacheConfig, addCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: Request) {
   try {
@@ -33,7 +35,7 @@ export async function GET(request: Request) {
     
     // Log presentation data for admin requests
     if (admin === 'true' && events.length > 0) {
-      console.log('Admin events fetched:', events.map(e => ({
+      logger.debug('Admin events fetched', events.map(e => ({
         id: e._id,
         topic: e.topic,
         presentations: e.presentations?.map(p => ({
@@ -45,9 +47,16 @@ export async function GET(request: Request) {
       })));
     }
     
-    return NextResponse.json({ success: true, data: events, total });
+    const response = NextResponse.json({ success: true, data: events, total });
+    
+    // Add cache headers for public requests
+    if (admin !== 'true') {
+      return addCacheHeaders(response, CacheConfig.EVENTS);
+    }
+    
+    return response;
   } catch (error) {
-    console.error('Error fetching events:', error);
+    logger.error('Error fetching events', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch events' },
       { status: 500 }
@@ -65,7 +74,7 @@ export async function POST(request: Request) {
     
     // Check if request contains FormData (with presentation) or JSON
     const contentType = request.headers.get('content-type') || '';
-    console.log('Content-Type:', contentType);
+    logger.debug('Content-Type', { contentType });
     let body: any;
     
     if (contentType.includes('multipart/form-data')) {
@@ -73,8 +82,10 @@ export async function POST(request: Request) {
       const formData = await request.formData();
       const presentationFile = formData.get('presentation') as File;
       
-      console.log('FormData fields:', Array.from(formData.keys()));
-      console.log('Presentation file:', presentationFile ? presentationFile.name : 'none');
+      logger.debug('FormData received', { 
+        fields: Array.from(formData.keys()),
+        presentationFile: presentationFile ? presentationFile.name : 'none'
+      });
       
       body = {
         date: formData.get('date'),
@@ -107,13 +118,13 @@ export async function POST(request: Request) {
               uploadedAt: new Date()
             });
 
-            console.log('Presentation data prepared:', {
+            logger.debug('Presentation data prepared', {
               filename: file.name,
               contentType: file.type,
               size: file.size
             });
           } catch (fileError) {
-            console.error('Error processing presentation file:', fileError);
+            logger.error('Error processing presentation file', fileError);
             // Continue without this file rather than failing the entire request
           }
         }
@@ -135,7 +146,7 @@ export async function POST(request: Request) {
       }
     }
     
-    console.log('Creating event with body:', {
+    logger.debug('Creating event', {
       ...body,
       presentation: body.presentation ? {
         filename: body.presentation.filename,
@@ -155,7 +166,7 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    console.error('Error creating event:', error);
+    logger.error('Error creating event', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create event' },
       { status: 500 }

@@ -1,10 +1,8 @@
 import mongoose from 'mongoose';
+import { getValidatedEnv } from './env-validation';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/etc_caucus';
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
-}
+const env = getValidatedEnv();
+const MONGODB_URI = env.MONGODB_URI;
 
 interface MongooseCache {
   conn: typeof mongoose | null;

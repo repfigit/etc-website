@@ -101,7 +101,7 @@ function SortableResourceItem({ resource, onEdit, onDelete }: {
       <div className="resource-admin-actions">
         <button
           onClick={(e) => {
-            console.log('Edit button clicked');
+
             e.stopPropagation();
             onEdit(resource);
           }}
@@ -206,7 +206,7 @@ export default function AdminResources() {
   };
 
   const handleEdit = (resource: Resource) => {
-    console.log('Edit button clicked for resource:', resource.title);
+
     setFormData({
       title: resource.title,
       url: resource.url,
@@ -277,9 +277,8 @@ export default function AdminResources() {
         );
         
         await Promise.all(updatePromises);
-        console.log('Resources reordered successfully');
+
       } catch (error) {
-        console.error('Error updating resource order:', error);
         // Revert the local state if API call fails
         await fetchResources();
       }

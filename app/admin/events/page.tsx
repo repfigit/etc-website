@@ -105,14 +105,6 @@ export default function AdminEvents() {
         time: `${formData.time} ${formData.timezone}`.trim()
       };
       
-      console.log('Form data before submission:', {
-        presentations: presentations.map(p => ({
-          name: p.name,
-          size: p.size,
-          type: p.type
-        }))
-      });
-      
       // Remove timezone from the data sent to API
       const { timezone, ...dataToSubmit } = submitData;
       
@@ -144,9 +136,6 @@ export default function AdminEvents() {
         });
       }
       
-      console.log('Sending FormData with fields:', Array.from(formDataToSend.keys()));
-      console.log('Presentation files:', presentations.map(p => `${p.name} (${p.size} bytes)`));
-      
       const response = await fetch(url, {
         method,
         body: formDataToSend
@@ -157,13 +146,9 @@ export default function AdminEvents() {
           resetForm();
         } else {
           const errorText = await response.text();
-          console.error('Server error:', errorText);
-          console.error('Response status:', response.status);
-          console.error('Response headers:', Object.fromEntries(response.headers.entries()));
           alert('Failed to save event: ' + (errorText || 'Unknown error'));
         }
     } catch (error) {
-      console.error('Error saving event:', error);
       alert('Error saving event');
     }
   };
@@ -235,17 +220,6 @@ export default function AdminEvents() {
       }
     }
     
-    console.log('Editing event:', {
-      id: event._id,
-      topic: event.topic,
-      presentations: event.presentations?.map(p => ({
-        filename: p.filename,
-        contentType: p.contentType,
-        size: p.size,
-        hasData: !!p.data
-      })) || []
-    });
-    
     setFormData({
       date: dateString,
       time: timeValue,
@@ -287,7 +261,6 @@ export default function AdminEvents() {
         alert('Failed to delete event');
       }
     } catch (error) {
-      console.error('Error deleting event:', error);
       alert('Error deleting event');
     }
   };
