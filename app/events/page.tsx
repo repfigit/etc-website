@@ -55,44 +55,74 @@ export default function EventsPage() {
       <Header />
       <Navigation />
       
-      <section style={{ display: 'block', marginTop: '2em' }}>
+      <section className="events-page-section">
         <h2>All Events</h2>
         <p>
-          <Link href="/#events" style={{ fontSize: '0.9em' }}>← Back to Home</Link>
+          <Link href="/#events" className="events-page-back-link">← Back to Home</Link>
         </p>
         
         {loading ? (
           <p>Loading events...</p>
         ) : events.length > 0 ? (
-          <ul>
+          <ul className="events-page-list">
             {events.map((event) => (
-              <li key={event._id} style={{ marginBottom: '1.5em', padding: '1em', border: '1px solid #333', background: '#1a1a1a' }}>
-                <Link href={`/events/${event._id}`} style={{ color: '#00ffcc', textDecoration: 'none' }}>
-                  <strong style={{ textDecoration: 'underline', fontSize: '1.2em' }}>{event.topic}</strong>
-                </Link>
-                <br />
-                {formatDate(event.date)} at {event.time}
+              <li key={event._id} className="event-card">
+                {/* Event Topic */}
+                <div className="event-topic-container">
+                  <Link href={`/events/${event._id}`} className="event-topic-link">
+                    <strong className="event-topic-text">{event.topic}</strong>
+                  </Link>
+                </div>
+
+                {/* Event Details */}
+                <div className="event-details">
+                  <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {event.time}
+                </div>
+
+                {/* Presenter */}
                 {event.presenter && (
-                  <>
-                    <br />
-                    Presenter: {event.presenterUrl ? (
-                      <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
-                    ) : (
-                      event.presenter
-                    )}
-                  </>
+                  <div className="event-presenter-container">
+                    <strong className="event-detail-label">👤 Presenter:</strong>                         {event.presenterUrl ? (
+                          <a 
+                            href={event.presenterUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="event-presenter-link"
+                          >
+                            {event.presenter}
+                          </a>
+                        ) : (
+                          <span>{event.presenter}</span>
+                        )}
+                  </div>
                 )}
-                <br />
-                Location: {event.locationUrl ? (
-                  <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
-                ) : (
-                  event.location
-                )}
+
+                {/* Location */}
+                <div className="event-location-container">
+                    <strong className="event-detail-label">📍 Location:</strong> {event.locationUrl ? (
+                        <a 
+                          href={event.locationUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="event-location-link"
+                        >
+                          {event.location}
+                        </a>
+                      ) : (
+                        <span>{event.location}</span>
+                      )}
+                </div>
+
+                {/* Detailed Information Link */}
                 {event.content && (
-                  <>
-                    <br />
-                    <span style={{ color: '#999', fontSize: '0.9em' }}>📝 Detailed information available</span>
-                  </>
+                  <div className="event-detailed-info">
+                    <Link
+                      href={`/events/${event._id}`}
+                      className="event-detailed-link"
+                    >
+                      📝 Detailed information available
+                    </Link>
+                  </div>
                 )}
               </li>
             ))}

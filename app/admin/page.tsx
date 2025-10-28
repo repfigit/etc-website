@@ -36,13 +36,13 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ maxWidth: '400px', width: '100%', padding: '2em', border: '2px solid #00f7ff', background: '#121212' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '1em' }}>Admin Login</h1>
+    <div className="container admin-login-container">
+      <div className="admin-login-form">
+        <h1 className="admin-login-title">Admin Login</h1>
         
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '1em' }}>
-            <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5em' }}>
+          <div className="admin-login-field">
+            <label htmlFor="password" className="admin-login-label">
               Password:
             </label>
             <input
@@ -50,37 +50,16 @@ export default function AdminPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5em',
-                fontSize: '1em',
-                background: '#000',
-                color: '#00ffcc',
-                border: '2px solid #00ffcc',
-                fontFamily: 'inherit'
-              }}
+              className="admin-login-input"
               required
             />
           </div>
           
           {error && (
-            <p style={{ color: '#ff0000', marginBottom: '1em' }}>{error}</p>
+            <div className="admin-login-error">{error}</div>
           )}
           
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '0.75em',
-              fontSize: '1em',
-              background: '#00ffcc',
-              color: '#000',
-              border: '2px solid #00f7ff',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontFamily: 'inherit'
-            }}
-          >
+          <button type="submit" className="admin-login-button">
             Login
           </button>
         </form>

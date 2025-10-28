@@ -235,50 +235,29 @@ export default function AdminTechList() {
         </Modal>
 
         <h2>All Tech Items ({techItems.length})</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1em' }}>
+        <div className="tech-list-grid">
           {techItems.map((item) => (
             <div
               key={item._id}
-              style={{
-                padding: '1em',
-                border: '2px solid #00ffcc',
-                background: item.isVisible ? '#121212' : '#333',
-                opacity: item.isVisible ? 1 : 0.6
-              }}
+              className={`tech-list-item ${!item.isVisible ? 'hidden' : ''}`}
             >
               <div>
-                <strong style={{ fontSize: '1.1em' }}>{item.name}</strong>
-                <div style={{ fontSize: '0.9em', marginTop: '0.5em', wordBreak: 'break-all' }}>
+                <strong className="tech-list-item-name">{item.name}</strong>
+                <div className="tech-list-item-url">
                   <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
                 </div>
-                {!item.isVisible && <div style={{ color: '#ff6700', marginTop: '0.5em' }}>⚠️ Hidden</div>}
+                {!item.isVisible && <div className="tech-list-item-hidden-label">⚠️ Hidden</div>}
               </div>
-              <div style={{ display: 'flex', gap: '0.5em', marginTop: '1em' }}>
+              <div className="tech-list-item-actions">
                 <button
                   onClick={() => handleEdit(item)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5em',
-                    background: '#ffff00',
-                    color: '#000',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit'
-                  }}
+                  className="tech-list-edit-button"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(item._id)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5em',
-                    background: '#ff0000',
-                    color: '#fff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit'
-                  }}
+                  className="tech-list-delete-button"
                 >
                   Delete
                 </button>

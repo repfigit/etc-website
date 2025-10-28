@@ -58,82 +58,54 @@ function SortableResourceItem({ resource, onEdit, onDelete }: {
   return (
     <div
       ref={setNodeRef}
+      className={`resource-admin-item ${!resource.isVisible ? 'hidden' : ''}`}
       style={{
         ...style,
-        padding: '1em',
-        border: '2px solid #00ffcc',
-        background: resource.isVisible ? '#121212' : '#333',
-        opacity: resource.isVisible ? 1 : 0.6,
       }}
       {...attributes}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1em', marginBottom: '1em' }}>
+      <div className="resource-admin-item-header">
         <div 
-          style={{ 
-            cursor: 'grab', 
-            padding: '0.5em', 
-            background: '#333', 
-            border: '1px solid #00ffcc',
-            fontSize: '0.8em',
-            userSelect: 'none'
-          }}
+          className="resource-admin-drag-handle"
           {...listeners}
         >
           ⋮⋮
         </div>
-        <div style={{ flex: 1 }}>
+        <div className="resource-admin-content">
           {resource.thumbnail && (
-            <div style={{ 
-              marginBottom: '0.75em', 
-              textAlign: 'center',
-              background: '#0f5200',
-              padding: '0.5em',
-              border: '1px solid #00ffcc'
-            }}>
+            <div className="resource-admin-thumbnail-container">
               <img 
                 src={resource.thumbnail} 
                 alt={resource.title}
-                style={{ 
-                  maxWidth: '100%', 
-                  height: 'auto',
-                  maxHeight: '100px'
-                }}
+                className="resource-admin-thumbnail"
               />
             </div>
           )}
-          <strong style={{ fontSize: '1.1em' }}>{resource.title}</strong>
+          <strong className="resource-admin-title">{resource.title}</strong>
           {resource.featured && (
-            <div style={{ display: 'inline-block', marginLeft: '0.5em', background: '#ffff00', color: '#000', padding: '0.1em 0.4em', fontSize: '0.7em', fontWeight: 'bold' }}>
+            <div style={{ display: 'inline-block', marginLeft: '0.5em', background: '#f1c40f', color: '#000', padding: '0.1em 0.4em', fontSize: '0.7em', fontWeight: 'bold' }}>
               FEATURED
             </div>
           )}
           {resource.description && (
-            <div style={{ fontSize: '0.9em', marginTop: '0.5em', color: '#d4d8d5' }}>
+            <div className="resource-admin-description">
               {resource.description}
             </div>
           )}
-          <div style={{ fontSize: '0.9em', marginTop: '0.5em', wordBreak: 'break-all' }}>
+          <div className="resource-admin-url">
             <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a>
           </div>
-          {!resource.isVisible && <div style={{ color: '#ff6700', marginTop: '0.5em' }}>⚠️ Hidden</div>}
+          {!resource.isVisible && <div className="resource-admin-hidden-label">⚠️ Hidden</div>}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '0.5em' }}>
+      <div className="resource-admin-actions">
         <button
           onClick={(e) => {
             console.log('Edit button clicked');
             e.stopPropagation();
             onEdit(resource);
           }}
-          style={{
-            flex: 1,
-            padding: '0.5em',
-            background: '#ffff00',
-            color: '#000',
-            border: 'none',
-            cursor: 'pointer',
-            fontFamily: 'inherit'
-          }}
+          className="resource-admin-edit-button"
         >
           Edit
         </button>
@@ -142,15 +114,7 @@ function SortableResourceItem({ resource, onEdit, onDelete }: {
             e.stopPropagation();
             onDelete(resource._id);
           }}
-          style={{
-            flex: 1,
-            padding: '0.5em',
-            background: '#ff0000',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontFamily: 'inherit'
-          }}
+          className="resource-admin-delete-button"
         >
           Delete
         </button>

@@ -68,8 +68,8 @@ export default function EventsSection() {
             <ul>
               {events.map((event) => (
                 <li key={event._id}>
-                  <Link href={`/events/${event._id}`} style={{ color: '#00ffcc', textDecoration: 'none' }}>
-                    <strong style={{ textDecoration: 'underline' }}>{event.topic}</strong>
+                  <Link href={`/events/${event._id}`} className='event-name-link'>
+                    <strong>{event.topic}</strong>
                   </Link>
                   <br />
                   {formatDate(event.date)} at {event.time}
@@ -92,7 +92,7 @@ export default function EventsSection() {
                   {event.presentation && (
                     <>
                       <br />
-                      <span style={{ color: '#00ffcc', fontSize: '0.9em' }}>
+                      <span className="events-section-presentation-link">
                         📄 {event.presentation.filename} available
                       </span>
                     </>
@@ -101,8 +101,8 @@ export default function EventsSection() {
               ))}
             </ul>
             {totalCount > 5 && (
-              <p style={{ marginTop: '1em', fontSize: '1.1em' }}>
-                <Link href="/events" style={{ fontWeight: 'bold' }}>
+              <p className="events-section-view-all">
+                <Link href="/events" className="events-section-view-all-link">
                   → View all {totalCount} events
                 </Link>
               </p>

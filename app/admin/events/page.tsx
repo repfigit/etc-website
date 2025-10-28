@@ -318,25 +318,16 @@ export default function AdminEvents() {
   if (loading) return <div className="container">Loading...</div>;
 
   return (
-    <div className="container" style={{ paddingTop: '2em', paddingBottom: '2em' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+    <div className="container admin-events-container">
+      <div className="admin-events-content">
+        <div className="admin-events-header">
           <h1>Manage Events</h1>
           <Link href="/admin/dashboard">← Back to Dashboard</Link>
         </div>
 
         <button
           onClick={() => { resetForm(); setShowModal(true); }}
-          style={{
-            padding: '0.75em 1.5em',
-            marginBottom: '2em',
-            background: '#00ffcc',
-            color: '#000',
-            border: '2px solid #00f7ff',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontFamily: 'inherit'
-          }}
+          className="admin-events-add-button"
         >
           + Add New Event
         </button>
@@ -360,8 +351,8 @@ export default function AdminEvents() {
                     width: '100%',
                     padding: '0.75em',
                     background: '#000',
-                    color: '#00ffcc',
-                    border: '2px solid #00ffcc',
+                    color: '#4ecdc4',
+                    border: '2px solid #4ecdc4',
                     borderRadius: '4px',
                     fontFamily: 'inherit',
                     fontSize: '1em',
@@ -382,8 +373,8 @@ export default function AdminEvents() {
                       flex: '1',
                       padding: '0.75em',
                       background: '#000',
-                      color: '#00ffcc',
-                      border: '2px solid #00ffcc',
+                      color: '#4ecdc4',
+                      border: '2px solid #4ecdc4',
                       borderRadius: '4px',
                       fontFamily: 'inherit',
                       fontSize: '1em',
@@ -399,8 +390,8 @@ export default function AdminEvents() {
                       width: '60px',
                       padding: '0.75em',
                       background: '#000',
-                      color: '#00ffcc',
-                      border: '2px solid #00ffcc',
+                      color: '#4ecdc4',
+                      border: '2px solid #4ecdc4',
                       borderRadius: '4px',
                       fontFamily: 'inherit',
                       fontSize: '1em',
@@ -425,8 +416,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -444,8 +435,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -463,8 +454,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -483,8 +474,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -502,8 +493,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -518,9 +509,9 @@ export default function AdminEvents() {
                   type="button"
                   onClick={() => setShowMarkdownPreview(true)}
                   style={{
-                    background: '#00ffcc',
+                    background: '#4ecdc4',
                     color: '#000',
-                    border: '1px solid #00ffcc',
+                    border: '1px solid #4ecdc4',
                     padding: '0.5em 1em',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
@@ -541,8 +532,8 @@ export default function AdminEvents() {
                   width: '100%',
                   padding: '0.75em',
                   background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  color: '#4ecdc4',
+                  border: '2px solid #4ecdc4',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em',
@@ -591,7 +582,7 @@ export default function AdminEvents() {
                 type="submit"
                 style={{
                   padding: '0.75em 2em',
-                  background: '#00ffcc',
+                  background: '#4ecdc4',
                   color: '#000',
                   border: '2px solid #00f7ff',
                   cursor: 'pointer',
@@ -625,9 +616,9 @@ export default function AdminEvents() {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
-                  h1: ({ children }) => <h1 style={{ color: '#00ffcc', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ color: '#00ffcc', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ color: '#00ffcc', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
+                  h1: ({ children }) => <h1 style={{ color: '#4ecdc4', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ color: '#4ecdc4', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: '#4ecdc4', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
                   p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
                   ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
                   ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
@@ -661,7 +652,7 @@ export default function AdminEvents() {
                   ),
                   blockquote: ({ children }) => (
                     <blockquote style={{ 
-                      borderLeft: '4px solid #00ffcc', 
+                      borderLeft: '4px solid #4ecdc4', 
                       paddingLeft: '1em', 
                       marginLeft: '0',
                       marginBottom: '1em',
@@ -678,7 +669,7 @@ export default function AdminEvents() {
                       href={href} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      style={{ color: '#00ffcc', textDecoration: 'underline' }}
+                      style={{ color: '#4ecdc4' }}
                     >
                       {children}
                     </a>
@@ -737,7 +728,7 @@ export default function AdminEvents() {
               style={{
                 marginBottom: '1em',
                 padding: '1em',
-                border: '2px solid #00ffcc',
+                border: '2px solid #4ecdc4',
                 background: event.isVisible ? '#121212' : '#333',
                 opacity: event.isVisible ? 1 : 0.6
               }}
@@ -753,7 +744,7 @@ export default function AdminEvents() {
                       <Link 
                         href={`/events/${event._id}`} 
                         target="_blank" 
-                        style={{ color: '#00ffcc', textDecoration: 'underline' }}
+                        style={{ color: '#4ecdc4' }}
                       >
                         📝 View Event Page
                       </Link>

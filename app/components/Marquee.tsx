@@ -41,7 +41,9 @@ export default function Marquee() {
             </span>
           ))}
           <span className="pacman">
-            <Image src="/img/pac-man.gif" alt="Pac-Man" width={16} height={16} unoptimized />
+            <a href="https://pacman.live/play.html" target="_self" rel="noopener noreferrer">
+              <Image src="/img/pac-man.gif" alt="Pac-Man" width={16} height={16} unoptimized />
+            </a>
           </span>
         </div>
       </div>

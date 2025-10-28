@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function Header() {
   return (
     <header>
-      <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link href="/" style={{ color: 'inherit' }}>
         <h1>
           <Image
             className="logo"

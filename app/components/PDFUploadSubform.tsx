@@ -90,8 +90,8 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
   };
 
   return (
-    <div style={{ marginTop: '1em' }}>
-      <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>
+    <div className="pdf-upload-container">
+      <label className="pdf-upload-label">
         Presentation PDFs
       </label>
       
@@ -101,22 +101,13 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        style={{
-          border: `2px dashed ${dragActive ? '#00ffcc' : '#666'}`,
-          borderRadius: '8px',
-          padding: '2em',
-          textAlign: 'center',
-          background: dragActive ? '#001a1a' : '#000',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          marginBottom: '1em'
-        }}
+        className={`pdf-upload-area ${dragActive ? 'drag-active' : ''}`}
         onClick={() => document.getElementById('pdf-upload-input')?.click()}
       >
-        <div style={{ color: '#00ffcc', fontSize: '1.2em', marginBottom: '0.5em' }}>
+        <div className="pdf-upload-text">
           📁 Drop PDF files here or click to browse
         </div>
-        <div style={{ color: '#888', fontSize: '0.9em' }}>
+        <div className="pdf-upload-subtext">
           Maximum 10MB per file
         </div>
         
@@ -132,34 +123,26 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
 
       {/* File List */}
       {presentations.length > 0 && (
-        <div style={{ marginTop: '1em' }}>
-          <h4 style={{ color: '#00ffcc', marginBottom: '0.5em' }}>
+        <div className="pdf-file-list">
+          <h4 className="pdf-file-list-title">
             Uploaded Files ({presentations.length})
           </h4>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+          <div className="pdf-file-list-container">
             {presentations.map((pdf) => (
               <div
                 key={pdf.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.75em',
-                  background: '#001a1a',
-                  border: '1px solid #00ffcc',
-                  borderRadius: '4px'
-                }}
+                className="pdf-file-item"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                  <span style={{ color: '#ff4444', fontSize: '1.2em' }}>📄</span>
+                <div className="pdf-file-info">
+                  <span className="pdf-file-icon">📄</span>
                   <div>
-                    <div style={{ color: '#00ffcc', fontWeight: 'bold' }}>
+                    <div className="pdf-file-name">
                       {pdf.name}
                     </div>
-                    <div style={{ color: '#888', fontSize: '0.8em' }}>
+                    <div className="pdf-file-details">
                       {formatFileSize(pdf.size)}
-                      {pdf.file === null && <span style={{ color: '#ffff00', marginLeft: '0.5em' }}>(existing)</span>}
+                      {pdf.file === null && <span className="pdf-file-existing">(existing)</span>}
                     </div>
                   </div>
                 </div>
@@ -167,15 +150,7 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
                 <button
                   type="button"
                   onClick={() => removePDF(pdf.id)}
-                  style={{
-                    padding: '0.5em',
-                    background: '#ff4444',
-                    color: '#fff',
-                    border: '1px solid #ff4444',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.9em'
-                  }}
+                  className="pdf-remove-button"
                   title="Remove file"
                 >
                   ✕ Remove

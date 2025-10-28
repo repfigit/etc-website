@@ -47,43 +47,17 @@ export default function ResourcesSection() {
         <p>Access research papers, legislative updates, and white papers on emerging technologies.</p>
         {resources.length > 0 ? (
           <>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-              gap: '1.5em',
-              margin: '1.5em 0'
-            }}>
+            <div className="resource-grid">
               {resources.map((resource) => (
                 <a 
                   key={resource._id}
                   href={resource.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  style={{
-                    display: 'block',
-                    border: '2px solid #00ffcc',
-                    padding: '1em',
-                    textDecoration: 'none',
-                    background: '#121212',
-                    transition: 'all 0.3s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = '#ff6700';
-                    e.currentTarget.style.boxShadow = '0 0 10px #00f7ff';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = '#00ffcc';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                  className="resource-card"
                 >
                   {resource.thumbnail && (
-                    <div style={{ 
-                      marginBottom: '0.75em', 
-                      textAlign: 'center',
-                      background: '#0f5200',
-                      padding: '0.5em',
-                      border: '1px solid #00ffcc'
-                    }}>
+                    <div className="resource-thumbnail-container">
                       <Image 
                         src={resource.thumbnail} 
                         alt={resource.title}
@@ -96,19 +70,19 @@ export default function ResourcesSection() {
                       />
                     </div>
                   )}
-                  <strong style={{ display: 'block', marginBottom: '0.5em' }}>
+                  <strong className="resource-title">
                     {resource.title}
                   </strong>
                   {resource.description && (
-                    <p style={{ fontSize: '0.9em', margin: 0 }}>
+                    <p className="resource-description">
                       {resource.description}
                     </p>
                   )}
                 </a>
               ))}
             </div>
-            <p style={{ marginTop: '1em', fontSize: '1.1em' }}>
-              <Link href="/resources" style={{ fontWeight: 'bold' }}>
+            <p className="resources-section-view-all">
+              <Link href="/resources" className="resources-section-view-all-link">
                 → View all {totalCount} resources
               </Link>
             </p>

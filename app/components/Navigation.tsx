@@ -10,43 +10,27 @@ export default function Navigation() {
   return (
     <div className="nav-container">
       <nav>
-        <a href="#mission">Mission</a>
-        <a href="#initiatives">Initiatives</a>
+        <a href="/#mission">Mission</a>
+        <a href="/#initiatives">Initiatives</a>
         <div 
-          style={{ position: 'relative', display: 'inline-block' }}
+          className="nav-dropdown-container"
           onMouseEnter={() => setShowEventsMenu(true)}
           onMouseLeave={() => setShowEventsMenu(false)}
         >
-          <a href="/#events" style={{ cursor: 'pointer' }}>
+          <a href="/#events" className="nav-dropdown-cursor">
             Events ▼
           </a>
           {showEventsMenu && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              background: '#121212',
-              border: '2px solid #00f7ff',
-              minWidth: '200px',
-              zIndex: 1000,
-              boxShadow: '0 4px 8px rgba(0, 247, 255, 0.3)'
-            }}>
+            <div className="nav-dropdown-menu">
               <a 
                 href="/#events" 
-                style={{ 
-                  display: 'block',
-                  padding: '0.5em 1em',
-                  borderBottom: '1px solid #00ffcc'
-                }}
+                className="nav-dropdown-item with-border"
               >
                 Upcoming & Recent Events
               </a>
               <Link 
                 href="/events"
-                style={{ 
-                  display: 'block',
-                  padding: '0.5em 1em'
-                }}
+                className="nav-dropdown-item"
               >
                 All Events
               </Link>
@@ -54,47 +38,31 @@ export default function Navigation() {
           )}
         </div>
         <div 
-          style={{ position: 'relative', display: 'inline-block' }}
+          className="nav-dropdown-container"
           onMouseEnter={() => setShowResourcesMenu(true)}
           onMouseLeave={() => setShowResourcesMenu(false)}
         >
-          <a href="/#resources" style={{ cursor: 'pointer' }}>
+          <a href="/#resources" className="nav-dropdown-cursor">
             Resources ▼
           </a>
           {showResourcesMenu && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              background: '#121212',
-              border: '2px solid #00f7ff',
-              minWidth: '200px',
-              zIndex: 1000,
-              boxShadow: '0 4px 8px rgba(0, 247, 255, 0.3)'
-            }}>
+            <div className="nav-dropdown-menu">
               <a 
                 href="/#resources" 
-                style={{ 
-                  display: 'block',
-                  padding: '0.5em 1em',
-                  borderBottom: '1px solid #00ffcc'
-                }}
+                className="nav-dropdown-item with-border"
               >
                 Featured Resources
               </a>
               <Link 
                 href="/resources"
-                style={{ 
-                  display: 'block',
-                  padding: '0.5em 1em'
-                }}
+                className="nav-dropdown-item"
               >
                 All Resources
               </Link>
             </div>
           )}
         </div>
-        <a href="#contact">Contact</a>
+        <a href="/#contact">Contact</a>
       </nav>
     </div>
   );

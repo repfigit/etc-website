@@ -42,83 +42,43 @@ export default function ResourcesPage() {
       <Header />
       <Navigation />
       
-      <section style={{ display: 'block', marginTop: '2em' }}>
+      <section className="resources-page-section">
         <h2>All Resources</h2>
         <p>
-          <Link href="/#resources" style={{ fontSize: '0.9em' }}>← Back to Home</Link>
+          <Link href="/#resources" className="resources-page-back-link">← Back to Home</Link>
         </p>
         
         {loading ? (
           <p>Loading resources...</p>
         ) : resources.length > 0 ? (
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-            gap: '1.5em',
-            margin: '1.5em 0'
-          }}>
+          <div className="resources-page-grid">
             {resources.map((resource) => (
-              <a 
-                key={resource._id}
-                href={resource.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: 'block',
-                  border: '2px solid #00ffcc',
-                  padding: '1em',
-                  textDecoration: 'none',
-                  background: '#121212',
-                  transition: 'all 0.3s',
-                  position: 'relative'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = '#ff6700';
-                  e.currentTarget.style.boxShadow = '0 0 10px #00f7ff';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = '#00ffcc';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {resource.featured && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '0.5em',
-                    right: '0.5em',
-                    background: '#ffff00',
-                    color: '#000',
-                    padding: '0.25em 0.5em',
-                    fontSize: '0.75em',
-                    fontWeight: 'bold'
-                  }}>
-                    FEATURED
-                  </div>
-                )}
-                {resource.thumbnail && (
-                  <div style={{ 
-                    marginBottom: '0.75em', 
-                    textAlign: 'center',
-                    background: '#0f5200',
-                    padding: '0.5em',
-                    border: '1px solid #00ffcc'
-                  }}>
-                    <img 
-                      src={resource.thumbnail} 
-                      alt={resource.title}
-                      style={{ 
-                        maxWidth: '100%', 
-                        height: 'auto',
-                        maxHeight: '150px'
-                      }}
-                    />
-                  </div>
-                )}
-                <strong style={{ display: 'block', marginBottom: '0.5em' }}>
+                <a 
+                  key={resource._id}
+                  href={resource.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="resources-page-card"
+                >
+                  {resource.featured && (
+                    <div className="resources-page-featured-label">
+                      FEATURED
+                    </div>
+                  )}
+                  {resource.thumbnail && (
+                    <div className="resources-page-thumbnail-container">
+                      <img 
+                        src={resource.thumbnail} 
+                        alt={resource.title}
+                        className="resources-page-thumbnail"
+                      />
+                    </div>
+                  )}
+                <strong className="resources-page-title">
                   {resource.title}
                 </strong>
                 {resource.description && (
-                  <p style={{ fontSize: '0.9em', margin: 0 }}>
+                  <p className="resources-page-description">
                     {resource.description}
                   </p>
                 )}

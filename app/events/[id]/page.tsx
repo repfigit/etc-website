@@ -102,9 +102,9 @@ export default function EventDetailPage() {
       <div className="container">
         <Header />
         <Navigation />
-        <section style={{ display: 'block', marginTop: '2em' }}>
-          <p>Loading event...</p>
-        </section>
+      <section className="event-detail-section">
+        <p>Loading event...</p>
+      </section>
         <Footer />
       </div>
     );
@@ -115,13 +115,13 @@ export default function EventDetailPage() {
       <div className="container">
         <Header />
         <Navigation />
-        <section style={{ display: 'block', marginTop: '2em' }}>
-          <h2>Event Not Found</h2>
-          <p>{error || 'The requested event could not be found.'}</p>
-          <p>
-            <Link href="/events" style={{ fontSize: '0.9em' }}>← Back to All Events</Link>
-          </p>
-        </section>
+      <section className="event-detail-section">
+        <h2>Event Not Found</h2>
+        <p>{error || 'The requested event could not be found.'}</p>
+        <p>
+          <Link href="/events" className="event-detail-back-link">← Back to All Events</Link>
+        </p>
+      </section>
         <Footer />
       </div>
     );
@@ -132,28 +132,28 @@ export default function EventDetailPage() {
       <Header />
       <Navigation />
       
-      <section style={{ display: 'block', marginTop: '2em' }}>
+      <section className="event-detail-section">
         <p>
-          <Link href="/events" style={{ fontSize: '0.9em' }}>← Back to All Events</Link>
+          <Link href="/events" className="event-detail-back-link">← Back to All Events</Link>
         </p>
         
-        <article style={{ marginTop: '2em' }}>
-          <header style={{ marginBottom: '2em', paddingBottom: '1em', borderBottom: '2px solid #00ffcc' }}>
-            <h1 style={{ marginBottom: '0.5em', color: '#00ffcc' }}>{event.topic}</h1>
+        <article className="event-detail-article">
+          <header className="event-detail-article-header">
+            <h1 className="event-detail-topic">{event.topic}</h1>
             
-            <div style={{ fontSize: '1.1em', marginBottom: '1em' }}>
+            <div className="event-detail-datetime">
               <strong>{formatDate(event.date)} at {event.time}</strong>
             </div>
             
             {event.presenter && (
-              <div style={{ marginBottom: '0.5em' }}>
+              <div className="event-detail-presenter-container">
                 <strong>Presenter: </strong>
                 {event.presenterUrl ? (
                   <a 
                     href={event.presenterUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    style={{ color: '#00ffcc' }}
+                    className="event-detail-presenter-link"
                   >
                     {event.presenter}
                   </a>
@@ -163,14 +163,14 @@ export default function EventDetailPage() {
               </div>
             )}
             
-            <div>
+            <div className="event-detail-location-container">
               <strong>Location: </strong>
               {event.locationUrl ? (
                 <a 
                   href={event.locationUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  style={{ color: '#00ffcc' }}
+                  className="event-detail-location-link"
                 >
                   {event.location}
                 </a>
@@ -180,47 +180,31 @@ export default function EventDetailPage() {
             </div>
             
             {event.presentations && event.presentations.length > 0 && (
-              <div style={{ marginTop: '1em' }}>
+              <div className="event-detail-presentations-container">
                 <strong>Presentations ({event.presentations.length}):</strong>
-                <div style={{ marginTop: '0.5em' }}>
+                <div className="event-detail-presentations-list">
                   {event.presentations.map((presentation, index) => (
                     <div 
                       key={index}
-                      style={{ 
-                        marginBottom: '0.5em',
-                        padding: '0.75em',
-                        background: '#001a1a',
-                        border: '1px solid #00ffcc',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
+                      className="event-detail-presentation-item"
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                        <span style={{ color: '#ff4444', fontSize: '1.2em' }}>📄</span>
+                      <div className="event-detail-presentation-info">
+                        <span className="event-detail-presentation-icon">📄</span>
                         <div>
-                          <div style={{ color: '#00ffcc', fontWeight: 'bold' }}>
+                          <div className="event-detail-presentation-name">
                             {presentation.filename}
                           </div>
-                          <div style={{ color: '#888', fontSize: '0.8em' }}>
+                          <div className="event-detail-presentation-size">
                             {formatFileSize(presentation.size)}
                           </div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '0.5em' }}>
+                      <div className="event-detail-presentation-actions">
                         <a 
                           href={`/api/events/${event._id}/presentations/${index}?download=true`}
                           target="_blank" 
                           rel="noopener noreferrer"
-                          style={{ 
-                            color: '#00ffcc',
-                            textDecoration: 'underline',
-                            fontSize: '0.9em',
-                            padding: '0.25em 0.5em',
-                            border: '1px solid #00ffcc',
-                            borderRadius: '3px'
-                          }}
+                          className="event-detail-download-link"
                         >
                           Download
                         </a>
@@ -229,17 +213,7 @@ export default function EventDetailPage() {
                             setSelectedPresentation(index.toString());
                             setShowPdfModal(true);
                           }}
-                          style={{
-                            background: '#00ffcc',
-                            color: '#000',
-                            border: '1px solid #00ffcc',
-                            padding: '0.25em 0.5em',
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                            fontWeight: 'bold',
-                            fontSize: '0.9em',
-                            borderRadius: '3px'
-                          }}
+                          className="event-detail-view-button"
                         >
                           View
                         </button>
@@ -264,9 +238,9 @@ export default function EventDetailPage() {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
-                  h1: ({ children }) => <h1 style={{ color: '#00ffcc', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ color: '#00ffcc', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ color: '#00ffcc', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
+                  h1: ({ children }) => <h1 style={{ color: '#4ecdc4', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ color: '#4ecdc4', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: '#4ecdc4', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
                   p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
                   ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
                   ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
@@ -300,7 +274,7 @@ export default function EventDetailPage() {
                   ),
                   blockquote: ({ children }) => (
                     <blockquote style={{ 
-                      borderLeft: '4px solid #00ffcc', 
+                      borderLeft: '4px solid #4ecdc4', 
                       paddingLeft: '1em', 
                       marginLeft: '0',
                       marginBottom: '1em',
@@ -317,7 +291,7 @@ export default function EventDetailPage() {
                       href={href} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      style={{ color: '#00ffcc', textDecoration: 'underline' }}
+                      style={{ color: '#4ecdc4' }}
                     >
                       {children}
                     </a>
@@ -398,7 +372,7 @@ export default function EventDetailPage() {
         >
           <div style={{
             backgroundColor: '#000',
-            border: '2px solid #00ffcc',
+            border: '2px solid #4ecdc4',
             borderRadius: '8px',
             width: '90%',
             height: '90%',
@@ -410,14 +384,14 @@ export default function EventDetailPage() {
           }}>
             {/* Modal Header */}
             <div style={{
-              background: '#00ffcc',
+              background: '#4ecdc4',
               color: '#000',
               padding: '1em',
               fontWeight: 'bold',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '2px solid #00ffcc'
+              borderBottom: '2px solid #4ecdc4'
             }}>
               <span style={{ fontSize: '1.1em' }}>
                 📄 {event.presentations[parseInt(selectedPresentation)].filename}
@@ -429,7 +403,6 @@ export default function EventDetailPage() {
                   rel="noopener noreferrer"
                   style={{ 
                     color: '#000',
-                    textDecoration: 'underline',
                     fontSize: '0.9em',
                     padding: '0.25em 0.5em',
                     border: '1px solid #000',
@@ -446,7 +419,7 @@ export default function EventDetailPage() {
                   }}
                   style={{
                     background: '#000',
-                    color: '#00ffcc',
+                    color: '#4ecdc4',
                     border: '2px solid #000',
                     padding: '0.25em 0.5em',
                     cursor: 'pointer',
