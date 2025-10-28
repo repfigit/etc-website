@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
@@ -31,6 +35,7 @@ export default function AdminEvents() {
   // Force recompilation
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     date: '',
@@ -507,7 +512,26 @@ export default function AdminEvents() {
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em', fontWeight: 'bold' }}>Detailed Notes (Markdown)</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5em' }}>
+                <label style={{ fontWeight: 'bold' }}>Detailed Notes (Markdown)</label>
+                <button
+                  type="button"
+                  onClick={() => setShowMarkdownPreview(true)}
+                  style={{
+                    background: '#00ffcc',
+                    color: '#000',
+                    border: '1px solid #00ffcc',
+                    padding: '0.5em 1em',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontWeight: 'bold',
+                    fontSize: '0.9em',
+                    borderRadius: '3px'
+                  }}
+                >
+                  👁️ Preview
+                </button>
+              </div>
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -579,6 +603,130 @@ export default function AdminEvents() {
               </button>
             </div>
           </form>
+        </Modal>
+
+        {/* Markdown Preview Modal */}
+        <Modal
+          isOpen={showMarkdownPreview}
+          onClose={() => setShowMarkdownPreview(false)}
+          title="Markdown Preview"
+        >
+          <div style={{ 
+            maxHeight: '70vh', 
+            overflowY: 'auto',
+            padding: '1em',
+            background: '#000',
+            color: '#d4d8d5',
+            lineHeight: '1.6',
+            fontSize: '1.1em'
+          }}>
+            {formData.content ? (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}
+                components={{
+                  h1: ({ children }) => <h1 style={{ color: '#00ffcc', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ color: '#00ffcc', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: '#00ffcc', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
+                  p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
+                  ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
+                  ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
+                  li: ({ children }) => <li style={{ marginBottom: '0.5em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</li>,
+                  code: ({ children, className }) => {
+                    const isInline = !className;
+                    return isInline ? (
+                      <code style={{ 
+                        background: '#333', 
+                        padding: '0.2em 0.4em', 
+                        borderRadius: '3px',
+                        fontSize: '0.9em'
+                      }}>
+                        {children}
+                      </code>
+                    ) : (
+                      <code className={className}>{children}</code>
+                    );
+                  },
+                  pre: ({ children }) => (
+                    <pre style={{ 
+                      background: '#1a1a1a', 
+                      padding: '1em', 
+                      borderRadius: '5px', 
+                      overflow: 'auto',
+                      marginBottom: '1em',
+                      border: '1px solid #333'
+                    }}>
+                      {children}
+                    </pre>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote style={{ 
+                      borderLeft: '4px solid #00ffcc', 
+                      paddingLeft: '1em', 
+                      marginLeft: '0',
+                      marginBottom: '1em',
+                      fontStyle: 'italic',
+                      animation: 'none',
+                      textShadow: 'none',
+                      transform: 'none'
+                    }}>
+                      {children}
+                    </blockquote>
+                  ),
+                  a: ({ children, href }) => (
+                    <a 
+                      href={href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ color: '#00ffcc', textDecoration: 'underline' }}
+                    >
+                      {children}
+                    </a>
+                  ),
+                  table: ({ children }) => (
+                    <div style={{ overflowX: 'auto', marginBottom: '1em' }}>
+                      <table style={{ 
+                        borderCollapse: 'collapse', 
+                        width: '100%',
+                        border: '1px solid #333'
+                      }}>
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  th: ({ children }) => (
+                    <th style={{ 
+                      border: '1px solid #333', 
+                      padding: '0.5em', 
+                      background: '#333',
+                      textAlign: 'left'
+                    }}>
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td style={{ 
+                      border: '1px solid #333', 
+                      padding: '0.5em'
+                    }}>
+                      {children}
+                    </td>
+                  ),
+                }}
+              >
+                {formData.content}
+              </ReactMarkdown>
+            ) : (
+              <div style={{ 
+                padding: '2em', 
+                border: '2px dashed #666', 
+                textAlign: 'center',
+                color: '#999'
+              }}>
+                <p>No content to preview. Start typing in the Detailed Notes field above.</p>
+              </div>
+            )}
+          </div>
         </Modal>
 
         <h2>All Events ({events.length})</h2>
