@@ -16,6 +16,13 @@ Before deploying, ensure:
 
 ## Deployment Options
 
+### Quick Links
+
+- **cPanel Hosting?** See detailed guide: [CPANEL_DEPLOYMENT.md](./CPANEL_DEPLOYMENT.md)
+- **Vercel (Easiest)**: Continue reading below
+- **Netlify**: See Option 2 below
+- **Self-Hosted VPS**: See Option 3 below
+
 ### Option 1: Vercel (Recommended)
 
 Vercel is the easiest deployment option for Next.js applications.
