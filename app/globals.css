@@ -1137,6 +1137,7 @@ img.logo {
     color: #e8ebe8;
     font-family: inherit;
     font-size: 1em;
+    box-sizing: border-box;
 }
 
 .admin-login-button {
@@ -1152,6 +1153,7 @@ img.logo {
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 0.5em;
+    box-sizing: border-box;
 }
 
 .admin-login-button:hover {
