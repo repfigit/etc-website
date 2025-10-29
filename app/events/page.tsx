@@ -11,12 +11,19 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://emergingtechnh.org/events',
     siteName: 'NH Emerging Technologies Caucus',
+    images: [{
+      url: 'https://emergingtechnh.org/img/index.png',
+      width: 1200,
+      height: 630,
+      alt: 'NH Emerging Technologies Caucus',
+    }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'All Events | NH Emerging Technologies Caucus',
     description: 'View all upcoming and past events from the New Hampshire Emerging Technologies Caucus.',
     site: '@EmergingTechNH',
+    images: ['https://emergingtechnh.org/img/index.png'],
   },
 };
 
