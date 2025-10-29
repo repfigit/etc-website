@@ -51,7 +51,8 @@ export async function GET(
     const endDate = new Date(startDate);
     endDate.setHours(startDate.getHours() + 1);
     
-    // Format dates for iCalendar (YYYYMMDDTHHMMSS)
+    // Format dates for iCalendar with timezone (YYYYMMDDTHHMMSSZ for UTC)
+    // Using America/New_York timezone (Eastern Time)
     const formatICalDate = (date: Date): string => {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -69,21 +70,29 @@ export async function GET(
     const now = formatICalDate(new Date());
     
     // Build description with all event details
+    // Preserve line breaks using proper iCalendar escaping
     let description = event.topic;
     if (event.presenter) {
-      description += `\\n\\nPresenter: ${event.presenter}`;
+      description += `\n\nPresenter: ${event.presenter}`;
       if (event.presenterUrl) {
         description += ` (${event.presenterUrl})`;
       }
     }
     if (event.content) {
-      // Strip markdown and limit length
+      // Strip markdown but preserve line breaks
       const plainContent = event.content
         .replace(/[#*_~`]/g, '')
-        .replace(/\n{2,}/g, '\\n\\n')
-        .substring(0, 500);
-      description += `\\n\\n${plainContent}`;
+        .substring(0, 1000);
+      description += `\n\n${plainContent}`;
     }
+    
+    // Escape special characters for iCalendar format
+    // Replace actual newlines with \n for iCalendar spec
+    description = description
+      .replace(/\\/g, '\\\\')  // Escape backslashes first
+      .replace(/;/g, '\\;')      // Escape semicolons
+      .replace(/,/g, '\\,')      // Escape commas
+      .replace(/\r\n|\n|\r/g, '\\n');  // Convert line breaks to \n
     
     // Build location
     let location = event.location;
@@ -91,21 +100,50 @@ export async function GET(
       location += ` - ${event.locationUrl}`;
     }
     
-    // Construct iCalendar file content
+    // Escape the summary (title) as well
+    const summary = `[ET Caucus] ${event.topic}`
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r\n|\n|\r/g, '\\n');
+    
+    // Escape location
+    const escapedLocation = location
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r\n|\n|\r/g, '\\n');
+    
+    // Construct iCalendar file content with timezone
     const icalContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//NH Emerging Technologies Caucus//Event//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
+      'BEGIN:VTIMEZONE',
+      'TZID:America/New_York',
+      'BEGIN:STANDARD',
+      'DTSTART:19701101T020000',
+      'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
+      'TZOFFSETFROM:-0400',
+      'TZOFFSETTO:-0500',
+      'END:STANDARD',
+      'BEGIN:DAYLIGHT',
+      'DTSTART:19700308T020000',
+      'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
+      'TZOFFSETFROM:-0500',
+      'TZOFFSETTO:-0400',
+      'END:DAYLIGHT',
+      'END:VTIMEZONE',
       'BEGIN:VEVENT',
       `UID:${uid}`,
       `DTSTAMP:${now}`,
-      `DTSTART:${formatICalDate(startDate)}`,
-      `DTEND:${formatICalDate(endDate)}`,
-      `SUMMARY:${event.topic}`,
+      `DTSTART;TZID=America/New_York:${formatICalDate(startDate)}`,
+      `DTEND;TZID=America/New_York:${formatICalDate(endDate)}`,
+      `SUMMARY:${summary}`,
       `DESCRIPTION:${description}`,
-      `LOCATION:${location}`,
+      `LOCATION:${escapedLocation}`,
       'STATUS:CONFIRMED',
       'SEQUENCE:0',
       'BEGIN:VALARM',
