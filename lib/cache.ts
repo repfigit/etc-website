@@ -24,7 +24,7 @@ export const CacheConfig = {
   
   // Events (moderate update frequency)
   EVENTS: {
-    revalidate: 300, // 5 minutes
+    revalidate: 10, // 10 seconds - short cache to show updates quickly
     tags: ['events']
   },
   
