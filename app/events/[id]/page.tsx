@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import EventDetailClient from './EventDetailClient';
 import connectDB from '@/lib/mongodb';
-import Event from '@/lib/models/Event';
+import Event, { IEvent } from '@/lib/models/Event';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id } = await params;
     await connectDB();
-    const event = await Event.findById(id).lean();
+    const event = await Event.findById(id).lean() as (IEvent & { _id: any }) | null;
 
     if (!event || !event.isVisible) {
       return {
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = `${event.topic} | NH Emerging Technologies Caucus`;
     const description = event.content 
       ? event.content.substring(0, 200).replace(/[#*_\[\]]/g, '') + '...'
-      : `Join us on ${formatDate(event.date)} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`;
+      : `Join us on ${formatDate(event.date.toISOString())} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`;
 
     return {
       title,
@@ -68,7 +68,7 @@ export default async function EventDetailPage({ params }: Props) {
   try {
     const { id } = await params;
     await connectDB();
-    const event = await Event.findById(id).lean();
+    const event = await Event.findById(id).lean() as (IEvent & { _id: any }) | null;
 
     if (!event || !event.isVisible) {
       notFound();
@@ -77,7 +77,7 @@ export default async function EventDetailPage({ params }: Props) {
     // Convert MongoDB document to plain object with serializable data
     const serializedEvent = {
       _id: event._id.toString(),
-      date: event.date,
+      date: event.date.toISOString(),
       time: event.time,
       presenter: event.presenter,
       presenterUrl: event.presenterUrl,
