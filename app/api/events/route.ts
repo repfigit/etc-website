@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       logger.debug('Admin events fetched', events.map(e => ({
         id: e._id,
         topic: e.topic,
-        presentations: e.presentations?.map(p => ({
+        presentations: e.presentations?.map((p: any) => ({
           filename: p.filename,
           contentType: p.contentType,
           size: p.size,

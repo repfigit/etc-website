@@ -78,7 +78,7 @@ export async function PUT(
       if (presentationsToKeep.length > 0) {
         const existingEvent = await Event.findById(id).select('presentations');
         existingPresentations = (existingEvent?.presentations || [])
-          .filter(p => presentationsToKeep.includes(p.filename));
+          .filter((p: any) => presentationsToKeep.includes(p.filename));
       }
       
       body.presentations = [...existingPresentations];
@@ -121,7 +121,7 @@ export async function PUT(
     
     logger.debug('Updating event', {
       ...body,
-      presentations: body.presentations ? body.presentations.map(p => ({
+      presentations: body.presentations ? body.presentations.map((p: any) => ({
         filename: p.filename,
         contentType: p.contentType,
         size: p.size,

@@ -19,12 +19,12 @@ interface Event {
   topic: string;
   location: string;
   locationUrl?: string;
-  presentation?: {
+  presentations?: Array<{
     filename: string;
     data: Buffer;
     contentType: string;
     size: number;
-  };
+  }>;
   isVisible: boolean;
   content?: string;
 }
@@ -52,7 +52,7 @@ export default function AdminEvents() {
   
   const [presentations, setPresentations] = useState<Array<{
     id: string;
-    file: File;
+    file: File | null;
     name: string;
     size: number;
     type: string;
@@ -532,7 +532,7 @@ export default function AdminEvents() {
 
             <PDFUploadSubform
               presentations={presentations}
-              onPresentationsChange={setPresentations}
+              onPresentationsChange={(presentations) => setPresentations(presentations)}
             />
 
             <div style={{ marginTop: '2em', display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
