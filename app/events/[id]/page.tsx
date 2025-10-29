@@ -139,7 +139,18 @@ export default function EventDetailPage() {
         
         <article className="event-detail-article">
           <header className="event-detail-article-header">
-            <h1 className="event-detail-topic">{event.topic}</h1>
+            <h1 className="event-detail-topic">
+              {event.topic}
+              {' '}
+              <a 
+                href={`/api/events/${event._id}/ical`}
+                download
+                className="event-calendar-icon-large"
+                title="Add to calendar"
+              >
+                📅
+              </a>
+            </h1>
             
             <div className="event-detail-datetime">
               <strong>{formatDate(event.date)} at {event.time}</strong>

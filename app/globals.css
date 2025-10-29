@@ -834,6 +834,36 @@ img.logo {
     border-radius: 3px;
 }
 
+/* Calendar Icon Styles */
+.event-calendar-icon {
+    text-decoration: none;
+    font-size: 1.2em;
+    display: inline-block;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.event-calendar-icon:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.event-calendar-icon-large {
+    text-decoration: none;
+    font-size: 0.8em;
+    display: inline-block;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    opacity: 0.8;
+    vertical-align: middle;
+}
+
+.event-calendar-icon-large:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
 /* PDF Modal Styles */
 .pdf-modal-overlay {
     position: fixed;
