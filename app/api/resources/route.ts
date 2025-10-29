@@ -55,7 +55,51 @@ export async function POST(request: Request) {
     await requireAuth(request as any);
     
     await connectDB();
-    const body = await request.json();
+    
+    const contentType = request.headers.get('content-type') || '';
+    let body: any;
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Handle FormData with thumbnail
+      const formData = await request.formData();
+      const thumbnailFile = formData.get('thumbnail') as File;
+      
+      body = {
+        title: formData.get('title'),
+        url: formData.get('url'),
+        description: formData.get('description'),
+        featured: formData.get('featured') === 'true',
+        order: parseInt(formData.get('order') as string) || 0,
+        isVisible: formData.get('isVisible') === 'true'
+      };
+      
+      // Handle thumbnail file
+      if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
+        try {
+          const bytes = await thumbnailFile.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          
+          body.thumbnail = {
+            filename: thumbnailFile.name,
+            data: buffer,
+            contentType: thumbnailFile.type,
+            size: thumbnailFile.size
+          };
+          
+          logger.debug('Thumbnail data prepared', {
+            filename: thumbnailFile.name,
+            contentType: thumbnailFile.type,
+            size: thumbnailFile.size
+          });
+        } catch (fileError) {
+          logger.error('Error processing thumbnail file', fileError);
+        }
+      }
+    } else {
+      // Handle JSON without thumbnail
+      body = await request.json();
+    }
+    
     const resource = await Resource.create(body);
     
     return NextResponse.json({ success: true, data: resource }, { status: 201 });

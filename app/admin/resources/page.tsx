@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
+import ImageUpload from '../../components/ImageUpload';
 import {
   DndContext,
   closestCenter,
@@ -28,7 +29,12 @@ interface Resource {
   title: string;
   url: string;
   description?: string;
-  thumbnail?: string;
+  thumbnail?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
   featured: boolean;
   order: number;
   isVisible: boolean;
@@ -75,7 +81,7 @@ function SortableResourceItem({ resource, onEdit, onDelete }: {
           {resource.thumbnail && (
             <div className="resource-admin-thumbnail-container">
               <img 
-                src={resource.thumbnail} 
+                src={`/api/resources/${resource._id}/thumbnail`}
                 alt={resource.title}
                 className="resource-admin-thumbnail"
               />
@@ -140,11 +146,14 @@ export default function AdminResources() {
     title: '',
     url: '',
     description: '',
-    thumbnail: '',
     featured: false,
     order: 0,
     isVisible: true
   });
+  
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState<string | null>(null);
+  const [removeThumbnail, setRemoveThumbnail] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -187,10 +196,25 @@ export default function AdminResources() {
       const url = editingId ? `/api/resources/${editingId}` : '/api/resources';
       const method = editingId ? 'PUT' : 'POST';
       
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('url', formData.url);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('featured', String(formData.featured));
+      formDataToSend.append('order', String(formData.order));
+      formDataToSend.append('isVisible', String(formData.isVisible));
+      
+      if (thumbnailFile) {
+        formDataToSend.append('thumbnail', thumbnailFile);
+      }
+      
+      if (removeThumbnail) {
+        formDataToSend.append('removeThumbnail', 'true');
+      }
+      
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: formDataToSend
       });
       
       if (response.ok) {
@@ -206,16 +230,24 @@ export default function AdminResources() {
   };
 
   const handleEdit = (resource: Resource) => {
-
     setFormData({
       title: resource.title,
       url: resource.url,
       description: resource.description || '',
-      thumbnail: resource.thumbnail || '',
       featured: resource.featured,
       order: resource.order,
       isVisible: resource.isVisible
     });
+    
+    // Set existing thumbnail URL if exists
+    if (resource.thumbnail) {
+      setExistingThumbnailUrl(`/api/resources/${resource._id}/thumbnail`);
+    } else {
+      setExistingThumbnailUrl(null);
+    }
+    
+    setThumbnailFile(null);
+    setRemoveThumbnail(false);
     setEditingId(resource._id);
     setShowModal(true);
   };
@@ -241,11 +273,13 @@ export default function AdminResources() {
       title: '',
       url: '',
       description: '',
-      thumbnail: '',
       featured: false,
       order: 0,
       isVisible: true
     });
+    setThumbnailFile(null);
+    setExistingThumbnailUrl(null);
+    setRemoveThumbnail(false);
     setEditingId(null);
     setShowModal(false);
   };
@@ -372,26 +406,18 @@ export default function AdminResources() {
               />
             </div>
 
-            <div style={{ marginBottom: '1em' }}>
-              <label style={{ display: 'block', marginBottom: '0.5em' }}>Thumbnail URL (optional)</label>
-              <input
-                type="url"
-                value={formData.thumbnail}
-                onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
-                placeholder="https://example.com/image.jpg or /img/resource-thumb.jpg"
-                style={{
-                  width: '100%',
-                  padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
-                  fontFamily: 'inherit'
-                }}
-              />
-              <small style={{ fontSize: '0.85em', color: '#d4d8d5', display: 'block', marginTop: '0.25em' }}>
-                Enter a URL to an image (external or /img/filename.jpg for images in public folder)
-              </small>
-              </div>
+            <ImageUpload
+              currentImage={existingThumbnailUrl}
+              onImageChange={(file) => {
+                setThumbnailFile(file);
+                setRemoveThumbnail(false);
+              }}
+              onRemoveImage={() => {
+                setThumbnailFile(null);
+                setExistingThumbnailUrl(null);
+                setRemoveThumbnail(true);
+              }}
+            />
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: '1em' }}>

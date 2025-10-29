@@ -4,7 +4,12 @@ export interface IResource extends Document {
   title: string;
   url: string;
   description?: string;
-  thumbnail?: string;
+  thumbnail?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
   featured: boolean;
   order: number;
   isVisible: boolean;
@@ -26,7 +31,10 @@ const ResourceSchema = new Schema<IResource>(
       type: String,
     },
     thumbnail: {
-      type: String,
+      filename: String,
+      data: Buffer,
+      contentType: String,
+      size: Number
     },
     featured: {
       type: Boolean,

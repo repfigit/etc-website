@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/lib/models/Resource';
+import { logger } from '@/lib/logger';
 
 export async function PUT(
   request: Request,
@@ -13,7 +14,56 @@ export async function PUT(
     
     await connectDB();
     const { id } = await params;
-    const body = await request.json();
+    
+    const contentType = request.headers.get('content-type') || '';
+    let body: any;
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Handle FormData with thumbnail
+      const formData = await request.formData();
+      const thumbnailFile = formData.get('thumbnail') as File;
+      const removeThumbnail = formData.get('removeThumbnail') === 'true';
+      
+      body = {
+        title: formData.get('title'),
+        url: formData.get('url'),
+        description: formData.get('description'),
+        featured: formData.get('featured') === 'true',
+        order: parseInt(formData.get('order') as string) || 0,
+        isVisible: formData.get('isVisible') === 'true'
+      };
+      
+      // Handle thumbnail removal
+      if (removeThumbnail) {
+        body.thumbnail = null;
+      }
+      // Handle new thumbnail upload
+      else if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
+        try {
+          const bytes = await thumbnailFile.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          
+          body.thumbnail = {
+            filename: thumbnailFile.name,
+            data: buffer,
+            contentType: thumbnailFile.type,
+            size: thumbnailFile.size
+          };
+          
+          logger.debug('Thumbnail data prepared', {
+            filename: thumbnailFile.name,
+            contentType: thumbnailFile.type,
+            size: thumbnailFile.size
+          });
+        } catch (fileError) {
+          logger.error('Error processing thumbnail file', fileError);
+        }
+      }
+    } else {
+      // Handle JSON without thumbnail
+      body = await request.json();
+    }
+    
     const resource = await Resource.findByIdAndUpdate(
       id,
       body,
@@ -35,7 +85,7 @@ export async function PUT(
         { status: 401 }
       );
     }
-    console.error('Error updating resource:', error);
+    logger.error('Error updating resource', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update resource' },
       { status: 500 }

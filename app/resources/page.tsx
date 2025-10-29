@@ -11,7 +11,12 @@ interface Resource {
   title: string;
   url: string;
   description?: string;
-  thumbnail?: string;
+  thumbnail?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
   featured: boolean;
 }
 
@@ -68,7 +73,7 @@ export default function ResourcesPage() {
                   {resource.thumbnail && (
                     <div className="resources-page-thumbnail-container">
                       <img 
-                        src={resource.thumbnail} 
+                        src={`/api/resources/${resource._id}/thumbnail`}
                         alt={resource.title}
                         className="resources-page-thumbnail"
                       />
