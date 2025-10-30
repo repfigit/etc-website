@@ -129,6 +129,23 @@ footer {
     animation: glitch 8s linear 20s infinite alternate;
 }
 
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4ecdc4;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    color: #e67e22;
+    transform: scale(1.1);
+}
+
+.github-link svg {
+    vertical-align: middle;
+}
+
 ul {
     list-style: "*";
     font-size: 1.1em;
