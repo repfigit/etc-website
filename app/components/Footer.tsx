@@ -13,7 +13,7 @@ export default function Footer() {
     <footer>
       <p>State House Address: 107 North Main Street, Concord, NH 03301</p>
       <p>&copy; <span className="copyright-year">{year}</span> New Hampshire Emerging Technologies Caucus. All rights reserved.</p>
-      <p>Made with &#129505; using <a href="https://chatgpt.com/">&#129302;</a> etc.</p>
+      <p>Made with &#129505; using <a href="https://clacky.ai/">&#129302;</a> etc.</p>
       <p>
         <a 
           href="https://github.com/repfigit/etc-website" 
