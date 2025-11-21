@@ -71,6 +71,16 @@ export default function EventsSection() {
                   <Link href={`/events/${event._id}`} className='event-name-link'>
                     <strong>{event.topic}</strong>
                   </Link>
+                  {' '}
+                  <a 
+                    href={`/api/events/${event._id}/ical`}
+                    download
+                    className="event-calendar-icon"
+                    title="Add to calendar"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    📅
+                  </a>
                   <br />
                   {formatDate(event.date)} at {event.time}
                   {event.presenter && (

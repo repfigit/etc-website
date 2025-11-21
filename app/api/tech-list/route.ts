@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import TechItem from '@/lib/models/TechItem';
+import { logger } from '@/lib/logger';
+import { CacheConfig, addCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: Request) {
   try {
@@ -25,9 +27,16 @@ export async function GET(request: Request) {
     
     const techItems = await query.lean();
     
-    return NextResponse.json({ success: true, data: techItems });
+    const response = NextResponse.json({ success: true, data: techItems });
+    
+    // Add cache headers for public requests
+    if (admin !== 'true') {
+      return addCacheHeaders(response, CacheConfig.TECH_LIST);
+    }
+    
+    return response;
   } catch (error) {
-    console.error('Error fetching tech items:', error);
+    logger.error('Error fetching tech items', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch tech items' },
       { status: 500 }
@@ -53,7 +62,7 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    console.error('Error creating tech item:', error);
+    logger.error('Error creating tech item', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create tech item' },
       { status: 500 }

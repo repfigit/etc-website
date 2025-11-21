@@ -30,6 +30,8 @@ const TechItemSchema = new Schema<ITechItem>(
 );
 
 
+// Index on name field is automatically created by unique: true constraint
+
 
 export default mongoose.models.TechItem || mongoose.model<ITechItem>('TechItem', TechItemSchema);
 

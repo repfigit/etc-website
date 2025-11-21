@@ -64,9 +64,9 @@ export default function AdminPage() {
           </button>
         </form>
         
-        <p style={{ textAlign: 'center', marginTop: '1em' }}>
+        <div className="admin-login-back-link">
           <Link href="/">← Back to Home</Link>
-        </p>
+        </div>
       </div>
     </div>
   );
