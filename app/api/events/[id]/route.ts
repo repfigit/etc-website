@@ -9,22 +9,22 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
-    
+
     // Check if this is an admin request
     const url = new URL(request.url);
     const admin = url.searchParams.get('admin');
-    
+
     // Only exclude presentation data for public API calls, not admin
     const selectFields = admin === 'true' ? '' : '-presentations.data';
     const event = await Event.findById(id).select(selectFields);
-    
+
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
     console.error('Error fetching event:', error);
@@ -43,18 +43,18 @@ export async function PUT(
     // Verify authentication for admin operations
     const { requireAuth } = await import('@/lib/auth');
     await requireAuth(request as any);
-    
+
     await connectDB();
     const { id } = await params;
-    
+
     // Check if request contains FormData (with presentation) or JSON
     const contentType = request.headers.get('content-type') || '';
     let body: any;
-    
+
     if (contentType.includes('multipart/form-data')) {
       // Handle FormData with presentation
       const formData = await request.formData();
-      
+
       body = {
         date: formData.get('date'),
         time: formData.get('time'),
@@ -66,22 +66,22 @@ export async function PUT(
         isVisible: formData.get('isVisible') === 'true',
         content: formData.get('content')
       };
-      
+
       // Handle multiple presentation files
       const presentationFiles = formData.getAll('presentations') as File[];
       const presentationsToKeep = formData.getAll('keepPresentations') as string[];
-      
+
       // Always process presentations when editing (even if empty)
       // Get existing presentations and filter to only keep specified ones
       let existingPresentations = [];
       if (presentationsToKeep.length > 0) {
         const existingEvent = await Event.findById(id).select('presentations');
         existingPresentations = (existingEvent?.presentations || [])
-          .filter(p => presentationsToKeep.includes(p.filename));
+          .filter((p: any) => presentationsToKeep.includes(p.filename));
       }
-      
+
       body.presentations = [...existingPresentations];
-      
+
       // Add new files
       for (const file of presentationFiles) {
         if (file instanceof File && file.size > 0) {
@@ -106,7 +106,7 @@ export async function PUT(
       // Handle JSON without presentation
       body = await request.json();
     }
-    
+
     // Fix timezone issue: convert date string to proper Date object
     if (body.date) {
       // If date is in YYYY-MM-DD format, create a date at noon local time to avoid timezone issues
@@ -117,30 +117,30 @@ export async function PUT(
         body.date = new Date(year, month - 1, day, 12, 0, 0);
       }
     }
-    
+
     console.log('Updating event with body:', {
       ...body,
-      presentations: body.presentations ? body.presentations.map(p => ({
+      presentations: body.presentations ? body.presentations.map((p: any) => ({
         filename: p.filename,
         contentType: p.contentType,
         size: p.size,
         dataLength: p.data?.length
       })) : null
     });
-    
+
     const event = await Event.findByIdAndUpdate(
       id,
       body,
       { new: true, runValidators: true }
     );
-    
+
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {
@@ -165,18 +165,18 @@ export async function DELETE(
     // Verify authentication for admin operations
     const { requireAuth } = await import('@/lib/auth');
     await requireAuth(request as any);
-    
+
     await connectDB();
     const { id } = await params;
     const event = await Event.findByIdAndDelete(id);
-    
+
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {

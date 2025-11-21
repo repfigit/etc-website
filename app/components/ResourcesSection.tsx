@@ -49,22 +49,22 @@ export default function ResourcesSection() {
           <>
             <div className="resource-grid">
               {resources.map((resource) => (
-                <a 
+                <a
                   key={resource._id}
-                  href={resource.url} 
-                  target="_blank" 
+                  href={resource.url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="resource-card"
                 >
-                  {resource.thumbnail && (
+                  {typeof resource.thumbnail === 'string' && resource.thumbnail.trim().length > 0 && (
                     <div className="resource-thumbnail-container">
-                      <Image 
-                        src={resource.thumbnail} 
+                      <Image
+                        src={resource.thumbnail}
                         alt={resource.title}
                         width={200}
                         height={150}
-                        style={{ 
-                          maxWidth: '100%', 
+                        style={{
+                          maxWidth: '100%',
                           height: 'auto'
                         }}
                       />

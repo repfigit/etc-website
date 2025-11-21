@@ -25,6 +25,12 @@ interface Event {
     contentType: string;
     size: number;
   };
+  presentations?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  }[];
   isVisible: boolean;
   content?: string;
 }
@@ -49,10 +55,10 @@ export default function AdminEvents() {
     isVisible: true,
     content: ''
   });
-  
+
   const [presentations, setPresentations] = useState<Array<{
     id: string;
-    file: File;
+    file: File | null;
     name: string;
     size: number;
     type: string;
@@ -63,7 +69,7 @@ export default function AdminEvents() {
       try {
         const response = await fetch('/api/auth/verify');
         const data = await response.json();
-        
+
         if (!data.authenticated) {
           router.push('/admin');
           return;
@@ -74,7 +80,7 @@ export default function AdminEvents() {
         router.push('/admin');
       }
     };
-    
+
     checkAuth();
   }, [router]);
 
@@ -94,17 +100,17 @@ export default function AdminEvents() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const url = editingId ? `/api/events/${editingId}` : '/api/events';
       const method = editingId ? 'PUT' : 'POST';
-      
+
       // Combine time and timezone for the API
       const submitData = {
         ...formData,
         time: `${formData.time} ${formData.timezone}`.trim()
       };
-      
+
       console.log('Form data before submission:', {
         presentations: presentations.map(p => ({
           name: p.name,
@@ -112,56 +118,56 @@ export default function AdminEvents() {
           type: p.type
         }))
       });
-      
+
       // Remove timezone from the data sent to API
       const { timezone, ...dataToSubmit } = submitData;
-      
+
       // Always use FormData for editing events to handle presentations properly
       const formDataToSend = new FormData();
-      
+
       // Add all form fields
       Object.entries(dataToSubmit).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
           formDataToSend.append(key, value.toString());
         }
       });
-      
+
       // Add presentation files (only new files, not existing ones)
       presentations.forEach(presentation => {
         if (presentation.file) {
           formDataToSend.append('presentations', presentation.file);
         }
       });
-      
+
       // Add information about which presentations to keep (for editing)
       if (editingId) {
         const presentationsToKeep = presentations
           .filter(p => p.file === null) // Only existing presentations (no file object)
           .map(p => p.name);
-        
+
         presentationsToKeep.forEach(filename => {
           formDataToSend.append('keepPresentations', filename);
         });
       }
-      
+
       console.log('Sending FormData with fields:', Array.from(formDataToSend.keys()));
       console.log('Presentation files:', presentations.map(p => `${p.name} (${p.size} bytes)`));
-      
+
       const response = await fetch(url, {
         method,
         body: formDataToSend
       });
-        
-        if (response.ok) {
-          await fetchEvents();
-          resetForm();
-        } else {
-          const errorText = await response.text();
-          console.error('Server error:', errorText);
-          console.error('Response status:', response.status);
-          console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-          alert('Failed to save event: ' + (errorText || 'Unknown error'));
-        }
+
+      if (response.ok) {
+        await fetchEvents();
+        resetForm();
+      } else {
+        const errorText = await response.text();
+        console.error('Server error:', errorText);
+        console.error('Response status:', response.status);
+        console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+        alert('Failed to save event: ' + (errorText || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error saving event:', error);
       alert('Error saving event');
@@ -175,15 +181,15 @@ export default function AdminEvents() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const dateString = `${year}-${month}-${day}`;
-    
+
     // Parse time and timezone from the stored time string
     let timeValue = '';
     let timezoneValue = 'ET';
-    
+
     if (event.time) {
       // Try to extract time in HH:MM format for HTML5 time input
       const timeStr = event.time.trim();
-      
+
       // Handle various time formats
       if (timeStr.includes('AM') || timeStr.includes('PM')) {
         // 12-hour format: "2:30 PM ET" or "2:30 PM"
@@ -193,14 +199,14 @@ export default function AdminEvents() {
           const minutes = ampmMatch[2];
           const ampm = ampmMatch[3].toUpperCase();
           timezoneValue = ampmMatch[4].trim() || 'ET';
-          
+
           // Convert to 24-hour format for HTML5 time input
           if (ampm === 'PM' && hours !== 12) {
             hours += 12;
           } else if (ampm === 'AM' && hours === 12) {
             hours = 0;
           }
-          
+
           timeValue = `${hours.toString().padStart(2, '0')}:${minutes}`;
         } else {
           // Fallback: try to extract just the time part
@@ -209,13 +215,13 @@ export default function AdminEvents() {
             let hours = parseInt(simpleMatch[1]);
             const minutes = simpleMatch[2];
             const ampm = simpleMatch[3].toUpperCase();
-            
+
             if (ampm === 'PM' && hours !== 12) {
               hours += 12;
             } else if (ampm === 'AM' && hours === 12) {
               hours = 0;
             }
-            
+
             timeValue = `${hours.toString().padStart(2, '0')}:${minutes}`;
             timezoneValue = timeStr.replace(/^\d{1,2}:\d{2}\s*(AM|PM)\s*/i, '').trim() || 'ET';
           }
@@ -234,7 +240,7 @@ export default function AdminEvents() {
         }
       }
     }
-    
+
     console.log('Editing event:', {
       id: event._id,
       topic: event.topic,
@@ -245,7 +251,7 @@ export default function AdminEvents() {
         hasData: !!p.data
       })) || []
     });
-    
+
     setFormData({
       date: dateString,
       time: timeValue,
@@ -258,7 +264,7 @@ export default function AdminEvents() {
       isVisible: event.isVisible,
       content: event.content || ''
     });
-    
+
     // Load existing presentations for display
     if (event.presentations && event.presentations.length > 0) {
       const existingPresentations = event.presentations.map(p => ({
@@ -278,7 +284,7 @@ export default function AdminEvents() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return;
-    
+
     try {
       const response = await fetch(`/api/events/${id}`, { method: 'DELETE' });
       if (response.ok) {
@@ -547,14 +553,14 @@ export default function AdminEvents() {
 
             <div style={{ marginTop: '1em', display: 'flex', alignItems: 'center' }}>
               <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.isVisible}
-                    onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                    style={{ marginRight: '0.5em' }}
-                  />
-                  Visible
-                </label>
+                <input
+                  type="checkbox"
+                  checked={formData.isVisible}
+                  onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                  style={{ marginRight: '0.5em' }}
+                />
+                Visible
+              </label>
             </div>
 
             <PDFUploadSubform
@@ -602,8 +608,8 @@ export default function AdminEvents() {
           onClose={() => setShowMarkdownPreview(false)}
           title="Markdown Preview"
         >
-          <div style={{ 
-            maxHeight: '70vh', 
+          <div style={{
+            maxHeight: '70vh',
             overflowY: 'auto',
             padding: '1em',
             background: '#000',
@@ -626,9 +632,9 @@ export default function AdminEvents() {
                   code: ({ children, className }) => {
                     const isInline = !className;
                     return isInline ? (
-                      <code style={{ 
-                        background: '#333', 
-                        padding: '0.2em 0.4em', 
+                      <code style={{
+                        background: '#333',
+                        padding: '0.2em 0.4em',
                         borderRadius: '3px',
                         fontSize: '0.9em'
                       }}>
@@ -639,10 +645,10 @@ export default function AdminEvents() {
                     );
                   },
                   pre: ({ children }) => (
-                    <pre style={{ 
-                      background: '#1a1a1a', 
-                      padding: '1em', 
-                      borderRadius: '5px', 
+                    <pre style={{
+                      background: '#1a1a1a',
+                      padding: '1em',
+                      borderRadius: '5px',
                       overflow: 'auto',
                       marginBottom: '1em',
                       border: '1px solid #333'
@@ -651,9 +657,9 @@ export default function AdminEvents() {
                     </pre>
                   ),
                   blockquote: ({ children }) => (
-                    <blockquote style={{ 
-                      borderLeft: '4px solid #4ecdc4', 
-                      paddingLeft: '1em', 
+                    <blockquote style={{
+                      borderLeft: '4px solid #4ecdc4',
+                      paddingLeft: '1em',
                       marginLeft: '0',
                       marginBottom: '1em',
                       fontStyle: 'italic',
@@ -665,9 +671,9 @@ export default function AdminEvents() {
                     </blockquote>
                   ),
                   a: ({ children, href }) => (
-                    <a 
-                      href={href} 
-                      target="_blank" 
+                    <a
+                      href={href}
+                      target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: '#4ecdc4' }}
                     >
@@ -676,8 +682,8 @@ export default function AdminEvents() {
                   ),
                   table: ({ children }) => (
                     <div style={{ overflowX: 'auto', marginBottom: '1em' }}>
-                      <table style={{ 
-                        borderCollapse: 'collapse', 
+                      <table style={{
+                        borderCollapse: 'collapse',
                         width: '100%',
                         border: '1px solid #333'
                       }}>
@@ -686,9 +692,9 @@ export default function AdminEvents() {
                     </div>
                   ),
                   th: ({ children }) => (
-                    <th style={{ 
-                      border: '1px solid #333', 
-                      padding: '0.5em', 
+                    <th style={{
+                      border: '1px solid #333',
+                      padding: '0.5em',
                       background: '#333',
                       textAlign: 'left'
                     }}>
@@ -696,8 +702,8 @@ export default function AdminEvents() {
                     </th>
                   ),
                   td: ({ children }) => (
-                    <td style={{ 
-                      border: '1px solid #333', 
+                    <td style={{
+                      border: '1px solid #333',
                       padding: '0.5em'
                     }}>
                       {children}
@@ -708,9 +714,9 @@ export default function AdminEvents() {
                 {formData.content}
               </ReactMarkdown>
             ) : (
-              <div style={{ 
-                padding: '2em', 
-                border: '2px dashed #666', 
+              <div style={{
+                padding: '2em',
+                border: '2px dashed #666',
                 textAlign: 'center',
                 color: '#999'
               }}>
@@ -741,9 +747,9 @@ export default function AdminEvents() {
                   <div>Location: {event.location}</div>
                   {event.content && (
                     <div style={{ marginTop: '0.5em' }}>
-                      <Link 
-                        href={`/events/${event._id}`} 
-                        target="_blank" 
+                      <Link
+                        href={`/events/${event._id}`}
+                        target="_blank"
                         style={{ color: '#4ecdc4' }}
                       >
                         📝 View Event Page
