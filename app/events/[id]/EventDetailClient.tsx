@@ -180,14 +180,7 @@ export default function EventDetailClient({ event }: Props) {
           </header>
 
           {event.content && (
-            <div style={{ 
-              marginTop: '2em',
-              lineHeight: '1.6',
-              fontSize: '1.1em',
-              animation: 'none',
-              textShadow: 'none',
-              transform: 'none'
-            }}>
+            <div className="event-detail-content">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}

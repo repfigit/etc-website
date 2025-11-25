@@ -24,10 +24,12 @@ interface Event {
 export default function EventsSection() {
   const [events, setEvents] = useState<Event[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchEvents() {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/events?limit=5');
         const data = await response.json();
         if (data.success) {
@@ -36,6 +38,8 @@ export default function EventsSection() {
         }
       } catch (error) {
         console.error('Error fetching events:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -52,6 +56,50 @@ export default function EventsSection() {
     });
   };
 
+  const formatTime = (timeString: string) => {
+    // Try to parse and format time nicely
+    try {
+      const [hours, minutes] = timeString.split(':');
+      
+      // Validate that both hours and minutes exist after splitting (checking for empty strings too)
+      if (!hours || !minutes) {
+        return timeString;
+      }
+      
+      const hour = parseInt(hours);
+      
+      // Validate that hour is a valid number
+      if (isNaN(hour)) {
+        return timeString;
+      }
+      
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minutes} ${ampm}`;
+    } catch {
+      return timeString;
+    }
+  };
+
+  const getDateBadge = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = date.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return { text: 'Past', className: 'date-badge past' };
+    } else if (diffDays === 0) {
+      return { text: 'Today', className: 'date-badge today' };
+    } else if (diffDays === 1) {
+      return { text: 'Tomorrow', className: 'date-badge upcoming' };
+    } else if (diffDays <= 7) {
+      return { text: 'This Week', className: 'date-badge upcoming' };
+    } else {
+      return { text: 'Upcoming', className: 'date-badge upcoming' };
+    }
+  };
+
   return (
     <section id="events">
       <div className="image-container">
@@ -63,53 +111,76 @@ export default function EventsSection() {
           Join us at our upcoming meetings and seminars where policymakers, industry leaders, and academics
           discuss the future of technology.
         </p>
-        {events.length > 0 ? (
+        {isLoading ? (
+          <div className="events-loading">
+            <div className="skeleton-card"></div>
+            <div className="skeleton-card"></div>
+            <div className="skeleton-card"></div>
+          </div>
+        ) : events.length > 0 ? (
           <>
-            <ul>
-              {events.map((event) => (
-                <li key={event._id}>
-                  <Link href={`/events/${event._id}`} className='event-name-link'>
-                    <strong>{event.topic}</strong>
-                  </Link>
-                  {' '}
-                  <a 
-                    href={`/api/events/${event._id}/ical`}
-                    download
-                    className="event-calendar-icon"
-                    title="Add to calendar"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    📅
-                  </a>
-                  <br />
-                  {formatDate(event.date)} at {event.time}
-                  {event.presenter && (
-                    <>
-                      <br />
-                      Presenter: {event.presenterUrl ? (
-                        <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
-                      ) : (
-                        event.presenter
+            <div className="events-list-container">
+              {events.map((event) => {
+                const badge = getDateBadge(event.date);
+                return (
+                  <div key={event._id} className="event-card-home">
+                    <div className="event-card-header">
+                      <Link href={`/events/${event._id}`} className='event-name-link'>
+                        <strong>{event.topic}</strong>
+                      </Link>
+                      <div className="event-card-badges">
+                        <span className={badge.className}>{badge.text}</span>
+                        <a 
+                          href={`/api/events/${event._id}/ical`}
+                          download
+                          className="event-calendar-icon"
+                          title="Add to calendar"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          📅
+                        </a>
+                      </div>
+                    </div>
+                    <div className="event-card-details">
+                      <div className="event-detail-item">
+                        <span className="event-detail-icon">📅</span>
+                        <span>{formatDate(event.date)} at {formatTime(event.time)}</span>
+                      </div>
+                      {event.presenter && (
+                        <div className="event-detail-item">
+                          <span className="event-detail-icon">👤</span>
+                          <span>
+                            Presenter: {event.presenterUrl ? (
+                              <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
+                            ) : (
+                              event.presenter
+                            )}
+                          </span>
+                        </div>
                       )}
-                    </>
-                  )}
-                  <br />
-                  Location: {event.locationUrl ? (
-                    <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
-                  ) : (
-                    event.location
-                  )}
-                  {event.presentation && (
-                    <>
-                      <br />
-                      <span className="events-section-presentation-link">
-                        📄 {event.presentation.filename} available
-                      </span>
-                    </>
-                  )}
-                </li>
-              ))}
-            </ul>
+                      <div className="event-detail-item">
+                        <span className="event-detail-icon">📍</span>
+                        <span>
+                          {event.locationUrl ? (
+                            <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
+                          ) : (
+                            event.location
+                          )}
+                        </span>
+                      </div>
+                      {event.presentation && (
+                        <div className="event-detail-item">
+                          <span className="event-detail-icon">📄</span>
+                          <span className="events-section-presentation-link">
+                            {event.presentation.filename} available
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             {totalCount > 5 && (
               <p className="events-section-view-all">
                 <Link href="/events" className="events-section-view-all-link">

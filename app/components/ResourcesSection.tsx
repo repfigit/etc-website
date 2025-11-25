@@ -16,10 +16,12 @@ interface Resource {
 export default function ResourcesSection() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchResources() {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/resources?featured=true');
         const data = await response.json();
         if (data.success) {
@@ -31,6 +33,8 @@ export default function ResourcesSection() {
         }
       } catch (error) {
         console.error('Error fetching resources:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -45,7 +49,14 @@ export default function ResourcesSection() {
       <div className="content-container">
         <h2>Featured Resources</h2>
         <p>Access research papers, legislative updates, and white papers on emerging technologies.</p>
-        {resources.length > 0 ? (
+        {isLoading ? (
+          <div className="resources-loading">
+            <div className="skeleton-resource-card"></div>
+            <div className="skeleton-resource-card"></div>
+            <div className="skeleton-resource-card"></div>
+            <div className="skeleton-resource-card"></div>
+          </div>
+        ) : resources.length > 0 ? (
           <>
             <div className="resource-grid">
               {resources.map((resource) => (
@@ -56,7 +67,10 @@ export default function ResourcesSection() {
                   rel="noopener noreferrer"
                   className="resource-card"
                 >
-                  {typeof resource.thumbnail === 'string' && resource.thumbnail.trim().length > 0 && (
+                  {resource.featured && (
+                    <span className="resource-featured-badge">Featured</span>
+                  )}
+                  {typeof resource.thumbnail === 'string' && resource.thumbnail.trim().length > 0 ? (
                     <div className="resource-thumbnail-container">
                       <Image
                         src={resource.thumbnail}
@@ -65,9 +79,14 @@ export default function ResourcesSection() {
                         height={150}
                         style={{
                           maxWidth: '100%',
-                          height: 'auto'
+                          height: 'auto',
+                          objectFit: 'cover'
                         }}
                       />
+                    </div>
+                  ) : (
+                    <div className="resource-thumbnail-container resource-thumbnail-placeholder">
+                      <span className="resource-placeholder-icon">📄</span>
                     </div>
                   )}
                   <strong className="resource-title">
@@ -78,6 +97,7 @@ export default function ResourcesSection() {
                       {resource.description}
                     </p>
                   )}
+                  <span className="resource-link-hint">Visit resource →</span>
                 </a>
               ))}
             </div>

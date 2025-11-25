@@ -73,6 +73,14 @@ export default function AdminDashboard() {
             <h2 className="admin-dashboard-card-title">📚 Manage Resources</h2>
             <p className="admin-dashboard-card-description">Add, edit, or delete resource links</p>
           </Link>
+
+          <Link
+            href="/admin/contacts"
+            className="admin-dashboard-card"
+          >
+            <h2 className="admin-dashboard-card-title">✉️ Contact Submissions</h2>
+            <p className="admin-dashboard-card-description">View and manage contact form submissions</p>
+          </Link>
         </div>
 
         <p style={{ marginTop: '2em', textAlign: 'center' }}>
