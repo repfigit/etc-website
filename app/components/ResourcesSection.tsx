@@ -9,7 +9,12 @@ interface Resource {
   title: string;
   url: string;
   description?: string;
-  thumbnail?: string;
+  thumbnail?: {
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+  };
   featured: boolean;
 }
 
@@ -70,10 +75,10 @@ export default function ResourcesSection() {
                   {resource.featured && (
                     <span className="resource-featured-badge">Featured</span>
                   )}
-                  {typeof resource.thumbnail === 'string' && resource.thumbnail.trim().length > 0 ? (
+                  {resource.thumbnail ? (
                     <div className="resource-thumbnail-container">
                       <Image
-                        src={resource.thumbnail}
+                        src={`/api/resources/${resource._id}/thumbnail`}
                         alt={resource.title}
                         width={200}
                         height={150}
