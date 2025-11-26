@@ -34,9 +34,45 @@ header, h1, h2, h3, h4, nav, .modal-title, code, pre, .flashing-cursor {
 header {
     background-color: #0d1210;
     line-height: 2em;
-    padding: 1em 0;
+    padding: 1em 1em;
     text-align: center;
     animation: glitch 30s ease-in-out 10s infinite;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+header h1 {
+    margin: 0;
+    padding: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+header h1 span {
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    header {
+        padding: 1em 0.75em;
+    }
+    
+    header h1 {
+        font-size: 1.2em;
+        line-height: 1.5em;
+    }
+    
+    header p {
+        font-size: 1em;
+        padding: 0 0.5em;
+    }
+    
+    header .logo {
+        width: 32px !important;
+        height: 32px !important;
+    }
 }
 
 .nav-container {
@@ -2967,6 +3003,9 @@ html {
     .hero-section {
         padding: 2em 1em;
     }
+    .hero-content {
+        padding: 0 0.5em;
+    }
 }
 
 .hero-tagline {
@@ -3003,6 +3042,7 @@ html {
     font-family: inherit;
     border: 2px solid;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .hero-button.primary {
@@ -3642,12 +3682,16 @@ a:not(.hero-button):not(.contact-submit-button):not(.scroll-to-top):hover {
         flex-direction: column;
         align-items: stretch;
         gap: 0.8em;
+        width: 100%;
+        max-width: 100%;
     }
     
     .hero-button {
         width: 100%;
+        max-width: 100%;
         text-align: center;
         padding: 0.875em 1.5em;
+        box-sizing: border-box;
     }
     
     .event-card-header {
