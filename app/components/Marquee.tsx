@@ -31,7 +31,7 @@ export default function Marquee() {
           // Shuffle the array
           const shuffled = [...data.data].sort(() => Math.random() - 0.5);
           setTechItems(shuffled);
-          
+
           // Randomly select 10% of items to scroll
           const itemsToScroll = shuffled
             .filter(() => Math.random() < 0.1)
