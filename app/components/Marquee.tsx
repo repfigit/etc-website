@@ -14,7 +14,6 @@ export default function Marquee() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [scrollingItems, setScrollingItems] = useState<Set<string>>(new Set());
-  // Randomly choose ms-pac-man 10% of the time, otherwise use pac-man
   // Initialize with default to avoid hydration mismatch, then set randomly on client
   const [pacmanImage, setPacmanImage] = useState('/img/pac-man.gif');
 
