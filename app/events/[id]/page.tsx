@@ -33,9 +33,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 
     const title = `${event.topic} | NH Emerging Technologies Caucus`;
-    const description = event.content 
+    const description = event.content
       ? event.content.substring(0, 200).replace(/[#*_\[\]]/g, '') + '...'
       : `Join us on ${formatDate(event.date.toISOString())} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`;
+
+    // Use the first event image if available, otherwise fall back to default
+    const hasEventImage = event.images && event.images.length > 0;
+    const imageUrl = hasEventImage
+      ? `https://emergingtechnh.org/api/events/${id}/images/0`
+      : 'https://emergingtechnh.org/img/index.png';
+    const imageAlt = hasEventImage
+      ? `${event.topic} - NH Emerging Technologies Caucus`
+      : 'NH Emerging Technologies Caucus';
 
     return {
       title,
@@ -47,10 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: `https://emergingtechnh.org/events/${id}`,
         siteName: 'NH Emerging Technologies Caucus',
         images: [{
-          url: 'https://emergingtechnh.org/img/index.png',
+          url: imageUrl,
           width: 1200,
           height: 630,
-          alt: 'NH Emerging Technologies Caucus',
+          alt: imageAlt,
         }],
       },
       twitter: {
@@ -58,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title,
         description,
         site: '@EmergingTechNH',
-        images: ['https://emergingtechnh.org/img/index.png'],
+        images: [imageUrl],
       },
     };
   } catch (error) {

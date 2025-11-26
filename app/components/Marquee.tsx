@@ -14,11 +14,11 @@ export default function Marquee() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [scrollingItems, setScrollingItems] = useState<Set<string>>(new Set());
-  // Start with default pac-man to avoid hydration mismatch, randomize on client
+  // Initialize with default to avoid hydration mismatch, then set randomly on client
   const [pacmanImage, setPacmanImage] = useState('/img/pac-man.gif');
 
   useEffect(() => {
-    // Randomly choose ms-pac-man 10% of the time, otherwise use pac-man
+    // Set pacman image randomly on client side only to avoid hydration mismatch
     setPacmanImage(Math.random() < 0.1 ? '/img/ms-pac-man.gif' : '/img/pac-man.gif');
 
     async function fetchTechItems() {

@@ -14,7 +14,7 @@ export default function Header() {
             height={24}
             priority
           />
-          <span style={{ whiteSpace: 'nowrap' }}>New Hampshire</span> Emerging Technologies Caucus
+          <span>New Hampshire</span> Emerging Technologies Caucus
         </h1>
       </Link>
       <p>Fostering Innovation, Collaboration, and Progress</p>
