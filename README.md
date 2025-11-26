@@ -28,16 +28,21 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 - **Database**: MongoDB with Mongoose ODM
 - **Styling**: Custom CSS with retro terminal aesthetic
 - **Authentication**: JWT-based admin authentication
+- **Drag & Drop**: @dnd-kit for reorderable lists
+- **Markdown**: react-markdown with GitHub-flavored markdown support
 
 ## 🎯 Features
 
 - **Public Website**: Events, resources, and tech topics showcase
-- **Admin Panel**: Manage events, resources, and tech list
+- **Admin Panel**: Manage events, resources, tech list, and contact submissions
 - **Dynamic Content**: All content stored in MongoDB
 - **Drag & Drop**: Reorder resources with drag-and-drop interface
-- **File Uploads**: PDF presentations for events
+- **Image Carousel**: Event pages support multiple images with carousel display
+- **File Uploads**: PDF presentations and image uploads stored in MongoDB
+- **iCalendar Export**: Download events as .ics files for calendar integration
+- **Contact Form**: Public contact form with admin management
 - **Responsive Design**: Mobile-friendly layout
-- **SEO Optimized**: Meta tags and Open Graph support
+- **SEO Optimized**: Meta tags, Open Graph, and Twitter Card support
 
 ## 📚 Documentation
 
@@ -52,7 +57,14 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 etc-website/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API routes
-│   ├── admin/             # Admin dashboard
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── events/        # Events CRUD + images + iCal
+│   │   ├── resources/     # Resources CRUD + thumbnails
+│   │   ├── tech-list/     # Tech list management
+│   │   └── contact/       # Contact form submissions
+│   ├── admin/             # Admin dashboard pages
+│   ├── events/            # Event listing and detail pages
+│   ├── resources/         # Resources page
 │   ├── components/        # React components
 │   └── page.tsx           # Home page
 ├── lib/                    # Utilities and models
@@ -68,11 +80,12 @@ etc-website/
 ## 🛠️ Available Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm start        # Start production server
-npm run seed     # Seed database with initial data
-npm run lint     # Run ESLint
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Start production server
+npm run seed         # Seed database with initial data
+npm run lint         # Run ESLint
+npm run copy-to-prod # Copy data to production database
 ```
 
 ## 🔐 Admin Access
