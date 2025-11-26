@@ -4,7 +4,7 @@ export default function InitiativesSection() {
   return (
     <section id="initiatives">
       <div className="image-container">
-        <Image src="/img/initiatives.webp" alt="Technology Initiatives" width={400} height={400} />
+        <Image src="/img/initiatives.webp" alt="Technology Initiatives" width={400} height={400} style={{ height: 'auto' }} />
       </div>
       <div className="content-container">
         <h2>Initiatives:</h2>

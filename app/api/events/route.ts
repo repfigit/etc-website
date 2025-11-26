@@ -16,11 +16,6 @@ export async function GET(request: Request) {
 
     let query = Event.find(filter).sort({ date: -1 });
 
-    // Only exclude presentation data for public API calls, not admin
-    if (admin !== 'true') {
-      query = query.select('-presentations.data');
-    }
-
     // Get total count
     const total = await Event.countDocuments(filter);
 
@@ -30,22 +25,50 @@ export async function GET(request: Request) {
     }
 
     const events = await query.lean();
+    
+    // Remove Buffer data from presentations and images (can't be serialized to JSON)
+    // This must be done after .lean() because Mongoose select doesn't work well with nested arrays
+    const sanitizedEvents = events.map((event: any) => {
+      const sanitized = { ...event };
+      if (sanitized.presentations) {
+        sanitized.presentations = sanitized.presentations.map((p: any) => {
+          const { data, ...rest } = p;
+          return rest;
+        });
+      }
+      if (sanitized.images) {
+        sanitized.images = sanitized.images.map((img: any) => {
+          const { data, ...rest } = img;
+          return rest;
+        });
+      }
+      return sanitized;
+    });
 
-    // Log presentation data for admin requests
-    if (admin === 'true' && events.length > 0) {
-      console.log('Admin events fetched:', events.map(e => ({
+    // Log presentation and image data for admin requests
+    if (admin === 'true' && sanitizedEvents.length > 0) {
+      console.log('Admin events fetched:', sanitizedEvents.map(e => ({
         id: e._id,
         topic: e.topic,
         presentations: e.presentations?.map((p: any) => ({
           filename: p.filename,
           contentType: p.contentType,
-          size: p.size,
-          hasData: !!p.data
-        })) || []
+          size: p.size
+        })) || [],
+        images: e.images?.map((img: any) => ({
+          filename: img.filename,
+          contentType: img.contentType,
+          size: img.size,
+          order: img.order
+        })) || [],
+        hasImagesField: 'images' in e,
+        imagesType: typeof e.images,
+        imagesIsArray: Array.isArray(e.images),
+        imagesCount: e.images?.length || 0
       })));
     }
 
-    return NextResponse.json({ success: true, data: events, total });
+    return NextResponse.json({ success: true, data: sanitizedEvents, total });
   } catch (error) {
     console.error('Error fetching events:', error);
     return NextResponse.json(
@@ -119,6 +142,71 @@ export async function POST(request: Request) {
           }
         }
       }
+
+      // Handle multiple image files
+      const imageFiles = formData.getAll('images') as File[];
+      console.log(`Received ${imageFiles.length} image files for processing`);
+      
+      if (imageFiles.length > 0) {
+        body.images = []; // Initialize images array only if there are files to process
+        // Validate image types
+        const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+        const maxImageSize = 5 * 1024 * 1024; // 5MB
+
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          console.log(`Processing image file ${i + 1}/${imageFiles.length}: ${file.name} (${file.size} bytes, type: ${file.type})`);
+          
+          if (file instanceof File && file.size > 0) {
+            // Validate file type
+            if (!allowedImageTypes.includes(file.type)) {
+              console.error(`Invalid image type: ${file.type} for file: ${file.name}`);
+              continue;
+            }
+
+            // Validate file size
+            if (file.size > maxImageSize) {
+              console.error(`Image too large: ${file.name} (${file.size} bytes)`);
+              continue;
+            }
+
+            try {
+              const bytes = await file.arrayBuffer();
+              const buffer = Buffer.from(bytes);
+
+              // Use body.images.length as order to ensure sequential ordering
+              // even when some files are skipped due to validation errors
+              const order = body.images.length;
+
+              body.images.push({
+                filename: file.name,
+                data: buffer,
+                contentType: file.type,
+                size: file.size,
+                uploadedAt: new Date(),
+                order: order
+              });
+
+              console.log('Image data prepared and added to body.images:', {
+                filename: file.name,
+                contentType: file.type,
+                size: file.size,
+                order: order,
+                bufferLength: buffer.length
+              });
+            } catch (fileError) {
+              console.error('Error processing image file:', fileError);
+              // Continue without this file rather than failing the entire request
+            }
+          } else {
+            console.warn(`Skipping invalid file: ${file.name} (not a File instance or size is 0)`);
+          }
+        }
+        
+        console.log(`Final body.images array has ${body.images.length} images`);
+      } else {
+        console.log('No image files provided in FormData');
+      }
     } else {
       // Handle JSON without presentation
       body = await request.json();
@@ -142,7 +230,14 @@ export async function POST(request: Request) {
         contentType: body.presentation.contentType,
         size: body.presentation.size,
         dataLength: body.presentation.data?.length
-      } : null
+      } : null,
+      images: body.images ? body.images.map((img: any) => ({
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        order: img.order,
+        dataLength: img.data?.length
+      })) : null
     });
 
     const event = await Event.create(body);

@@ -15,6 +15,14 @@ export interface IEvent extends Document {
     size: number;
     uploadedAt: Date;
   }>;
+  images?: Array<{
+    filename: string;
+    data: Buffer;
+    contentType: string;
+    size: number;
+    uploadedAt: Date;
+    order?: number;
+  }>;
   isVisible: boolean;
   content?: string; // Markdown content for detailed notes
   createdAt: Date;
@@ -68,6 +76,31 @@ const EventSchema = new Schema<IEvent>(
       uploadedAt: {
         type: Date,
         default: Date.now,
+      },
+    }],
+    images: [{
+      filename: {
+        type: String,
+        required: true,
+      },
+      data: {
+        type: Buffer,
+        required: true,
+      },
+      contentType: {
+        type: String,
+        required: true,
+      },
+      size: {
+        type: Number,
+        required: true,
+      },
+      uploadedAt: {
+        type: Date,
+        default: Date.now,
+      },
+      order: {
+        type: Number,
       },
     }],
     isVisible: {

@@ -9,6 +9,7 @@ import 'highlight.js/styles/github-dark.css';
 import Header from '../../components/Header';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
+import ImageCarousel from '../../components/ImageCarousel';
 
 interface Event {
   _id: string;
@@ -24,6 +25,13 @@ interface Event {
     contentType: string;
     size: number;
     uploadedAt?: string;
+  }>;
+  images?: Array<{
+    filename: string;
+    contentType: string;
+    size: number;
+    uploadedAt?: string;
+    order?: number;
   }>;
   content?: string;
   isVisible: boolean;
@@ -178,6 +186,12 @@ export default function EventDetailClient({ event }: Props) {
               </div>
             )}
           </header>
+
+          {event.images && event.images.length > 0 && (
+            <div className="event-detail-images">
+              <ImageCarousel images={event.images} eventId={event._id} />
+            </div>
+          )}
 
           {event.content && (
             <div className="event-detail-content">

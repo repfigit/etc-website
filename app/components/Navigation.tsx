@@ -10,6 +10,7 @@ export default function Navigation() {
   const [showResourcesMenu, setShowResourcesMenu] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [isSticky, setIsSticky] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -92,45 +93,83 @@ export default function Navigation() {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    setShowEventsMenu(false);
+    setShowResourcesMenu(false);
+  };
+
   return (
     <div className={`nav-container sticky-nav ${isSticky ? 'is-sticky' : ''}`}>
       <nav>
         {isSticky && (
-          <Link href="/" className="nav-logo-container">
+          <Link href="/" className="nav-logo-container" onClick={closeMobileMenu}>
             <Image
               className="nav-logo"
               src="/img/favicon/favicon.svg"
               alt="Logo"
               width={20}
-              height={20}
+              height={20}              
             />
             <span className="nav-site-name">NH Emerging Tech Caucus</span>
           </Link>
         )}
-        <div className="nav-menu-items">
+        <button 
+          className="mobile-menu-toggle"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span className={`hamburger-icon ${isMobileMenuOpen ? 'open' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+        <div className={`nav-menu-items ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
           <a 
             href="/#mission" 
             className={activeSection === 'mission' ? 'active' : ''}
-            onClick={(e) => handleSmoothScroll(e, '/#mission')}
+            onClick={(e) => { handleSmoothScroll(e, '/#mission'); closeMobileMenu(); }}
           >
             Mission
           </a>
           <a 
             href="/#initiatives" 
             className={activeSection === 'initiatives' ? 'active' : ''}
-            onClick={(e) => handleSmoothScroll(e, '/#initiatives')}
+            onClick={(e) => { handleSmoothScroll(e, '/#initiatives'); closeMobileMenu(); }}
           >
             Initiatives
           </a>
           <div 
             className="nav-dropdown-container"
-            onMouseEnter={() => setShowEventsMenu(true)}
-            onMouseLeave={() => setShowEventsMenu(false)}
+            onMouseEnter={() => {
+              if (window.innerWidth > 767) {
+                setShowEventsMenu(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (window.innerWidth > 767) {
+                setShowEventsMenu(false);
+              }
+            }}
           >
             <a 
               href="/#events" 
               className={`nav-dropdown-cursor ${activeSection === 'events' ? 'active' : ''}`}
-              onClick={(e) => handleSmoothScroll(e, '/#events')}
+              onClick={(e) => {
+                const isMobile = window.innerWidth <= 767;
+                if (isMobile) {
+                  e.preventDefault();
+                  setShowEventsMenu(!showEventsMenu);
+                } else {
+                  handleSmoothScroll(e, '/#events');
+                }
+              }}
             >
               Events ▼
             </a>
@@ -139,13 +178,14 @@ export default function Navigation() {
                 <a 
                   href="/#events" 
                   className="nav-dropdown-item with-border"
-                  onClick={(e) => handleSmoothScroll(e, '/#events')}
+                  onClick={(e) => { handleSmoothScroll(e, '/#events'); closeMobileMenu(); }}
                 >
                   Upcoming & Recent Events
                 </a>
                 <Link 
                   href="/events"
                   className="nav-dropdown-item"
+                  onClick={closeMobileMenu}
                 >
                   All Events
                 </Link>
@@ -154,13 +194,29 @@ export default function Navigation() {
           </div>
           <div 
             className="nav-dropdown-container"
-            onMouseEnter={() => setShowResourcesMenu(true)}
-            onMouseLeave={() => setShowResourcesMenu(false)}
+            onMouseEnter={() => {
+              if (window.innerWidth > 767) {
+                setShowResourcesMenu(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (window.innerWidth > 767) {
+                setShowResourcesMenu(false);
+              }
+            }}
           >
             <a 
               href="/#resources" 
               className={`nav-dropdown-cursor ${activeSection === 'resources' ? 'active' : ''}`}
-              onClick={(e) => handleSmoothScroll(e, '/#resources')}
+              onClick={(e) => {
+                const isMobile = window.innerWidth <= 767;
+                if (isMobile) {
+                  e.preventDefault();
+                  setShowResourcesMenu(!showResourcesMenu);
+                } else {
+                  handleSmoothScroll(e, '/#resources');
+                }
+              }}
             >
               Resources ▼
             </a>
@@ -169,13 +225,14 @@ export default function Navigation() {
                 <a 
                   href="/#resources" 
                   className="nav-dropdown-item with-border"
-                  onClick={(e) => handleSmoothScroll(e, '/#resources')}
+                  onClick={(e) => { handleSmoothScroll(e, '/#resources'); closeMobileMenu(); }}
                 >
                   Featured Resources
                 </a>
                 <Link 
                   href="/resources"
                   className="nav-dropdown-item"
+                  onClick={closeMobileMenu}
                 >
                   All Resources
                 </Link>
@@ -185,7 +242,7 @@ export default function Navigation() {
           <a 
             href="/#contact" 
             className={activeSection === 'contact' ? 'active' : ''}
-            onClick={(e) => handleSmoothScroll(e, '/#contact')}
+            onClick={(e) => { handleSmoothScroll(e, '/#contact'); closeMobileMenu(); }}
           >
             Contact
           </a>

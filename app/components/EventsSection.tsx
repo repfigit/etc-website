@@ -19,6 +19,12 @@ interface Event {
     contentType: string;
     size: number;
   };
+  images?: {
+    filename: string;
+    contentType: string;
+    size: number;
+    order?: number;
+  }[];
 }
 
 export default function EventsSection() {
@@ -177,6 +183,30 @@ export default function EventsSection() {
                         </div>
                       )}
                     </div>
+                    {event.images && event.images.length > 0 && (
+                      <div className="event-thumbnails-home">
+                        {event.images.slice(0, 3).map((img, idx) => (
+                          <Link
+                            key={idx}
+                            href={`/events/${event._id}`}
+                            className="event-thumbnail"
+                          >
+                            <img
+                              src={`/api/events/${event._id}/images/${idx}`}
+                              alt={img.filename}
+                            />
+                          </Link>
+                        ))}
+                        {event.images.length > 3 && (
+                          <Link
+                            href={`/events/${event._id}`}
+                            className="event-thumbnail event-thumbnail-more"
+                          >
+                            +{event.images.length - 3}
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}

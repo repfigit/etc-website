@@ -48,6 +48,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* React Dev Tools */}
+        <script src="http://localhost:8097"></script>
+      </head>
       <body>
         <ErrorBoundary>
           {children}

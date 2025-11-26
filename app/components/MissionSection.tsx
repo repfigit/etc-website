@@ -4,7 +4,7 @@ export default function MissionSection() {
   return (
     <section id="mission">
       <div className="image-container">
-        <Image src="/img/about.webp" alt="About Us Technology" width={400} height={400} />
+        <Image src="/img/about.webp" alt="About Us Technology" width={400} height={400} style={{ height: 'auto' }} />
       </div>
       <div className="content-container">
         <h2>Mission</h2>

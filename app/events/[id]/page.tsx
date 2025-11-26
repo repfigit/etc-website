@@ -99,6 +99,13 @@ export default async function EventDetailPage({ params }: Props) {
         size: p.size,
         uploadedAt: p.uploadedAt?.toISOString(),
       })) || [],
+      images: event.images?.map((img: any) => ({
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        uploadedAt: img.uploadedAt?.toISOString(),
+        order: img.order,
+      })) || [],
     };
 
     return <EventDetailClient event={serializedEvent} />;

@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
+import ImageUploadSubform from '@/app/components/ImageUploadSubform';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 
@@ -30,6 +31,13 @@ interface Event {
     data: Buffer;
     contentType: string;
     size: number;
+  }[];
+  images?: {
+    filename: string;
+    contentType: string;
+    size: number;
+    uploadedAt?: string;
+    order?: number;
   }[];
   isVisible: boolean;
   content?: string;
@@ -62,6 +70,15 @@ export default function AdminEvents() {
     name: string;
     size: number;
     type: string;
+  }>>([]);
+
+  const [images, setImages] = useState<Array<{
+    id: string;
+    file: File | null;
+    name: string;
+    size: number;
+    type: string;
+    preview?: string;
   }>>([]);
 
   useEffect(() => {
@@ -150,8 +167,29 @@ export default function AdminEvents() {
         });
       }
 
+      // Add image files (only new files, not existing ones)
+      images.forEach(image => {
+        if (image.file) {
+          formDataToSend.append('images', image.file);
+        }
+      });
+
+      // Add information about which images to keep (for editing)
+      // Send them in the order they appear in the images array (preserves reordering)
+      if (editingId) {
+        const imagesToKeep = images
+          .filter(img => img.file === null) // Only existing images (no file object)
+          .map(img => img.name);
+
+        // Send filenames in the order they appear (preserves client-side reordering)
+        imagesToKeep.forEach(filename => {
+          formDataToSend.append('keepImages', filename);
+        });
+      }
+
       console.log('Sending FormData with fields:', Array.from(formDataToSend.keys()));
       console.log('Presentation files:', presentations.map(p => `${p.name} (${p.size} bytes)`));
+      console.log('Image files:', images.map(img => `${img.name} (${img.size} bytes)`));
 
       const response = await fetch(url, {
         method,
@@ -174,9 +212,27 @@ export default function AdminEvents() {
     }
   };
 
-  const handleEdit = (event: Event) => {
+  const handleEdit = async (event: Event) => {
+    // Fetch fresh event data to ensure we have the latest images
+    // The list view might have stale data
+    let eventData = event;
+    try {
+      const response = await fetch(`/api/events/${event._id}?admin=true`);
+      const data = await response.json();
+      if (data.success && data.data) {
+        eventData = data.data;
+        console.log('Fetched fresh event data:', {
+          id: eventData._id,
+          hasImages: !!eventData.images,
+          imageCount: eventData.images?.length || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching event details, using cached data:', error);
+    }
+
     // Convert the stored date back to YYYY-MM-DD format for the form input
-    const date = new Date(event.date);
+    const date = new Date(eventData.date);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -186,9 +242,9 @@ export default function AdminEvents() {
     let timeValue = '';
     let timezoneValue = 'ET';
 
-    if (event.time) {
+    if (eventData.time) {
       // Try to extract time in HH:MM format for HTML5 time input
-      const timeStr = event.time.trim();
+      const timeStr = eventData.time.trim();
 
       // Handle various time formats
       if (timeStr.includes('AM') || timeStr.includes('PM')) {
@@ -242,13 +298,19 @@ export default function AdminEvents() {
     }
 
     console.log('Editing event:', {
-      id: event._id,
-      topic: event.topic,
-      presentations: event.presentations?.map(p => ({
+      id: eventData._id,
+      topic: eventData.topic,
+      presentations: eventData.presentations?.map(p => ({
         filename: p.filename,
         contentType: p.contentType,
         size: p.size,
         hasData: !!p.data
+      })) || [],
+      images: eventData.images?.map(img => ({
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        order: img.order
       })) || []
     });
 
@@ -256,20 +318,20 @@ export default function AdminEvents() {
       date: dateString,
       time: timeValue,
       timezone: timezoneValue,
-      presenter: event.presenter || '',
-      presenterUrl: event.presenterUrl || '',
-      topic: event.topic,
-      location: event.location,
-      locationUrl: event.locationUrl || '',
-      isVisible: event.isVisible,
-      content: event.content || ''
+      presenter: eventData.presenter || '',
+      presenterUrl: eventData.presenterUrl || '',
+      topic: eventData.topic,
+      location: eventData.location,
+      locationUrl: eventData.locationUrl || '',
+      isVisible: eventData.isVisible,
+      content: eventData.content || ''
     });
 
     // Load existing presentations for display
-    if (event.presentations && event.presentations.length > 0) {
-      const existingPresentations = event.presentations.map(p => ({
+    if (eventData.presentations && eventData.presentations.length > 0) {
+      const existingPresentations = eventData.presentations.map(p => ({
         id: Math.random().toString(36).substr(2, 9), // Generate ID for display
-        file: null as any, // No file object for existing presentations
+        file: null as File | null, // No file object for existing presentations
         name: p.filename,
         size: p.size,
         type: p.contentType
@@ -278,7 +340,40 @@ export default function AdminEvents() {
     } else {
       setPresentations([]);
     }
-    setEditingId(event._id);
+
+    // Load existing images for display
+    console.log('Loading images for edit:', {
+      eventId: eventData._id,
+      hasImages: !!eventData.images,
+      imageCount: eventData.images?.length || 0,
+      images: eventData.images
+    });
+
+    if (eventData.images && eventData.images.length > 0) {
+      // Sort images by order if available
+      const sortedImages = [...eventData.images].sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : 0;
+        const orderB = b.order !== undefined ? b.order : 0;
+        return orderA - orderB;
+      });
+
+      console.log('Sorted images:', sortedImages);
+
+      const existingImages = sortedImages.map(img => ({
+        id: Math.random().toString(36).substr(2, 9), // Generate ID for display
+        file: null as File | null, // No file object for existing images
+        name: img.filename,
+        size: img.size,
+        type: img.contentType
+      }));
+
+      console.log('Setting images state:', existingImages);
+      setImages(existingImages);
+    } else {
+      console.log('No images found in event, clearing images state');
+      setImages([]);
+    }
+    setEditingId(eventData._id);
     setShowModal(true);
   };
 
@@ -312,6 +407,7 @@ export default function AdminEvents() {
       content: ''
     });
     setPresentations([]);
+    setImages([]);
     setEditingId(null);
     setShowModal(false);
   };
@@ -568,6 +664,12 @@ export default function AdminEvents() {
               onPresentationsChange={setPresentations}
             />
 
+            <ImageUploadSubform
+              images={images}
+              onImagesChange={setImages}
+              eventId={editingId || undefined}
+            />
+
             <div style={{ marginTop: '2em', display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
               <button
                 type="button"
@@ -757,6 +859,52 @@ export default function AdminEvents() {
                     </div>
                   )}
                   {!event.isVisible && <div style={{ color: '#ff6700' }}>⚠️ Hidden</div>}
+                  {event.images && event.images.length > 0 && (
+                    <div style={{ marginTop: '0.75em', display: 'flex', gap: '0.5em', flexWrap: 'wrap' }}>
+                      {event.images.slice(0, 4).map((img, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            border: '1px solid #4ecdc4',
+                            background: '#000'
+                          }}
+                        >
+                          <img
+                            src={`/api/events/${event._id}/images/${idx}`}
+                            alt={img.filename}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        </div>
+                      ))}
+                      {event.images.length > 4 && (
+                        <div
+                          style={{
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '4px',
+                            border: '1px solid #4ecdc4',
+                            background: '#1a1a1a',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#4ecdc4',
+                            fontSize: '0.9em',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          +{event.images.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div style={{ display: 'flex', gap: '0.5em' }}>
                   <button

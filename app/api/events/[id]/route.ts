@@ -14,9 +14,7 @@ export async function GET(
     const url = new URL(request.url);
     const admin = url.searchParams.get('admin');
 
-    // Only exclude presentation data for public API calls, not admin
-    const selectFields = admin === 'true' ? '' : '-presentations.data';
-    const event = await Event.findById(id).select(selectFields);
+    const event = await Event.findById(id).lean();
 
     if (!event) {
       return NextResponse.json(
@@ -25,7 +23,37 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: event });
+    // Remove Buffer data from presentations and images (can't be serialized to JSON)
+    // This must be done after .lean() because Mongoose select doesn't work well with nested arrays
+    const sanitized: any = { ...event };
+    if (sanitized.presentations) {
+      sanitized.presentations = sanitized.presentations.map((p: any) => {
+        const { data, ...rest } = p;
+        return rest;
+      });
+    }
+    if (sanitized.images) {
+      sanitized.images = sanitized.images.map((img: any) => {
+        const { data, ...rest } = img;
+        return rest;
+      });
+    }
+
+    // Log what we're returning for debugging
+    console.log('Fetching event for admin:', {
+      id: sanitized._id,
+      topic: sanitized.topic,
+      hasImages: 'images' in sanitized,
+      imagesCount: sanitized.images?.length || 0,
+      images: sanitized.images?.map((img: any) => ({
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        order: img.order
+      })) || []
+    });
+
+    return NextResponse.json({ success: true, data: sanitized });
   } catch (error) {
     console.error('Error fetching event:', error);
     return NextResponse.json(
@@ -71,12 +99,28 @@ export async function PUT(
       const presentationFiles = formData.getAll('presentations') as File[];
       const presentationsToKeep = formData.getAll('keepPresentations') as string[];
 
+      // Handle multiple image files
+      const imageFiles = formData.getAll('images') as File[];
+      const imagesToKeep = formData.getAll('keepImages') as string[];
+
+      console.log(`Editing event: received ${presentationFiles.length} new presentation files, ${presentationsToKeep.length} presentations to keep`);
+      console.log(`Editing event: received ${imageFiles.length} new image files, ${imagesToKeep.length} images to keep`);
+      console.log('keepImages filenames:', imagesToKeep);
+
+      // Fetch existing event data once for both presentations and images
+      const existingEvent = await Event.findById(id).select('presentations images');
+      const existingPresentationsData = existingEvent?.presentations || [];
+      const existingImagesData = existingEvent?.images || [];
+
+      console.log(`Found ${existingPresentationsData.length} existing presentations in database`);
+      console.log(`Found ${existingImagesData.length} existing images in database`);
+      console.log('Existing image filenames:', existingImagesData.map((img: any) => img.filename));
+
       // Always process presentations when editing (even if empty)
       // Get existing presentations and filter to only keep specified ones
-      let existingPresentations = [];
+      let existingPresentations: any[] = [];
       if (presentationsToKeep.length > 0) {
-        const existingEvent = await Event.findById(id).select('presentations');
-        existingPresentations = (existingEvent?.presentations || [])
+        existingPresentations = existingPresentationsData
           .filter((p: any) => presentationsToKeep.includes(p.filename));
       }
 
@@ -102,6 +146,86 @@ export async function PUT(
           }
         }
       }
+
+      // Always process images when editing
+      // The admin page always sends keepImages for existing images that should be kept
+      // If keepImages is empty and no new images, it means user deleted all images
+
+      // Get existing images and create a map for quick lookup
+      const existingImagesMap = new Map();
+      const existingImages = existingImagesData;
+      
+      if (imagesToKeep.length > 0) {
+        existingImages.forEach((img: any) => {
+          if (imagesToKeep.includes(img.filename)) {
+            existingImagesMap.set(img.filename, img);
+            console.log(`Keeping existing image: ${img.filename}`);
+          }
+        });
+      }
+
+      // Reconstruct images array in the order specified by imagesToKeep (which preserves client-side order)
+      body.images = [];
+      
+      // Add existing images in the order they appear in imagesToKeep (preserves client-side reordering)
+      imagesToKeep.forEach(filename => {
+        const existingImage = existingImagesMap.get(filename);
+        if (existingImage) {
+          body.images.push(existingImage);
+        } else {
+          console.warn(`Image to keep not found in database: ${filename}`);
+        }
+      });
+
+      // Add new image files (they're already in the correct order from the client)
+      const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+      const maxImageSize = 5 * 1024 * 1024; // 5MB
+
+      for (const file of imageFiles) {
+        console.log(`Processing new image file: ${file.name} (${file.size} bytes, type: ${file.type})`);
+        
+        if (file instanceof File && file.size > 0) {
+          // Validate file type
+          if (!allowedImageTypes.includes(file.type)) {
+            console.error(`Invalid image type: ${file.type} for file: ${file.name}`);
+            continue;
+          }
+
+          // Validate file size
+          if (file.size > maxImageSize) {
+            console.error(`Image too large: ${file.name} (${file.size} bytes)`);
+            continue;
+          }
+
+          try {
+            const bytes = await file.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+
+            body.images.push({
+              filename: file.name,
+              data: buffer,
+              contentType: file.type,
+              size: file.size,
+              uploadedAt: new Date()
+            });
+            
+            console.log(`Added new image to body.images: ${file.name} (buffer length: ${buffer.length})`);
+          } catch (fileError) {
+            console.error('Error processing image file:', fileError);
+            // Continue without this file rather than failing the entire request
+          }
+        } else {
+          console.warn(`Skipping invalid file: ${file.name}`);
+        }
+      }
+
+      // Set order based on current array position (preserves the order from client)
+      body.images = body.images.map((img: any, idx: number) => ({
+        ...img,
+        order: idx
+      }));
+      
+      console.log(`Final body.images array has ${body.images.length} images with order set`);
     } else {
       // Handle JSON without presentation
       body = await request.json();
@@ -125,6 +249,13 @@ export async function PUT(
         contentType: p.contentType,
         size: p.size,
         dataLength: p.data?.length
+      })) : null,
+      images: body.images ? body.images.map((img: any) => ({
+        filename: img.filename,
+        contentType: img.contentType,
+        size: img.size,
+        order: img.order,
+        dataLength: img.data?.length
       })) : null
     });
 
@@ -140,6 +271,13 @@ export async function PUT(
         { status: 404 }
       );
     }
+
+    // Verify images were saved correctly
+    console.log('Event updated successfully:', {
+      id: event._id,
+      imagesCount: event.images?.length || 0,
+      imageFilenames: event.images?.map((img: any) => img.filename) || []
+    });
 
     return NextResponse.json({ success: true, data: event });
   } catch (error) {

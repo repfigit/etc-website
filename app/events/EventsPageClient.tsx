@@ -16,6 +16,12 @@ interface Event {
   location: string;
   locationUrl?: string;
   content?: string;
+  images?: {
+    filename: string;
+    contentType: string;
+    size: number;
+    order?: number;
+  }[];
 }
 
 export default function EventsPageClient() {
@@ -132,6 +138,32 @@ export default function EventsPageClient() {
                     >
                       📝 Detailed information available
                     </Link>
+                  </div>
+                )}
+
+                {/* Image Thumbnails */}
+                {event.images && event.images.length > 0 && (
+                  <div className="event-thumbnails">
+                    {event.images.slice(0, 4).map((img, idx) => (
+                      <Link
+                        key={idx}
+                        href={`/events/${event._id}`}
+                        className="event-thumbnail"
+                      >
+                        <img
+                          src={`/api/events/${event._id}/images/${idx}`}
+                          alt={img.filename}
+                        />
+                      </Link>
+                    ))}
+                    {event.images.length > 4 && (
+                      <Link
+                        href={`/events/${event._id}`}
+                        className="event-thumbnail event-thumbnail-more"
+                      >
+                        +{event.images.length - 4}
+                      </Link>
+                    )}
                   </div>
                 )}
               </li>
