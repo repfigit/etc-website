@@ -10,6 +10,7 @@ import Header from '../../components/Header';
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import ImageCarousel from '../../components/ImageCarousel';
+import ShareButton from '../../components/ShareButton';
 
 interface Event {
   _id: string;
@@ -93,14 +94,21 @@ export default function EventDetailClient({ event }: Props) {
             <h1 className="event-detail-topic">
               {event.topic}
               {' '}
-              <a 
-                href={`/api/events/${event._id}/ical`}
-                download
-                className="event-calendar-icon-large"
-                title="Add to calendar"
-              >
-                📅
-              </a>
+              <span className="event-detail-actions">
+                <a 
+                  href={`/api/events/${event._id}/ical`}
+                  download
+                  className="event-calendar-icon-large"
+                  title="Add to calendar"
+                >
+                  📅
+                </a>
+                <ShareButton 
+                  url={`/events/${event._id}`}
+                  title={event.topic}
+                  description={`Join us on ${formatDate(event.date)} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`}
+                />
+              </span>
             </h1>
             
             <div className="event-detail-datetime">
