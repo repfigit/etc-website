@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { Analytics } from '@vercel/analytics/react';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -56,6 +57,7 @@ export default function RootLayout({
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
