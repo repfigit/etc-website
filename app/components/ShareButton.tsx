@@ -8,20 +8,48 @@ interface ShareButtonProps {
   description?: string;
 }
 
+interface DropdownPosition {
+  top: number;
+  left: number;
+}
+
 export default function ShareButton({ url, title, description }: ShareButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({ top: 0, left: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Check if native share is available (mostly mobile)
     setCanNativeShare(typeof navigator !== 'undefined' && !!navigator.share);
   }, []);
 
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownWidth = 200;
+      
+      // Position below the button, aligned to the right
+      let left = rect.right - dropdownWidth;
+      
+      // Make sure it doesn't go off the left edge
+      if (left < 8) {
+        left = 8;
+      }
+      
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: left,
+      });
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -108,8 +136,9 @@ export default function ShareButton({ url, title, description }: ShareButtonProp
   };
 
   return (
-    <div className="share-button-container" ref={dropdownRef}>
+    <div className="share-button-container" ref={containerRef}>
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="share-button-trigger"
         title="Share this event"
@@ -135,7 +164,13 @@ export default function ShareButton({ url, title, description }: ShareButtonProp
       </button>
 
       {isOpen && (
-        <div className="share-dropdown">
+        <div 
+          className="share-dropdown"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+          }}
+        >
           {canNativeShare && (
             <button onClick={handleNativeShare} className="share-dropdown-item">
               <span className="share-dropdown-icon">📤</span>

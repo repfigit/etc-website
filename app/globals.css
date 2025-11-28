@@ -2497,6 +2497,7 @@ img.logo {
     position: relative;
     vertical-align: middle;
     margin-left: 0.25em;
+    z-index: 9999;
 }
 
 .share-button-trigger {
@@ -2523,15 +2524,13 @@ img.logo {
 }
 
 .share-dropdown {
-    position: absolute;
-    top: calc(100% + 0.5em);
-    right: 0;
+    position: fixed;
     background: #1a1a1a;
     border: 1px solid #5db8b0;
     border-radius: 10px;
     min-width: 200px;
-    z-index: 1000;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 99999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     padding: 0.5em 0;
     animation: shareDropdownFadeIn 0.15s ease-out;
 }
@@ -2588,21 +2587,7 @@ img.logo {
 
 @media (max-width: 767px) {
     .share-dropdown {
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%);
         min-width: 180px;
-    }
-    
-    @keyframes shareDropdownFadeIn {
-        from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
     }
 }
 
