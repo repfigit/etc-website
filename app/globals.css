@@ -2527,11 +2527,11 @@ img.logo {
     position: fixed;
     background: #1a1a1a;
     border: 1px solid #5db8b0;
-    border-radius: 8px;
-    min-width: 160px;
+    border-radius: 6px;
+    min-width: 130px;
     z-index: 99999;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    padding: 0.25em 0;
+    padding: 0.2em 0;
     animation: shareDropdownFadeIn 0.15s ease-out;
 }
 
@@ -2549,15 +2549,15 @@ img.logo {
 .share-dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.4em;
     width: 100%;
-    padding: 0.4em 0.75em;
+    padding: 0.35em 0.6em;
     background: transparent;
     border: none;
     color: #e8ebe8;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.8em;
+    font-size: 0.7em;
     text-align: left;
     transition: all 0.15s ease;
 }
@@ -2571,26 +2571,26 @@ img.logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
+    width: 14px;
     flex-shrink: 0;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 .share-dropdown-icon svg {
     display: block;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 
 .share-dropdown-divider {
     height: 1px;
     background: rgba(93, 184, 176, 0.3);
-    margin: 0.25em 0.75em;
+    margin: 0.2em 0.6em;
 }
 
 @media (max-width: 767px) {
     .share-dropdown {
-        min-width: 150px;
+        min-width: 130px;
     }
 }
 
