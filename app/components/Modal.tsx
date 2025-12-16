@@ -1,20 +1,45 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  /** If true, clicking the overlay will not close the modal. Default: false */
+  preventOverlayClose?: boolean;
+  /** If true, pressing Escape will not close the modal. Default: false */
+  preventEscapeClose?: boolean;
+  /** If provided, will show a confirmation dialog before closing */
+  confirmClose?: string;
 }
 
-export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export default function Modal({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children,
+  preventOverlayClose = false,
+  preventEscapeClose = false,
+  confirmClose
+}: ModalProps) {
+  
+  const handleClose = useCallback(() => {
+    if (confirmClose) {
+      if (window.confirm(confirmClose)) {
+        onClose();
+      }
+    } else {
+      onClose();
+    }
+  }, [onClose, confirmClose]);
+
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
+      if (e.key === 'Escape' && !preventEscapeClose) {
+        handleClose();
       }
     };
 
@@ -28,7 +53,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose, preventEscapeClose]);
 
   if (!isOpen) return null;
 
@@ -36,8 +61,8 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     <div 
       className="modal-overlay"
       onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
+        if (e.target === e.currentTarget && !preventOverlayClose) {
+          handleClose();
         }
       }}
     >
@@ -47,7 +72,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="modal-close-button"
           title="Close modal"
         >

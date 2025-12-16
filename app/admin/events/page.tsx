@@ -52,6 +52,7 @@ export default function AdminEvents() {
   const [showModal, setShowModal] = useState(false);
   const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [formDirty, setFormDirty] = useState(false);
   const [formData, setFormData] = useState({
     date: '',
     time: '',
@@ -457,6 +458,12 @@ export default function AdminEvents() {
     setImages([]);
     setEditingId(null);
     setShowModal(false);
+    setFormDirty(false);
+  };
+
+  const updateFormData = (updates: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+    setFormDirty(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -486,6 +493,8 @@ export default function AdminEvents() {
           isOpen={showModal}
           onClose={() => { resetForm(); setShowModal(false); }}
           title={editingId ? 'Edit Event' : 'New Event'}
+          preventOverlayClose={true}
+          confirmClose={formDirty ? "You have unsaved changes. Are you sure you want to close?" : undefined}
         >
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
@@ -494,7 +503,7 @@ export default function AdminEvents() {
                 <input
                   type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  onChange={(e) => updateFormData({ date: e.target.value })}
                   required
                   style={{
                     width: '100%',
@@ -516,7 +525,7 @@ export default function AdminEvents() {
                   <input
                     type="time"
                     value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    onChange={(e) => updateFormData({ time: e.target.value })}
                     required
                     style={{
                       flex: '1',
@@ -534,7 +543,7 @@ export default function AdminEvents() {
                     type="text"
                     placeholder="ET"
                     value={formData.timezone || 'ET'}
-                    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                    onChange={(e) => updateFormData({ timezone: e.target.value })}
                     style={{
                       width: '60px',
                       padding: '0.75em',
@@ -559,7 +568,7 @@ export default function AdminEvents() {
               <input
                 type="text"
                 value={formData.topic}
-                onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                onChange={(e) => updateFormData({ topic: e.target.value })}
                 required
                 style={{
                   width: '100%',
@@ -579,7 +588,7 @@ export default function AdminEvents() {
               <input
                 type="text"
                 value={formData.presenter}
-                onChange={(e) => setFormData({ ...formData, presenter: e.target.value })}
+                onChange={(e) => updateFormData({ presenter: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '0.75em',
@@ -598,7 +607,7 @@ export default function AdminEvents() {
               <input
                 type="url"
                 value={formData.presenterUrl}
-                onChange={(e) => setFormData({ ...formData, presenterUrl: e.target.value })}
+                onChange={(e) => updateFormData({ presenterUrl: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '0.75em',
@@ -617,7 +626,7 @@ export default function AdminEvents() {
               <input
                 type="text"
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onChange={(e) => updateFormData({ location: e.target.value })}
                 required
                 style={{
                   width: '100%',
@@ -637,7 +646,7 @@ export default function AdminEvents() {
               <input
                 type="url"
                 value={formData.locationUrl}
-                onChange={(e) => setFormData({ ...formData, locationUrl: e.target.value })}
+                onChange={(e) => updateFormData({ locationUrl: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '0.75em',
@@ -674,7 +683,7 @@ export default function AdminEvents() {
               </div>
               <textarea
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(e) => updateFormData({ content: e.target.value })}
                 placeholder="Enter detailed event information using Markdown syntax..."
                 rows={8}
                 style={{
@@ -699,7 +708,7 @@ export default function AdminEvents() {
                 <input
                   type="checkbox"
                   checked={formData.isVisible}
-                  onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                  onChange={(e) => updateFormData({ isVisible: e.target.checked })}
                   style={{ marginRight: '0.5em' }}
                 />
                 Visible
@@ -708,12 +717,18 @@ export default function AdminEvents() {
 
             <PDFUploadSubform
               presentations={presentations}
-              onPresentationsChange={setPresentations}
+              onPresentationsChange={(newPresentations) => {
+                setPresentations(newPresentations);
+                setFormDirty(true);
+              }}
             />
 
             <ImageUploadSubform
               images={images}
-              onImagesChange={setImages}
+              onImagesChange={(newImages) => {
+                setImages(newImages);
+                setFormDirty(true);
+              }}
               eventId={editingId || undefined}
             />
 
