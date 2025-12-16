@@ -13,21 +13,19 @@ export async function GET(
     
     const resource = await Resource.findById(id).select('thumbnail');
     
-    if (!resource || !resource.thumbnail || !resource.thumbnail.data) {
+    if (!resource || !resource.thumbnail || !resource.thumbnail.url) {
       return NextResponse.json(
         { success: false, error: 'Thumbnail not found' },
         { status: 404 }
       );
     }
     
-    // Return the image with appropriate headers
-    return new NextResponse(resource.thumbnail.data, {
-      status: 200,
+    // Redirect to the blob URL
+    return NextResponse.redirect(resource.thumbnail.url, {
+      status: 302,
       headers: {
-        'Content-Type': resource.thumbnail.contentType,
-        'Content-Length': resource.thumbnail.size.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable',
-      },
+      }
     });
   } catch (error) {
     logger.error('Error fetching thumbnail', error);

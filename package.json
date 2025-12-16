@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx scripts/seed-database.ts",
-    "copy-to-prod": "tsx scripts/copy-to-prod.ts"
+    "copy-to-prod": "tsx scripts/copy-to-prod.ts",
+    "migrate-to-blob": "tsx scripts/migrate-to-blob.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -16,6 +17,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/blob": "^2.0.0",
     "@vercel/speed-insights": "^1.2.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",

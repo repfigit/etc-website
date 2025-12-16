@@ -6,7 +6,7 @@ export interface IResource extends Document {
   description?: string;
   thumbnail?: {
     filename: string;
-    data: Buffer;
+    url: string; // Vercel Blob URL
     contentType: string;
     size: number;
   };
@@ -32,7 +32,7 @@ const ResourceSchema = new Schema<IResource>(
     },
     thumbnail: {
       filename: String,
-      data: Buffer,
+      url: String,
       contentType: String,
       size: Number
     },

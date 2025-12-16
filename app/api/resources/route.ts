@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Resource from '@/lib/models/Resource';
 import { logger } from '@/lib/logger';
 import { CacheConfig, addCacheHeaders } from '@/lib/cache';
+import { uploadFileToBlob } from '@/lib/blob';
 
 export async function GET(request: Request) {
   try {
@@ -73,36 +74,43 @@ export async function POST(request: Request) {
         isVisible: formData.get('isVisible') === 'true'
       };
       
+      // Create resource first to get the ID for blob storage paths
+      const resource = await Resource.create(body);
+      const resourceId = resource._id.toString();
+      
       // Handle thumbnail file
       if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
         try {
-          const bytes = await thumbnailFile.arrayBuffer();
-          const buffer = Buffer.from(bytes);
+          const uploadResult = await uploadFileToBlob('resources', resourceId, 'thumbnail', thumbnailFile);
           
-          body.thumbnail = {
-            filename: thumbnailFile.name,
-            data: buffer,
-            contentType: thumbnailFile.type,
-            size: thumbnailFile.size
+          resource.thumbnail = {
+            filename: uploadResult.filename,
+            url: uploadResult.url,
+            contentType: uploadResult.contentType,
+            size: uploadResult.size
           };
           
-          logger.debug('Thumbnail data prepared', {
+          await resource.save();
+          
+          logger.debug('Thumbnail uploaded to blob', {
             filename: thumbnailFile.name,
-            contentType: thumbnailFile.type,
+            url: uploadResult.url,
             size: thumbnailFile.size
           });
         } catch (fileError) {
-          logger.error('Error processing thumbnail file', fileError);
+          logger.error('Error uploading thumbnail file', fileError);
         }
       }
+      
+      return NextResponse.json({ success: true, data: resource }, { status: 201 });
     } else {
       // Handle JSON without thumbnail
       body = await request.json();
+      
+      const resource = await Resource.create(body);
+      
+      return NextResponse.json({ success: true, data: resource }, { status: 201 });
     }
-    
-    const resource = await Resource.create(body);
-    
-    return NextResponse.json({ success: true, data: resource }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json(
@@ -117,4 +125,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

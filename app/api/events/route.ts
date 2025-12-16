@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { uploadFileToBlob } from '@/lib/blob';
 
 export async function GET(request: Request) {
   try {
@@ -25,38 +26,21 @@ export async function GET(request: Request) {
     }
 
     const events = await query.lean();
-    
-    // Remove Buffer data from presentations and images (can't be serialized to JSON)
-    // This must be done after .lean() because Mongoose select doesn't work well with nested arrays
-    const sanitizedEvents = events.map((event: any) => {
-      const sanitized = { ...event };
-      if (sanitized.presentations) {
-        sanitized.presentations = sanitized.presentations.map((p: any) => {
-          const { data, ...rest } = p;
-          return rest;
-        });
-      }
-      if (sanitized.images) {
-        sanitized.images = sanitized.images.map((img: any) => {
-          const { data, ...rest } = img;
-          return rest;
-        });
-      }
-      return sanitized;
-    });
 
     // Log presentation and image data for admin requests
-    if (admin === 'true' && sanitizedEvents.length > 0) {
-      console.log('Admin events fetched:', sanitizedEvents.map(e => ({
+    if (admin === 'true' && events.length > 0) {
+      console.log('Admin events fetched:', events.map((e: any) => ({
         id: e._id,
         topic: e.topic,
         presentations: e.presentations?.map((p: any) => ({
           filename: p.filename,
+          url: p.url,
           contentType: p.contentType,
           size: p.size
         })) || [],
         images: e.images?.map((img: any) => ({
           filename: img.filename,
+          url: img.url,
           contentType: img.contentType,
           size: img.size,
           order: img.order
@@ -68,7 +52,7 @@ export async function GET(request: Request) {
       })));
     }
 
-    return NextResponse.json({ success: true, data: sanitizedEvents, total });
+    return NextResponse.json({ success: true, data: events, total });
   } catch (error) {
     console.error('Error fetching events:', error);
     return NextResponse.json(
@@ -94,10 +78,8 @@ export async function POST(request: Request) {
     if (contentType.includes('multipart/form-data')) {
       // Handle FormData with presentation
       const formData = await request.formData();
-      const presentationFile = formData.get('presentation') as File;
 
       console.log('FormData fields:', Array.from(formData.keys()));
-      console.log('Presentation file:', presentationFile ? presentationFile.name : 'none');
 
       body = {
         date: formData.get('date'),
@@ -111,35 +93,46 @@ export async function POST(request: Request) {
         content: formData.get('content')
       };
 
+      // Create event first to get the ID for blob storage paths
+      // Fix timezone issue: convert date string to proper Date object
+      if (body.date) {
+        const dateStr = body.date;
+        if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          const [year, month, day] = dateStr.split('-').map(Number);
+          body.date = new Date(year, month - 1, day, 12, 0, 0);
+        }
+      }
+
+      const event = await Event.create(body);
+      const eventId = event._id.toString();
+
       // Handle multiple presentation files
       const presentationFiles = formData.getAll('presentations') as File[];
       if (presentationFiles.length > 0) {
-        body.presentations = [];
+        const presentations = [];
 
         for (const file of presentationFiles) {
           if (file instanceof File && file.size > 0) {
             try {
-              const bytes = await file.arrayBuffer();
-              const buffer = Buffer.from(bytes);
-
-              body.presentations.push({
-                filename: file.name,
-                data: buffer,
-                contentType: file.type,
-                size: file.size,
+              const uploadResult = await uploadFileToBlob('events', eventId, 'presentations', file);
+              presentations.push({
+                ...uploadResult,
                 uploadedAt: new Date()
               });
 
-              console.log('Presentation data prepared:', {
+              console.log('Presentation uploaded to blob:', {
                 filename: file.name,
-                contentType: file.type,
+                url: uploadResult.url,
                 size: file.size
               });
             } catch (fileError) {
-              console.error('Error processing presentation file:', fileError);
-              // Continue without this file rather than failing the entire request
+              console.error('Error uploading presentation file:', fileError);
             }
           }
+        }
+
+        if (presentations.length > 0) {
+          event.presentations = presentations;
         }
       }
 
@@ -148,8 +141,7 @@ export async function POST(request: Request) {
       console.log(`Received ${imageFiles.length} image files for processing`);
       
       if (imageFiles.length > 0) {
-        body.images = []; // Initialize images array only if there are files to process
-        // Validate image types
+        const images: Array<{ url: string; filename: string; contentType: string; size: number; uploadedAt: Date; order: number }> = [];
         const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
         const maxImageSize = 5 * 1024 * 1024; // 5MB
 
@@ -171,78 +163,65 @@ export async function POST(request: Request) {
             }
 
             try {
-              const bytes = await file.arrayBuffer();
-              const buffer = Buffer.from(bytes);
+              const uploadResult = await uploadFileToBlob('events', eventId, 'images', file);
 
-              // Use body.images.length as order to ensure sequential ordering
-              // even when some files are skipped due to validation errors
-              const order = body.images.length;
-
-              body.images.push({
-                filename: file.name,
-                data: buffer,
-                contentType: file.type,
-                size: file.size,
+              images.push({
+                ...uploadResult,
                 uploadedAt: new Date(),
-                order: order
+                order: images.length
               });
 
-              console.log('Image data prepared and added to body.images:', {
+              console.log('Image uploaded to blob:', {
                 filename: file.name,
-                contentType: file.type,
-                size: file.size,
-                order: order,
-                bufferLength: buffer.length
+                url: uploadResult.url,
+                order: images.length - 1
               });
             } catch (fileError) {
-              console.error('Error processing image file:', fileError);
-              // Continue without this file rather than failing the entire request
+              console.error('Error uploading image file:', fileError);
             }
           } else {
             console.warn(`Skipping invalid file: ${file.name} (not a File instance or size is 0)`);
           }
         }
         
-        console.log(`Final body.images array has ${body.images.length} images`);
+        if (images.length > 0) {
+          event.images = images;
+        }
+        console.log(`Final images array has ${images.length} images`);
       } else {
         console.log('No image files provided in FormData');
       }
+
+      // Save the event with uploaded files
+      await event.save();
+
+      console.log('Event created with files:', {
+        id: event._id,
+        topic: event.topic,
+        presentationsCount: event.presentations?.length || 0,
+        imagesCount: event.images?.length || 0
+      });
+
+      return NextResponse.json({ success: true, data: event }, { status: 201 });
     } else {
       // Handle JSON without presentation
       body = await request.json();
-    }
 
-    // Fix timezone issue: convert date string to proper Date object
-    if (body.date) {
-      // If date is in YYYY-MM-DD format, create a date at noon local time to avoid timezone issues
-      const dateStr = body.date;
-      if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        const [year, month, day] = dateStr.split('-').map(Number);
-        // Create date at noon local time to avoid timezone conversion issues
-        body.date = new Date(year, month - 1, day, 12, 0, 0);
+      // Fix timezone issue: convert date string to proper Date object
+      if (body.date) {
+        const dateStr = body.date;
+        if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          const [year, month, day] = dateStr.split('-').map(Number);
+          body.date = new Date(year, month - 1, day, 12, 0, 0);
+        }
       }
+
+      console.log('Creating event with body:', body);
+
+      const event = await Event.create(body);
+
+      return NextResponse.json({ success: true, data: event }, { status: 201 });
     }
-
-    console.log('Creating event with body:', {
-      ...body,
-      presentation: body.presentation ? {
-        filename: body.presentation.filename,
-        contentType: body.presentation.contentType,
-        size: body.presentation.size,
-        dataLength: body.presentation.data?.length
-      } : null,
-      images: body.images ? body.images.map((img: any) => ({
-        filename: img.filename,
-        contentType: img.contentType,
-        size: img.size,
-        order: img.order,
-        dataLength: img.data?.length
-      })) : null
-    });
-
-    const event = await Event.create(body);
-
-    return NextResponse.json({ success: true, data: event }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json(
@@ -257,4 +236,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

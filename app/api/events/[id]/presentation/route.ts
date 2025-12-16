@@ -9,10 +9,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
-    const { searchParams } = new URL(request.url);
-    const download = searchParams.get('download') === 'true';
     
-    const event = await Event.findById(id);
+    const event = await Event.findById(id).select('presentations');
     
     if (!event) {
       return NextResponse.json(
@@ -21,38 +19,28 @@ export async function GET(
       );
     }
     
-    if (!event.presentation) {
-      return NextResponse.json(
-        { success: false, error: 'No presentation available for this event' },
-        { status: 404 }
-      );
+    // Check for presentations array (new format)
+    if (event.presentations && event.presentations.length > 0) {
+      const presentation = event.presentations[0];
+      if (presentation.url) {
+        return NextResponse.redirect(presentation.url, {
+          status: 302,
+          headers: {
+            'Cache-Control': 'public, max-age=31536000',
+          }
+        });
+      }
     }
     
-    // Set headers based on whether it's a download or inline view
-    const headers: Record<string, string> = {
-      'Content-Type': event.presentation.contentType,
-      'Content-Length': event.presentation.size.toString(),
-      'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
-    };
-    
-    if (download) {
-      // Force download with original filename
-      headers['Content-Disposition'] = `attachment; filename="${event.presentation.filename}"`;
-    } else {
-      // Inline viewing for iframe
-      headers['Content-Disposition'] = `inline; filename="${event.presentation.filename}"`;
-    }
-    
-    // Return the PDF file with proper headers
-    return new NextResponse(event.presentation.data, {
-      status: 200,
-      headers,
-    });
+    return NextResponse.json(
+      { success: false, error: 'No presentation available for this event' },
+      { status: 404 }
+    );
     
   } catch (error) {
-    console.error('Error downloading presentation:', error);
+    console.error('Error fetching presentation:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to download presentation' },
+      { success: false, error: 'Failed to fetch presentation' },
       { status: 500 }
     );
   }

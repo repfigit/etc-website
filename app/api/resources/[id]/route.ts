@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/lib/models/Resource';
 import { logger } from '@/lib/logger';
+import { uploadFileToBlob, deleteFromBlob } from '@/lib/blob';
 
 export async function PUT(
   request: Request,
@@ -33,30 +34,43 @@ export async function PUT(
         isVisible: formData.get('isVisible') === 'true'
       };
       
+      // Get existing resource to check for existing thumbnail
+      const existingResource = await Resource.findById(id).select('thumbnail');
+      
       // Handle thumbnail removal
       if (removeThumbnail) {
+        // Delete existing thumbnail from blob
+        if (existingResource?.thumbnail?.url) {
+          await deleteFromBlob(existingResource.thumbnail.url);
+          logger.debug('Deleted existing thumbnail from blob');
+        }
         body.thumbnail = null;
       }
       // Handle new thumbnail upload
       else if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
+        // Delete old thumbnail if it exists
+        if (existingResource?.thumbnail?.url) {
+          await deleteFromBlob(existingResource.thumbnail.url);
+          logger.debug('Deleted old thumbnail from blob before uploading new one');
+        }
+        
         try {
-          const bytes = await thumbnailFile.arrayBuffer();
-          const buffer = Buffer.from(bytes);
+          const uploadResult = await uploadFileToBlob('resources', id, 'thumbnail', thumbnailFile);
           
           body.thumbnail = {
-            filename: thumbnailFile.name,
-            data: buffer,
-            contentType: thumbnailFile.type,
-            size: thumbnailFile.size
+            filename: uploadResult.filename,
+            url: uploadResult.url,
+            contentType: uploadResult.contentType,
+            size: uploadResult.size
           };
           
-          logger.debug('Thumbnail data prepared', {
+          logger.debug('Thumbnail uploaded to blob', {
             filename: thumbnailFile.name,
-            contentType: thumbnailFile.type,
+            url: uploadResult.url,
             size: thumbnailFile.size
           });
         } catch (fileError) {
-          logger.error('Error processing thumbnail file', fileError);
+          logger.error('Error uploading thumbnail file', fileError);
         }
       }
     } else {
@@ -104,7 +118,9 @@ export async function DELETE(
     
     await connectDB();
     const { id } = await params;
-    const resource = await Resource.findByIdAndDelete(id);
+    
+    // Get resource to find thumbnail to delete
+    const resource = await Resource.findById(id);
     
     if (!resource) {
       return NextResponse.json(
@@ -112,6 +128,15 @@ export async function DELETE(
         { status: 404 }
       );
     }
+    
+    // Delete thumbnail from blob if it exists
+    if (resource.thumbnail?.url) {
+      await deleteFromBlob(resource.thumbnail.url);
+      logger.debug('Deleted thumbnail from blob');
+    }
+    
+    // Delete the resource from database
+    await Resource.findByIdAndDelete(id);
     
     return NextResponse.json({ success: true, data: resource });
   } catch (error) {
@@ -128,4 +153,3 @@ export async function DELETE(
     );
   }
 }
-

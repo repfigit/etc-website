@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { deleteFromBlob } from '@/lib/blob';
 
 export async function DELETE(
   request: NextRequest,
@@ -44,6 +45,13 @@ export async function DELETE(
         { success: false, error: 'Image index out of range' },
         { status: 404 }
       );
+    }
+
+    // Get the image to delete from blob
+    const imageToDelete = event.images[index];
+    if (imageToDelete.url) {
+      await deleteFromBlob(imageToDelete.url);
+      console.log(`Deleted image from blob: ${imageToDelete.filename}`);
     }
 
     // Remove the image at the specified index
@@ -150,4 +158,3 @@ export async function PUT(
     );
   }
 }
-

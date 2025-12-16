@@ -54,7 +54,7 @@ export default function RootLayout({
         {/* React Dev Tools */}
         <script src="http://localhost:8097"></script>
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

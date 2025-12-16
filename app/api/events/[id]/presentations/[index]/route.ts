@@ -43,34 +43,20 @@ export async function GET(
 
     const presentation = event.presentations[presentationIndex];
     
-    if (!presentation || !presentation.data) {
+    if (!presentation || !presentation.url) {
       return NextResponse.json(
-        { success: false, error: 'Presentation data not found' },
+        { success: false, error: 'Presentation not found' },
         { status: 404 }
       );
     }
 
-    const url = new URL(request.url);
-    const download = url.searchParams.get('download') === 'true';
-
-    if (download) {
-      // Return as downloadable file
-      return new NextResponse(presentation.data, {
-        headers: {
-          'Content-Type': presentation.contentType,
-          'Content-Disposition': `attachment; filename="${presentation.filename}"`,
-          'Content-Length': presentation.size.toString(),
-        },
-      });
-    } else {
-      // Return as inline PDF for viewing
-      return new NextResponse(presentation.data, {
-        headers: {
-          'Content-Type': presentation.contentType,
-          'Content-Length': presentation.size.toString(),
-        },
-      });
-    }
+    // Redirect to the blob URL
+    return NextResponse.redirect(presentation.url, {
+      status: 302,
+      headers: {
+        'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
+      }
+    });
   } catch (error) {
     console.error('Error fetching presentation:', error);
     return NextResponse.json(

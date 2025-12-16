@@ -10,14 +10,14 @@ export interface IEvent extends Document {
   locationUrl?: string;
   presentations?: Array<{
     filename: string;
-    data: Buffer;
+    url: string; // Vercel Blob URL
     contentType: string;
     size: number;
     uploadedAt: Date;
   }>;
   images?: Array<{
     filename: string;
-    data: Buffer;
+    url: string; // Vercel Blob URL
     contentType: string;
     size: number;
     uploadedAt: Date;
@@ -61,8 +61,8 @@ const EventSchema = new Schema<IEvent>(
         type: String,
         required: true,
       },
-      data: {
-        type: Buffer,
+      url: {
+        type: String,
         required: true,
       },
       contentType: {
@@ -83,8 +83,8 @@ const EventSchema = new Schema<IEvent>(
         type: String,
         required: true,
       },
-      data: {
-        type: Buffer,
+      url: {
+        type: String,
         required: true,
       },
       contentType: {

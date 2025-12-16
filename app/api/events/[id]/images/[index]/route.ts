@@ -50,33 +50,19 @@ export async function GET(
 
     const image = sortedImages[imageIndex];
     
-    if (!image || !image.data) {
+    if (!image || !image.url) {
       return NextResponse.json(
-        { success: false, error: 'Image data not found' },
+        { success: false, error: 'Image not found' },
         { status: 404 }
       );
     }
 
-    const url = new URL(request.url);
-    const download = url.searchParams.get('download') === 'true';
-
-    const headers: Record<string, string> = {
-      'Content-Type': image.contentType,
-      'Content-Length': image.size.toString(),
-      'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
-    };
-
-    if (download) {
-      // Return as downloadable file
-      headers['Content-Disposition'] = `attachment; filename="${image.filename}"`;
-    } else {
-      // Return as inline image for viewing
-      headers['Content-Disposition'] = `inline; filename="${image.filename}"`;
-    }
-
-    return new NextResponse(image.data, {
-      status: 200,
-      headers,
+    // Redirect to the blob URL
+    return NextResponse.redirect(image.url, {
+      status: 302,
+      headers: {
+        'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
+      }
     });
   } catch (error) {
     console.error('Error fetching image:', error);
@@ -86,4 +72,3 @@ export async function GET(
     );
   }
 }
-

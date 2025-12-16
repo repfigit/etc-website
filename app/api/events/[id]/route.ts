@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { uploadFileToBlob, deleteFromBlob, deleteMultipleFromBlob } from '@/lib/blob';
 
 export async function GET(
   request: Request,
@@ -23,37 +24,22 @@ export async function GET(
       );
     }
 
-    // Remove Buffer data from presentations and images (can't be serialized to JSON)
-    // This must be done after .lean() because Mongoose select doesn't work well with nested arrays
-    const sanitized: any = { ...event };
-    if (sanitized.presentations) {
-      sanitized.presentations = sanitized.presentations.map((p: any) => {
-        const { data, ...rest } = p;
-        return rest;
-      });
-    }
-    if (sanitized.images) {
-      sanitized.images = sanitized.images.map((img: any) => {
-        const { data, ...rest } = img;
-        return rest;
-      });
-    }
-
     // Log what we're returning for debugging
     console.log('Fetching event for admin:', {
-      id: sanitized._id,
-      topic: sanitized.topic,
-      hasImages: 'images' in sanitized,
-      imagesCount: sanitized.images?.length || 0,
-      images: sanitized.images?.map((img: any) => ({
+      id: (event as any)._id,
+      topic: (event as any).topic,
+      hasImages: 'images' in event,
+      imagesCount: (event as any).images?.length || 0,
+      images: (event as any).images?.map((img: any) => ({
         filename: img.filename,
+        url: img.url,
         contentType: img.contentType,
         size: img.size,
         order: img.order
       })) || []
     });
 
-    return NextResponse.json({ success: true, data: sanitized });
+    return NextResponse.json({ success: true, data: event });
   } catch (error) {
     console.error('Error fetching event:', error);
     return NextResponse.json(
@@ -116,52 +102,79 @@ export async function PUT(
       console.log(`Found ${existingImagesData.length} existing images in database`);
       console.log('Existing image filenames:', existingImagesData.map((img: any) => img.filename));
 
-      // Always process presentations when editing (even if empty)
+      // ===== HANDLE PRESENTATIONS =====
       // Get existing presentations and filter to only keep specified ones
       let existingPresentations: any[] = [];
+      const presentationsToDelete: string[] = [];
+      
       if (presentationsToKeep.length > 0) {
-        existingPresentations = existingPresentationsData
-          .filter((p: any) => presentationsToKeep.includes(p.filename));
-      }
-
-      body.presentations = [...existingPresentations];
-
-      // Add new files
-      for (const file of presentationFiles) {
-        if (file instanceof File && file.size > 0) {
-          try {
-            const bytes = await file.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            body.presentations.push({
-              filename: file.name,
-              data: buffer,
-              contentType: file.type,
-              size: file.size,
-              uploadedAt: new Date()
-            });
-          } catch (fileError) {
-            console.error('Error processing presentation file:', fileError);
-            // Continue without this file rather than failing the entire request
+        for (const p of existingPresentationsData) {
+          if (presentationsToKeep.includes(p.filename)) {
+            existingPresentations.push(p);
+          } else if (p.url) {
+            presentationsToDelete.push(p.url);
+          }
+        }
+      } else {
+        // Delete all existing presentations
+        for (const p of existingPresentationsData) {
+          if (p.url) {
+            presentationsToDelete.push(p.url);
           }
         }
       }
 
-      // Always process images when editing
-      // The admin page always sends keepImages for existing images that should be kept
-      // If keepImages is empty and no new images, it means user deleted all images
+      // Delete removed presentations from blob
+      if (presentationsToDelete.length > 0) {
+        await deleteMultipleFromBlob(presentationsToDelete);
+        console.log(`Deleted ${presentationsToDelete.length} presentations from blob`);
+      }
 
+      body.presentations = [...existingPresentations];
+
+      // Add new presentation files
+      for (const file of presentationFiles) {
+        if (file instanceof File && file.size > 0) {
+          try {
+            const uploadResult = await uploadFileToBlob('events', id, 'presentations', file);
+            body.presentations.push({
+              ...uploadResult,
+              uploadedAt: new Date()
+            });
+            console.log('New presentation uploaded:', uploadResult.filename);
+          } catch (fileError) {
+            console.error('Error processing presentation file:', fileError);
+          }
+        }
+      }
+
+      // ===== HANDLE IMAGES =====
       // Get existing images and create a map for quick lookup
       const existingImagesMap = new Map();
-      const existingImages = existingImagesData;
+      const imagesToDelete: string[] = [];
       
       if (imagesToKeep.length > 0) {
-        existingImages.forEach((img: any) => {
+        existingImagesData.forEach((img: any) => {
           if (imagesToKeep.includes(img.filename)) {
             existingImagesMap.set(img.filename, img);
             console.log(`Keeping existing image: ${img.filename}`);
+          } else if (img.url) {
+            imagesToDelete.push(img.url);
           }
         });
+      } else {
+        // Delete all existing images
+        for (const img of existingImagesData) {
+          if (img.url) {
+            imagesToDelete.push(img.url);
+          }
+        }
+      }
+
+      // Delete removed images from blob
+      if (imagesToDelete.length > 0) {
+        await deleteMultipleFromBlob(imagesToDelete);
+        console.log(`Deleted ${imagesToDelete.length} images from blob`);
       }
 
       // Reconstruct images array in the order specified by imagesToKeep (which preserves client-side order)
@@ -198,21 +211,15 @@ export async function PUT(
           }
 
           try {
-            const bytes = await file.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
+            const uploadResult = await uploadFileToBlob('events', id, 'images', file);
             body.images.push({
-              filename: file.name,
-              data: buffer,
-              contentType: file.type,
-              size: file.size,
+              ...uploadResult,
               uploadedAt: new Date()
             });
             
-            console.log(`Added new image to body.images: ${file.name} (buffer length: ${buffer.length})`);
+            console.log(`New image uploaded: ${file.name} -> ${uploadResult.url}`);
           } catch (fileError) {
             console.error('Error processing image file:', fileError);
-            // Continue without this file rather than failing the entire request
           }
         } else {
           console.warn(`Skipping invalid file: ${file.name}`);
@@ -246,16 +253,16 @@ export async function PUT(
       ...body,
       presentations: body.presentations ? body.presentations.map((p: any) => ({
         filename: p.filename,
+        url: p.url,
         contentType: p.contentType,
-        size: p.size,
-        dataLength: p.data?.length
+        size: p.size
       })) : null,
       images: body.images ? body.images.map((img: any) => ({
         filename: img.filename,
+        url: img.url,
         contentType: img.contentType,
         size: img.size,
-        order: img.order,
-        dataLength: img.data?.length
+        order: img.order
       })) : null
     });
 
@@ -306,14 +313,44 @@ export async function DELETE(
 
     await connectDB();
     const { id } = await params;
-    const event = await Event.findByIdAndDelete(id);
-
+    
+    // First, get the event to find files to delete from blob
+    const event = await Event.findById(id);
+    
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
         { status: 404 }
       );
     }
+
+    // Collect all blob URLs to delete
+    const urlsToDelete: string[] = [];
+    
+    if (event.presentations) {
+      for (const p of event.presentations) {
+        if (p.url) {
+          urlsToDelete.push(p.url);
+        }
+      }
+    }
+    
+    if (event.images) {
+      for (const img of event.images) {
+        if (img.url) {
+          urlsToDelete.push(img.url);
+        }
+      }
+    }
+
+    // Delete all files from blob storage
+    if (urlsToDelete.length > 0) {
+      await deleteMultipleFromBlob(urlsToDelete);
+      console.log(`Deleted ${urlsToDelete.length} files from blob storage`);
+    }
+
+    // Now delete the event from database
+    await Event.findByIdAndDelete(id);
 
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
@@ -330,4 +367,3 @@ export async function DELETE(
     );
   }
 }
-
