@@ -156,8 +156,8 @@ export default function ShareButton({ url, title, description }: ShareButtonProp
         aria-expanded={isOpen}
       >
         <svg 
-          width="12" 
-          height="12" 
+          width="10" 
+          height="10" 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor" 

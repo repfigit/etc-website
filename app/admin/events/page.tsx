@@ -11,6 +11,7 @@ import ImageUploadSubform from '@/app/components/ImageUploadSubform';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 import { uploadFileToBlobClient } from '@/lib/blob-client';
+import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
   _id: string;
@@ -922,7 +923,7 @@ export default function AdminEvents() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: '1.1em' }}>{formatDate(event.date)} at {event.time}</strong>
+                  <strong style={{ fontSize: '1.1em' }}>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</strong>
                   {event.presenter && <div>Presenter: {event.presenter}</div>}
                   <div>Topic: {event.topic}</div>
                   <div>Location: {event.location}</div>

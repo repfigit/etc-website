@@ -1246,16 +1246,40 @@ img.logo {
 /* Event Card Styles */
 .event-card {
     margin-bottom: 1.5em;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    list-style-type: none;
+    box-shadow: none;
+}
+
+.event-card-link {
+    display: block;
+    margin-bottom: 1.5em;
     padding: 1.5em;
     border: 1px solid #5db8b0;
     background: #0d1210;
     border-radius: 12px;
-    list-style-type: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.event-card-link:hover {
+    border-color: #d4783e;
+    box-shadow: 0 6px 20px rgba(93, 184, 176, 0.3);
+    transform: translateY(-2px);
+}
+
+.event-card-link:visited {
+    color: inherit;
 }
 
 @media (max-width: 767px) {
-    .event-card {
+    .event-card-link {
         padding: 1em;
         margin-bottom: 1em;
     }
@@ -1266,6 +1290,12 @@ img.logo {
 }
 
 .event-topic-link {
+    color: #5db8b0;
+    text-decoration: none;
+}
+
+.event-card-link .event-topic-link,
+.event-card-home .event-name-link {
     color: #5db8b0;
     text-decoration: none;
 }
@@ -1819,22 +1849,26 @@ img.logo {
     border: 1px solid #5db8b0;
     color: #5db8b0;
     cursor: pointer;
-    padding: 0.23em 0.38em;
+    padding: 0.15em 0.25em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.26em;
-    border-radius: 5px;
+    gap: 0.2em;
+    border-radius: 4px;
     transition: all 0.2s ease;
     font-family: inherit;
-    font-size: 0.65em;
+    font-size: 0.55em;
     font-weight: 500;
     line-height: 1;
     text-decoration: none;
     margin: 0;
-    height: auto;
+    height: 1.8em;
+    min-height: 1.8em;
+    max-height: 1.8em;
+    box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    vertical-align: middle;
 }
 
 .calendar-button-trigger:hover {
@@ -1858,7 +1892,9 @@ img.logo {
     }
     
     .calendar-button-trigger {
-        padding: 0.48em;
+        padding: 0.4em;
+        height: 1.8em;
+        min-height: 1.8em;
     }
 }
 
@@ -2689,6 +2725,8 @@ img.logo {
     align-items: center;
     margin: 0;
     z-index: 9999;
+    height: 1.8em;
+    vertical-align: middle;
 }
 
 .share-button-trigger {
@@ -2696,20 +2734,24 @@ img.logo {
     border: 1px solid #5db8b0;
     color: #5db8b0;
     cursor: pointer;
-    padding: 0.23em 0.38em;
+    padding: 0.15em 0.25em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.26em;
-    border-radius: 5px;
+    gap: 0.2em;
+    border-radius: 4px;
     transition: all 0.2s ease;
     font-family: inherit;
-    font-size: 0.65em;
+    font-size: 0.55em;
     font-weight: 500;
     line-height: 1;
-    height: auto;
+    height: 1.8em;
+    min-height: 1.8em;
+    max-height: 1.8em;
+    box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    vertical-align: middle;
 }
 
 .share-button-trigger:hover {
@@ -2765,7 +2807,9 @@ img.logo {
     }
     
     .share-button-trigger {
-        padding: 0.48em;
+        padding: 0.4em;
+        height: 1.8em;
+        min-height: 1.8em;
     }
 }
 
@@ -3519,6 +3563,7 @@ section:not(:last-child)::after {
 }
 
 .event-card-home {
+    display: block;
     background: #1a1a1a;
     border: 1px solid #5db8b0;
     border-radius: 12px;
@@ -3526,6 +3571,9 @@ section:not(:last-child)::after {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 .event-card-home::before {
@@ -3548,6 +3596,10 @@ section:not(:last-child)::after {
 
 .event-card-home:hover::before {
     transform: scaleY(1);
+}
+
+.event-card-home:visited {
+    color: inherit;
 }
 
 .event-card-header {

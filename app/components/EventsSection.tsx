@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
   _id: string;
@@ -129,11 +130,11 @@ export default function EventsSection() {
               {events.map((event) => {
                 const badge = getDateBadge(event.date);
                 return (
-                  <div key={event._id} className="event-card-home">
+                  <Link key={event._id} href={`/events/${event._id}`} className="event-card-home event-card-link">
                     <div className="event-card-header">
-                      <Link href={`/events/${event._id}`} className='event-name-link'>
+                      <div className='event-name-link'>
                         <strong>{event.topic}</strong>
-                      </Link>
+                      </div>
                       <div className="event-card-badges">
                         <span className={badge.className}>{badge.text}</span>
                         <a 
@@ -150,14 +151,14 @@ export default function EventsSection() {
                     <div className="event-card-details">
                       <div className="event-detail-item">
                         <span className="event-detail-icon">📅</span>
-                        <span>{formatDate(event.date)} at {formatTime(event.time)}</span>
+                        <span>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</span>
                       </div>
                       {event.presenter && (
                         <div className="event-detail-item">
                           <span className="event-detail-icon">👤</span>
                           <span>
                             Presenter: {event.presenterUrl ? (
-                              <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer">{event.presenter}</a>
+                              <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{event.presenter}</a>
                             ) : (
                               event.presenter
                             )}
@@ -168,7 +169,7 @@ export default function EventsSection() {
                         <span className="event-detail-icon">📍</span>
                         <span>
                           {event.locationUrl ? (
-                            <a href={event.locationUrl} target="_blank" rel="noopener noreferrer">{event.location}</a>
+                            <a href={event.locationUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{event.location}</a>
                           ) : (
                             event.location
                           )}
@@ -186,28 +187,24 @@ export default function EventsSection() {
                     {event.images && event.images.length > 0 && (
                       <div className="event-thumbnails-home">
                         {event.images.slice(0, 3).map((img, idx) => (
-                          <Link
+                          <div
                             key={idx}
-                            href={`/events/${event._id}`}
                             className="event-thumbnail"
                           >
                             <img
                               src={`/api/events/${event._id}/images/${idx}`}
                               alt={img.filename}
                             />
-                          </Link>
+                          </div>
                         ))}
                         {event.images.length > 3 && (
-                          <Link
-                            href={`/events/${event._id}`}
-                            className="event-thumbnail event-thumbnail-more"
-                          >
+                          <div className="event-thumbnail event-thumbnail-more">
                             +{event.images.length - 3}
-                          </Link>
+                          </div>
                         )}
                       </div>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>

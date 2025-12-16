@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import EventDetailClient from './EventDetailClient';
 import connectDB from '@/lib/mongodb';
 import Event, { IEvent } from '@/lib/models/Event';
+import { formatTime12Hour } from '@/lib/time-utils';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = `${event.topic} | NH Emerging Technologies Caucus`;
     const description = event.content
       ? event.content.substring(0, 200).replace(/[#*_\[\]]/g, '') + '...'
-      : `Join us on ${formatDate(event.date.toISOString())} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`;
+      : `Join us on ${formatDate(event.date.toISOString())} at ${formatTime12Hour(event.time)} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`;
 
     // Use the first event image if available, otherwise fall back to default
     const hasEventImage = event.images && event.images.length > 0;

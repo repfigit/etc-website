@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
   _id: string;
@@ -73,73 +74,74 @@ export default function EventsPageClient() {
           <ul className="events-page-list">
             {events.map((event) => (
               <li key={event._id} className="event-card">
-                {/* Event Topic */}
-                <div className="event-topic-container">
-                  <Link href={`/events/${event._id}`} className="event-topic-link">
-                    <strong className="event-topic-text">{event.topic}</strong>
-                  </Link>
-                  {' '}
-                  <a 
-                    href={`/api/events/${event._id}/ical`}
-                    download
-                    className="event-calendar-icon"
-                    title="Add to calendar"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    📅
-                  </a>
-                </div>
+                <Link href={`/events/${event._id}`} className="event-card-link">
+                  {/* Event Topic */}
+                  <div className="event-topic-container">
+                    <div className="event-topic-link">
+                      <strong className="event-topic-text">{event.topic}</strong>
+                    </div>
+                    {' '}
+                    <a 
+                      href={`/api/events/${event._id}/ical`}
+                      download
+                      className="event-calendar-icon"
+                      title="Add to calendar"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      📅
+                    </a>
+                  </div>
 
-                {/* Event Details */}
-                <div className="event-details">
-                  <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {event.time}
-                </div>
+                  {/* Event Details */}
+                  <div className="event-details">
+                    <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
+                  </div>
 
-                {/* Presenter */}
-                {event.presenter && (
-                  <div className="event-presenter-container">
-                    <strong className="event-detail-label">👤 Presenter:</strong>                         {event.presenterUrl ? (
+                  {/* Presenter */}
+                  {event.presenter && (
+                    <div className="event-presenter-container">
+                      <strong className="event-detail-label">👤 Presenter:</strong>                         {event.presenterUrl ? (
+                            <a 
+                              href={event.presenterUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="event-presenter-link"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {event.presenter}
+                            </a>
+                          ) : (
+                            <span>{event.presenter}</span>
+                          )}
+                    </div>
+                  )}
+
+                  {/* Location */}
+                  <div className="event-location-container">
+                      <strong className="event-detail-label">📍 Location:</strong> {event.locationUrl ? (
                           <a 
-                            href={event.presenterUrl} 
+                            href={event.locationUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="event-presenter-link"
+                            className="event-location-link"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {event.presenter}
+                            {event.location}
                           </a>
                         ) : (
-                          <span>{event.presenter}</span>
+                          <span>{event.location}</span>
                         )}
                   </div>
-                )}
 
-                {/* Location */}
-                <div className="event-location-container">
-                    <strong className="event-detail-label">📍 Location:</strong> {event.locationUrl ? (
-                        <a 
-                          href={event.locationUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="event-location-link"
-                        >
-                          {event.location}
-                        </a>
-                      ) : (
-                        <span>{event.location}</span>
-                      )}
-                </div>
-
-                {/* Detailed Information Link */}
-                {event.content && (
-                  <div className="event-detailed-info">
-                    <Link
-                      href={`/events/${event._id}`}
-                      className="event-detailed-link"
-                    >
-                      📝 Detailed information available
-                    </Link>
-                  </div>
-                )}
+                  {/* Detailed Information Link */}
+                  {event.content && (
+                    <div className="event-detailed-info">
+                      <span className="event-detailed-link">
+                        📝 Detailed information available
+                      </span>
+                    </div>
+                  )}
+                </Link>
 
                 {/* Image Thumbnails */}
                 {event.images && event.images.length > 0 && (

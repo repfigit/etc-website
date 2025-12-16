@@ -11,6 +11,7 @@ import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import ImageCarousel from '../../components/ImageCarousel';
 import ShareButton from '../../components/ShareButton';
+import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
   _id: string;
@@ -153,7 +154,7 @@ export default function EventDetailClient({ event }: Props) {
                 <ShareButton 
                   url={`/events/${event._id}`}
                   title={event.topic}
-                  description={`Join us on ${formatDate(event.date)} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`}
+                  description={`Join us on ${formatDate(event.date)} at ${formatTimeWithTimezone(event.date, event.time)} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`}
                 />
                 {!isEventPast() && (
                   <a 
@@ -163,8 +164,8 @@ export default function EventDetailClient({ event }: Props) {
                     title="Add to calendar"
                   >
                   <svg 
-                    width="12" 
-                    height="12" 
+                    width="10" 
+                    height="10" 
                     viewBox="0 0 24 24" 
                     fill="none" 
                     stroke="currentColor" 
@@ -177,14 +178,14 @@ export default function EventDetailClient({ event }: Props) {
                       <line x1="8" y1="2" x2="8" y2="6"/>
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    <span className="calendar-button-text">Add to Calendar</span>
+                    <span className="calendar-button-text">Calendar</span>
                   </a>
                 )}
               </span>
             </h1>
             
             <div className="event-detail-datetime">
-              <strong>{formatDate(event.date)} at {event.time}</strong>
+              <strong>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</strong>
             </div>
             
             {event.presenter && (
