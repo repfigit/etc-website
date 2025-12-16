@@ -900,6 +900,7 @@ export default function AdminEvents() {
                 marginBottom: '1em',
                 padding: '1em',
                 border: '2px solid #4ecdc4',
+                borderRadius: '12px',
                 background: event.isVisible ? '#121212' : '#333',
                 opacity: event.isVisible ? 1 : 0.6
               }}
