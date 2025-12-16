@@ -100,6 +100,32 @@ export default function EventDetailClient({ event }: Props) {
     });
   };
 
+  // Check if event date is in the past
+  const isEventPast = () => {
+    if (!event.date || !event.time) return false;
+    
+    try {
+      // Parse date and time
+      const eventDate = new Date(event.date);
+      
+      // Extract time (handle formats like "10:00" or "10:00 ET")
+      const timeMatch = event.time.match(/(\d{1,2}):(\d{2})/);
+      if (!timeMatch) return false;
+      
+      const hours = parseInt(timeMatch[1], 10);
+      const minutes = parseInt(timeMatch[2], 10);
+      
+      // Set the time on the event date
+      eventDate.setHours(hours || 0, minutes || 0, 0, 0);
+      
+      // Compare with current date/time
+      return eventDate < new Date();
+    } catch (error) {
+      console.error('Error checking if event is past:', error);
+      return false;
+    }
+  };
+
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -124,19 +150,36 @@ export default function EventDetailClient({ event }: Props) {
               {event.topic}
               {' '}
               <span className="event-detail-actions">
-                <a 
-                  href={`/api/events/${event._id}/ical`}
-                  download
-                  className="event-calendar-icon-large"
-                  title="Add to calendar"
-                >
-                  📅
-                </a>
                 <ShareButton 
                   url={`/events/${event._id}`}
                   title={event.topic}
                   description={`Join us on ${formatDate(event.date)} at ${event.time} for ${event.topic}${event.presenter ? ` with ${event.presenter}` : ''}.`}
                 />
+                {!isEventPast() && (
+                  <a 
+                    href={`/api/events/${event._id}/ical`}
+                    download
+                    className="calendar-button-trigger shimmer-button"
+                    title="Add to calendar"
+                  >
+                  <svg 
+                    width="12" 
+                    height="12" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span className="calendar-button-text">Add to Calendar</span>
+                  </a>
+                )}
               </span>
             </h1>
             

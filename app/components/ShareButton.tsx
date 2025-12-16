@@ -150,14 +150,14 @@ export default function ShareButton({ url, title, description }: ShareButtonProp
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="share-button-trigger"
+        className="share-button-trigger shimmer-button"
         title="Share this event"
         aria-label="Share this event"
         aria-expanded={isOpen}
       >
         <svg 
-          width="20" 
-          height="20" 
+          width="12" 
+          height="12" 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor" 
@@ -171,6 +171,7 @@ export default function ShareButton({ url, title, description }: ShareButtonProp
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
           <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
         </svg>
+        <span className="share-button-text">Share</span>
       </button>
 
       {isOpen && (

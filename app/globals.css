@@ -1814,20 +1814,52 @@ img.logo {
     transform: scale(1.2);
 }
 
-.event-calendar-icon-large {
-    text-decoration: none;
-    font-size: 0.8em;
-    display: inline-block;
-    transition: transform 0.2s ease;
+.calendar-button-trigger {
+    background: rgba(93, 184, 176, 0.1);
+    border: 1px solid #5db8b0;
+    color: #5db8b0;
     cursor: pointer;
-    opacity: 1;
-    vertical-align: middle;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
-    font-style: normal;
+    padding: 0.23em 0.38em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.26em;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    font-size: 0.65em;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    margin: 0;
+    height: auto;
+    position: relative;
+    overflow: hidden;
 }
 
-.event-calendar-icon-large:hover {
-    transform: scale(1.2);
+.calendar-button-trigger:hover {
+    background: #5db8b0;
+    color: #0d1210;
+    transform: scale(1.02);
+}
+
+.calendar-button-trigger svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+.calendar-button-text {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    .calendar-button-text {
+        display: none;
+    }
+    
+    .calendar-button-trigger {
+        padding: 0.48em;
+    }
 }
 
 /* PDF Modal Styles */
@@ -2652,34 +2684,89 @@ img.logo {
 
 /* Share Button Styles */
 .share-button-container {
-    display: inline-block;
+    display: inline-flex;
     position: relative;
-    vertical-align: middle;
-    margin-left: 0.25em;
+    align-items: center;
+    margin: 0;
     z-index: 9999;
 }
 
 .share-button-trigger {
-    background: transparent;
-    border: none;
+    background: rgba(93, 184, 176, 0.1);
+    border: 1px solid #5db8b0;
     color: #5db8b0;
     cursor: pointer;
-    padding: 0.25em;
+    padding: 0.23em 0.38em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    gap: 0.26em;
+    border-radius: 5px;
     transition: all 0.2s ease;
-    vertical-align: middle;
+    font-family: inherit;
+    font-size: 0.65em;
+    font-weight: 500;
+    line-height: 1;
+    height: auto;
+    position: relative;
+    overflow: hidden;
 }
 
 .share-button-trigger:hover {
-    color: #d4783e;
-    transform: scale(1.15);
+    background: #5db8b0;
+    color: #0d1210;
+    transform: scale(1.02);
 }
 
 .share-button-trigger svg {
     display: block;
+    flex-shrink: 0;
+}
+
+.share-button-text {
+    white-space: nowrap;
+}
+
+/* Shimmer effect for buttons */
+.shimmer-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(93, 184, 176, 0.2),
+        transparent
+    );
+    animation: shimmer 3s infinite;
+    z-index: 0;
+}
+
+.shimmer-button > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .share-button-text {
+        display: none;
+    }
+    
+    .share-button-trigger {
+        padding: 0.48em;
+    }
 }
 
 .share-dropdown {
@@ -2756,7 +2843,8 @@ img.logo {
 .event-detail-actions {
     display: inline-flex;
     align-items: center;
-    gap: 0.25em;
+    gap: 0.75em;
+    margin-left: 0.5em;
     vertical-align: middle;
 }
 
