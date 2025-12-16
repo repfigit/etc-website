@@ -30,9 +30,9 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
         return;
       }
 
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`File size must be less than 10MB. Skipping: ${file.name}`);
+      // Validate file size (max 50MB - using client-side blob uploads)
+      if (file.size > 50 * 1024 * 1024) {
+        alert(`File size must be less than 50MB. Skipping: ${file.name}`);
         return;
       }
 
@@ -108,7 +108,7 @@ export default function PDFUploadSubform({ presentations, onPresentationsChange 
           📁 Drop PDF files here or click to browse
         </div>
         <div className="pdf-upload-subtext">
-          Maximum 10MB per file
+          Maximum 50MB per file
         </div>
         
         <input

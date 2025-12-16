@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -45,11 +45,40 @@ interface Props {
 export default function EventDetailClient({ event }: Props) {
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [selectedPresentation, setSelectedPresentation] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handle fullscreen toggle
+  const toggleFullscreen = useCallback(async () => {
+    if (!modalRef.current) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await modalRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      console.error('Fullscreen error:', err);
+    }
+  }, []);
+
+  // Listen for fullscreen changes (e.g., user pressing Escape)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   // Handle Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showPdfModal) {
+      if (e.key === 'Escape' && showPdfModal && !document.fullscreenElement) {
         setShowPdfModal(false);
         setSelectedPresentation(null);
       }
@@ -234,18 +263,40 @@ export default function EventDetailClient({ event }: Props) {
           }}
         >
           <div 
-            className="modal-content"
+            ref={modalRef}
+            className={`modal-content pdf-modal-content ${isFullscreen ? 'is-fullscreen' : ''}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <button 
-              className="modal-close-button"
-              onClick={() => {
-                setShowPdfModal(false);
-                setSelectedPresentation(null);
-              }}
-            >
-              ✕
-            </button>
+            <div className="pdf-modal-controls">
+              <button 
+                className="modal-control-button"
+                onClick={toggleFullscreen}
+                title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              >
+                {isFullscreen ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                  </svg>
+                )}
+              </button>
+              <button 
+                className="modal-control-button"
+                onClick={() => {
+                  if (isFullscreen) {
+                    document.exitFullscreen();
+                  }
+                  setShowPdfModal(false);
+                  setSelectedPresentation(null);
+                }}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
             <iframe
               src={`/api/events/${event._id}/presentations/${selectedPresentation}`}
               className="modal-iframe"

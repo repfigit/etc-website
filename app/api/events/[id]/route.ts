@@ -234,8 +234,124 @@ export async function PUT(
       
       console.log(`Final body.images array has ${body.images.length} images with order set`);
     } else {
-      // Handle JSON without presentation
-      body = await request.json();
+      // Handle JSON - may include blob URLs from client-side uploads
+      const jsonData = await request.json();
+      
+      // Extract special fields for file handling
+      const { keepPresentations, newPresentationUrls, keepImages, newImageUrls, ...basicData } = jsonData;
+      body = basicData;
+
+      // If we have file-related fields, process them
+      if (keepPresentations !== undefined || newPresentationUrls !== undefined || 
+          keepImages !== undefined || newImageUrls !== undefined) {
+        
+        // Fetch existing event data
+        const existingEvent = await Event.findById(id).select('presentations images');
+        const existingPresentationsData = existingEvent?.presentations || [];
+        const existingImagesData = existingEvent?.images || [];
+
+        // ===== HANDLE PRESENTATIONS =====
+        const presentationsToKeepList = keepPresentations || [];
+        const presentationsToDelete: string[] = [];
+        let keptPresentations: any[] = [];
+
+        if (presentationsToKeepList.length > 0) {
+          for (const p of existingPresentationsData) {
+            if (presentationsToKeepList.includes(p.filename)) {
+              keptPresentations.push(p);
+            } else if (p.url) {
+              presentationsToDelete.push(p.url);
+            }
+          }
+        } else if (existingPresentationsData.length > 0) {
+          // No presentations to keep, delete all
+          for (const p of existingPresentationsData) {
+            if (p.url) {
+              presentationsToDelete.push(p.url);
+            }
+          }
+        }
+
+        // Delete removed presentations from blob
+        if (presentationsToDelete.length > 0) {
+          await deleteMultipleFromBlob(presentationsToDelete);
+          console.log(`Deleted ${presentationsToDelete.length} presentations from blob`);
+        }
+
+        // Build final presentations array
+        body.presentations = [...keptPresentations];
+        
+        // Add new presentations from client-side uploads
+        if (newPresentationUrls && Array.isArray(newPresentationUrls)) {
+          for (const uploaded of newPresentationUrls) {
+            body.presentations.push({
+              filename: uploaded.filename,
+              url: uploaded.url,
+              contentType: uploaded.contentType,
+              size: uploaded.size,
+              uploadedAt: new Date()
+            });
+          }
+        }
+
+        // ===== HANDLE IMAGES =====
+        const imagesToKeepList = keepImages || [];
+        const imagesToDelete: string[] = [];
+        const existingImagesMap = new Map();
+
+        if (imagesToKeepList.length > 0) {
+          for (const img of existingImagesData) {
+            if (imagesToKeepList.includes(img.filename)) {
+              existingImagesMap.set(img.filename, img);
+            } else if (img.url) {
+              imagesToDelete.push(img.url);
+            }
+          }
+        } else if (existingImagesData.length > 0) {
+          // No images to keep, delete all
+          for (const img of existingImagesData) {
+            if (img.url) {
+              imagesToDelete.push(img.url);
+            }
+          }
+        }
+
+        // Delete removed images from blob
+        if (imagesToDelete.length > 0) {
+          await deleteMultipleFromBlob(imagesToDelete);
+          console.log(`Deleted ${imagesToDelete.length} images from blob`);
+        }
+
+        // Build final images array - maintain order from keepImages
+        body.images = [];
+        for (const filename of imagesToKeepList) {
+          const existingImage = existingImagesMap.get(filename);
+          if (existingImage) {
+            body.images.push(existingImage);
+          }
+        }
+
+        // Add new images from client-side uploads
+        if (newImageUrls && Array.isArray(newImageUrls)) {
+          for (const uploaded of newImageUrls) {
+            body.images.push({
+              filename: uploaded.filename,
+              url: uploaded.url,
+              contentType: uploaded.contentType,
+              size: uploaded.size,
+              uploadedAt: new Date()
+            });
+          }
+        }
+
+        // Set order on all images
+        body.images = body.images.map((img: any, idx: number) => ({
+          ...img,
+          order: idx
+        }));
+
+        console.log(`Final presentations: ${body.presentations.length}, images: ${body.images.length}`);
+      }
     }
 
     // Fix timezone issue: convert date string to proper Date object

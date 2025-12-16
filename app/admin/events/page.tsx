@@ -10,6 +10,7 @@ import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import ImageUploadSubform from '@/app/components/ImageUploadSubform';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
+import { uploadFileToBlobClient } from '@/lib/blob-client';
 
 interface Event {
   _id: string;
@@ -115,100 +116,146 @@ export default function AdminEvents() {
     }
   };
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploading(true);
+    setUploadProgress('Saving event...');
 
     try {
-      const url = editingId ? `/api/events/${editingId}` : '/api/events';
-      const method = editingId ? 'PUT' : 'POST';
-
       // Combine time and timezone for the API
       const submitData = {
         ...formData,
         time: `${formData.time} ${formData.timezone}`.trim()
       };
 
-      console.log('Form data before submission:', {
-        presentations: presentations.map(p => ({
-          name: p.name,
-          size: p.size,
-          type: p.type
-        }))
-      });
-
       // Remove timezone from the data sent to API
       const { timezone, ...dataToSubmit } = submitData;
 
-      // Always use FormData for editing events to handle presentations properly
-      const formDataToSend = new FormData();
+      let eventId = editingId;
 
-      // Add all form fields
-      Object.entries(dataToSubmit).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value.toString());
+      // Step 1: Create or update event with basic data first
+      if (!editingId) {
+        // Creating new event - create it first to get an ID
+        setUploadProgress('Creating event...');
+        const createResponse = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataToSubmit)
+        });
+
+        if (!createResponse.ok) {
+          const errorText = await createResponse.text();
+          throw new Error(`Failed to create event: ${errorText}`);
         }
-      });
 
-      // Add presentation files (only new files, not existing ones)
-      presentations.forEach(presentation => {
+        const createData = await createResponse.json();
+        eventId = createData.data._id;
+        console.log('Created event with ID:', eventId);
+      }
+
+      // Step 2: Upload new files to blob storage using client-side uploads
+      const newPresentationFiles = presentations.filter(p => p.file !== null);
+      const newImageFiles = images.filter(img => img.file !== null);
+
+      const uploadedPresentations: Array<{ url: string; filename: string; contentType: string; size: number }> = [];
+      const uploadedImages: Array<{ url: string; filename: string; contentType: string; size: number }> = [];
+
+      // Upload presentations
+      for (let i = 0; i < newPresentationFiles.length; i++) {
+        const presentation = newPresentationFiles[i];
         if (presentation.file) {
-          formDataToSend.append('presentations', presentation.file);
+          setUploadProgress(`Uploading presentation ${i + 1}/${newPresentationFiles.length}: ${presentation.name}`);
+          try {
+            const result = await uploadFileToBlobClient(
+              presentation.file,
+              'events',
+              eventId!,
+              'presentations'
+            );
+            uploadedPresentations.push(result);
+            console.log('Uploaded presentation:', result.url);
+          } catch (uploadError) {
+            console.error('Error uploading presentation:', uploadError);
+            throw new Error(`Failed to upload presentation: ${presentation.name}`);
+          }
         }
-      });
-
-      // Add information about which presentations to keep (for editing)
-      if (editingId) {
-        const presentationsToKeep = presentations
-          .filter(p => p.file === null) // Only existing presentations (no file object)
-          .map(p => p.name);
-
-        presentationsToKeep.forEach(filename => {
-          formDataToSend.append('keepPresentations', filename);
-        });
       }
 
-      // Add image files (only new files, not existing ones)
-      images.forEach(image => {
+      // Upload images
+      for (let i = 0; i < newImageFiles.length; i++) {
+        const image = newImageFiles[i];
         if (image.file) {
-          formDataToSend.append('images', image.file);
+          setUploadProgress(`Uploading image ${i + 1}/${newImageFiles.length}: ${image.name}`);
+          try {
+            const result = await uploadFileToBlobClient(
+              image.file,
+              'events',
+              eventId!,
+              'images'
+            );
+            uploadedImages.push(result);
+            console.log('Uploaded image:', result.url);
+          } catch (uploadError) {
+            console.error('Error uploading image:', uploadError);
+            throw new Error(`Failed to upload image: ${image.name}`);
+          }
         }
-      });
-
-      // Add information about which images to keep (for editing)
-      // Send them in the order they appear in the images array (preserves reordering)
-      if (editingId) {
-        const imagesToKeep = images
-          .filter(img => img.file === null) // Only existing images (no file object)
-          .map(img => img.name);
-
-        // Send filenames in the order they appear (preserves client-side reordering)
-        imagesToKeep.forEach(filename => {
-          formDataToSend.append('keepImages', filename);
-        });
       }
 
-      console.log('Sending FormData with fields:', Array.from(formDataToSend.keys()));
-      console.log('Presentation files:', presentations.map(p => `${p.name} (${p.size} bytes)`));
-      console.log('Image files:', images.map(img => `${img.name} (${img.size} bytes)`));
+      // Step 3: Update event with file URLs
+      setUploadProgress('Finalizing event...');
 
-      const response = await fetch(url, {
-        method,
-        body: formDataToSend
+      // Build the update payload
+      const updatePayload: any = { ...dataToSubmit };
+
+      // For presentations: keep existing ones + add new uploaded ones
+      const existingPresentations = presentations
+        .filter(p => p.file === null)
+        .map(p => p.name);
+
+      // For images: keep existing ones (in order) + add new uploaded ones
+      const existingImages = images
+        .filter(img => img.file === null)
+        .map(img => img.name);
+
+      // Send as JSON with blob URLs
+      const finalPayload = {
+        ...updatePayload,
+        // Tell the API which existing files to keep and which new URLs to add
+        keepPresentations: existingPresentations,
+        newPresentationUrls: uploadedPresentations,
+        keepImages: existingImages,
+        newImageUrls: uploadedImages,
+      };
+
+      console.log('Final payload:', {
+        ...finalPayload,
+        newPresentationUrls: finalPayload.newPresentationUrls?.length || 0,
+        newImageUrls: finalPayload.newImageUrls?.length || 0,
       });
 
-      if (response.ok) {
-        await fetchEvents();
-        resetForm();
-      } else {
-        const errorText = await response.text();
-        console.error('Server error:', errorText);
-        console.error('Response status:', response.status);
-        console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-        alert('Failed to save event: ' + (errorText || 'Unknown error'));
+      const updateResponse = await fetch(`/api/events/${eventId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(finalPayload)
+      });
+
+      if (!updateResponse.ok) {
+        const errorText = await updateResponse.text();
+        throw new Error(`Failed to update event: ${errorText}`);
       }
+
+      await fetchEvents();
+      resetForm();
     } catch (error) {
       console.error('Error saving event:', error);
-      alert('Error saving event');
+      alert('Failed to save event: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsUploading(false);
+      setUploadProgress('');
     }
   };
 
@@ -670,35 +717,51 @@ export default function AdminEvents() {
               eventId={editingId || undefined}
             />
 
+            {isUploading && uploadProgress && (
+              <div style={{
+                marginTop: '1em',
+                padding: '1em',
+                background: 'rgba(78, 205, 196, 0.1)',
+                border: '1px solid #4ecdc4',
+                borderRadius: '4px',
+                color: '#4ecdc4'
+              }}>
+                ⏳ {uploadProgress}
+              </div>
+            )}
+
             <div style={{ marginTop: '2em', display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
               <button
                 type="button"
                 onClick={() => { resetForm(); setShowModal(false); }}
+                disabled={isUploading}
                 style={{
                   padding: '0.75em 2em',
                   background: '#666',
                   color: '#fff',
                   border: '2px solid #888',
-                  cursor: 'pointer',
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
                   fontWeight: 'bold',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
+                  opacity: isUploading ? 0.5 : 1
                 }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
+                disabled={isUploading}
                 style={{
                   padding: '0.75em 2em',
-                  background: '#4ecdc4',
-                  color: '#000',
+                  background: isUploading ? '#666' : '#4ecdc4',
+                  color: isUploading ? '#999' : '#000',
                   border: '2px solid #00f7ff',
-                  cursor: 'pointer',
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
                   fontWeight: 'bold',
                   fontFamily: 'inherit'
                 }}
               >
-                {editingId ? 'Update Event' : 'Create Event'}
+                {isUploading ? 'Uploading...' : (editingId ? 'Update Event' : 'Create Event')}
               </button>
             </div>
           </form>
