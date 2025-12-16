@@ -1308,6 +1308,10 @@ img.logo {
 .event-details {
     margin-bottom: 1em;
     color: #e8ebe8;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
 }
 
 .event-detail-label {
@@ -1339,6 +1343,12 @@ img.logo {
 .event-presenter-link {
     color: #5db8b0;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
 }
 
 .event-presenter-link:hover {
@@ -1348,6 +1358,12 @@ img.logo {
 .event-location-link {
     color: #5db8b0;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
 }
 
 .event-location-link:hover {
@@ -1360,7 +1376,6 @@ img.logo {
     flex-wrap: wrap;
     margin-top: 1em;
     padding-top: 0.8em;
-    border-top: 1px solid #333;
 }
 
 .event-thumbnail {
@@ -1405,7 +1420,6 @@ img.logo {
     flex-wrap: wrap;
     margin-top: 1em;
     padding-top: 0.75em;
-    border-top: 1px solid #333;
 }
 
 .event-thumbnails-home .event-thumbnail {
@@ -1838,6 +1852,11 @@ img.logo {
     opacity: 1;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
     font-style: normal;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: inherit;
 }
 
 .event-calendar-icon:hover {

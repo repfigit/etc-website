@@ -80,36 +80,46 @@ export default function EventsPageClient() {
                     <div className="event-topic-link">
                       <strong className="event-topic-text">{event.topic}</strong>
                     </div>
-                    {' '}
-                    <a 
-                      href={`/api/events/${event._id}/ical`}
-                      download
-                      className="event-calendar-icon"
-                      title="Add to calendar"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      📅
-                    </a>
                   </div>
 
                   {/* Event Details */}
                   <div className="event-details">
-                    <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
+                    <strong className="event-detail-label">Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
+                    {' '}
+                    <button
+                      type="button"
+                      className="event-calendar-icon"
+                      title="Add to calendar"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const link = document.createElement('a');
+                        link.href = `/api/events/${event._id}/ical`;
+                        link.download = '';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
+                    >
+                      📅
+                    </button>
                   </div>
 
                   {/* Presenter */}
                   {event.presenter && (
                     <div className="event-presenter-container">
                       <strong className="event-detail-label">👤 Presenter:</strong>                         {event.presenterUrl ? (
-                            <a 
-                              href={event.presenterUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
+                            <button
+                              type="button"
                               className="event-presenter-link"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(event.presenterUrl, '_blank', 'noopener,noreferrer');
+                              }}
                             >
                               {event.presenter}
-                            </a>
+                            </button>
                           ) : (
                             <span>{event.presenter}</span>
                           )}
@@ -119,15 +129,17 @@ export default function EventsPageClient() {
                   {/* Location */}
                   <div className="event-location-container">
                       <strong className="event-detail-label">📍 Location:</strong> {event.locationUrl ? (
-                          <a 
-                            href={event.locationUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
                             className="event-location-link"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(event.locationUrl, '_blank', 'noopener,noreferrer');
+                            }}
                           >
                             {event.location}
-                          </a>
+                          </button>
                         ) : (
                           <span>{event.location}</span>
                         )}
@@ -141,33 +153,29 @@ export default function EventsPageClient() {
                       </span>
                     </div>
                   )}
-                </Link>
 
-                {/* Image Thumbnails */}
-                {event.images && event.images.length > 0 && (
-                  <div className="event-thumbnails">
-                    {event.images.slice(0, 4).map((img, idx) => (
-                      <Link
-                        key={idx}
-                        href={`/events/${event._id}`}
-                        className="event-thumbnail"
-                      >
-                        <img
-                          src={`/api/events/${event._id}/images/${idx}`}
-                          alt={img.filename}
-                        />
-                      </Link>
-                    ))}
-                    {event.images.length > 4 && (
-                      <Link
-                        href={`/events/${event._id}`}
-                        className="event-thumbnail event-thumbnail-more"
-                      >
-                        +{event.images.length - 4}
-                      </Link>
-                    )}
-                  </div>
-                )}
+                  {/* Image Thumbnails */}
+                  {event.images && event.images.length > 0 && (
+                    <div className="event-thumbnails">
+                      {event.images.slice(0, 4).map((img, idx) => (
+                        <div
+                          key={idx}
+                          className="event-thumbnail"
+                        >
+                          <img
+                            src={`/api/events/${event._id}/images/${idx}`}
+                            alt={img.filename}
+                          />
+                        </div>
+                      ))}
+                      {event.images.length > 4 && (
+                        <div className="event-thumbnail event-thumbnail-more">
+                          +{event.images.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Link>
               </li>
             ))}
           </ul>

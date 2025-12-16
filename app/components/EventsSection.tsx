@@ -137,28 +137,47 @@ export default function EventsSection() {
                       </div>
                       <div className="event-card-badges">
                         <span className={badge.className}>{badge.text}</span>
-                        <a 
-                          href={`/api/events/${event._id}/ical`}
-                          download
-                          className="event-calendar-icon"
-                          title="Add to calendar"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          📅
-                        </a>
                       </div>
                     </div>
                     <div className="event-card-details">
                       <div className="event-detail-item">
-                        <span className="event-detail-icon">📅</span>
+                        <span className="event-detail-icon"></span>
                         <span>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</span>
+                        {' '}
+                        <button
+                          type="button"
+                          className="event-calendar-icon"
+                          title="Add to calendar"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const link = document.createElement('a');
+                            link.href = `/api/events/${event._id}/ical`;
+                            link.download = '';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          }}
+                        >
+                          📅
+                        </button>
                       </div>
                       {event.presenter && (
                         <div className="event-detail-item">
                           <span className="event-detail-icon">👤</span>
                           <span>
                             Presenter: {event.presenterUrl ? (
-                              <a href={event.presenterUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{event.presenter}</a>
+                              <button
+                                type="button"
+                                className="event-presenter-link"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  window.open(event.presenterUrl, '_blank', 'noopener,noreferrer');
+                                }}
+                              >
+                                {event.presenter}
+                              </button>
                             ) : (
                               event.presenter
                             )}
@@ -169,7 +188,17 @@ export default function EventsSection() {
                         <span className="event-detail-icon">📍</span>
                         <span>
                           {event.locationUrl ? (
-                            <a href={event.locationUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{event.location}</a>
+                            <button
+                              type="button"
+                              className="event-location-link"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(event.locationUrl, '_blank', 'noopener,noreferrer');
+                              }}
+                            >
+                              {event.location}
+                            </button>
                           ) : (
                             event.location
                           )}
