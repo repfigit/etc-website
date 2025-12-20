@@ -84,65 +84,19 @@ export default function EventsPageClient() {
 
                   {/* Event Details */}
                   <div className="event-details">
-                    <strong className="event-detail-label">Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
-                    {' '}
-                    <button
-                      type="button"
-                      className="event-calendar-icon"
-                      title="Add to calendar"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const link = document.createElement('a');
-                        link.href = `/api/events/${event._id}/ical`;
-                        link.download = '';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }}
-                    >
-                      📅
-                    </button>
+                    <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
                   </div>
 
                   {/* Presenter */}
                   {event.presenter && (
                     <div className="event-presenter-container">
-                      <strong className="event-detail-label">👤 Presenter:</strong>                         {event.presenterUrl ? (
-                            <button
-                              type="button"
-                              className="event-presenter-link"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                window.open(event.presenterUrl, '_blank', 'noopener,noreferrer');
-                              }}
-                            >
-                              {event.presenter}
-                            </button>
-                          ) : (
-                            <span>{event.presenter}</span>
-                          )}
+                      <strong className="event-detail-label">👤 Presenter:</strong> {event.presenter}
                     </div>
                   )}
 
                   {/* Location */}
                   <div className="event-location-container">
-                      <strong className="event-detail-label">📍 Location:</strong> {event.locationUrl ? (
-                          <button
-                            type="button"
-                            className="event-location-link"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.open(event.locationUrl, '_blank', 'noopener,noreferrer');
-                            }}
-                          >
-                            {event.location}
-                          </button>
-                        ) : (
-                          <span>{event.location}</span>
-                        )}
+                    <strong className="event-detail-label">📍 Location:</strong> {event.location}
                   </div>
 
                   {/* Detailed Information Link */}
