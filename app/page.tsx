@@ -1,6 +1,7 @@
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
+import ActivitySection from './components/ActivitySection';
 import Marquee from './components/Marquee';
 import MissionSection from './components/MissionSection';
 import InitiativesSection from './components/InitiativesSection';
@@ -17,6 +18,7 @@ export default function Home() {
       <Navigation />
       <div className="container">
         <HeroSection />
+        <ActivitySection />
         <Marquee />
         <MissionSection />
         <InitiativesSection />
@@ -29,4 +31,3 @@ export default function Home() {
     </>
   );
 }
-

@@ -50,7 +50,7 @@ export default function ResourcesPageClient() {
       <section className="resources-page-section">
         <h2>All Resources</h2>
         <p>
-          <Link href="/#resources" className="resources-page-back-link">← Back to Home</Link>
+          <Link href="/#resources" className="resources-page-back-link">Back to Home</Link>
         </p>
         
         {loading ? (

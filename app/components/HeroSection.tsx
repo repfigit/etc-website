@@ -29,35 +29,36 @@ export default function HeroSection() {
 
   return (
     <section className="hero-section">
+      <div className="hero-visual" aria-hidden="true" />
       <div className="hero-content">
+        <p className="section-kicker">Bicameral. Bipartisan. Future-focused.</p>
         <h1 className="hero-title">
           New Hampshire Emerging Technologies Caucus
         </h1>
         <p className="hero-tagline">
-          Fostering Innovation, Collaboration, and Progress
+          Helping policymakers understand emerging technologies before they reshape the economy.
         </p>
         <p className="hero-description">
-          Empowering New Hampshire&apos;s economy through emerging technologies, 
-          thoughtful governance, and forward-thinking policymaking.
+          We convene lawmakers, technologists, entrepreneurs, educators, and civic leaders to advance
+          thoughtful governance and practical innovation across the Granite State.
         </p>
         <div className="hero-cta">
           <a 
-            href="/#mission" 
+            href="/#events" 
             className="hero-button primary"
-            onClick={(e) => handleSmoothScroll(e, '/#mission')}
+            onClick={(e) => handleSmoothScroll(e, '/#events')}
           >
-            Learn More
+            Explore Events
           </a>
           <a 
-            href="/#contact" 
+            href="/#resources" 
             className="hero-button secondary"
-            onClick={(e) => handleSmoothScroll(e, '/#contact')}
+            onClick={(e) => handleSmoothScroll(e, '/#resources')}
           >
-            Get Involved
+            View Resources
           </a>
         </div>
       </div>
     </section>
   );
 }
-
