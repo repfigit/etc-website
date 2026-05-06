@@ -65,7 +65,7 @@ export default function EventsPageClient() {
       <section className="events-page-section">
         <h2>All Events</h2>
         <p>
-          <Link href="/#events" className="events-page-back-link">← Back to Home</Link>
+          <Link href="/#events" className="events-page-back-link">Back to Home</Link>
         </p>
         
         {loading ? (
@@ -84,26 +84,26 @@ export default function EventsPageClient() {
 
                   {/* Event Details */}
                   <div className="event-details">
-                    <strong className="event-detail-label">📅 Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
+                    <strong className="event-detail-label">Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
                   </div>
 
                   {/* Presenter */}
                   {event.presenter && (
                     <div className="event-presenter-container">
-                      <strong className="event-detail-label">👤 Presenter:</strong> {event.presenter}
+                      <strong className="event-detail-label">Presenter:</strong> {event.presenter}
                     </div>
                   )}
 
                   {/* Location */}
                   <div className="event-location-container">
-                    <strong className="event-detail-label">📍 Location:</strong> {event.location}
+                    <strong className="event-detail-label">Location:</strong> {event.location}
                   </div>
 
                   {/* Detailed Information Link */}
                   {event.content && (
                     <div className="event-detailed-info">
                       <span className="event-detailed-link">
-                        📝 Detailed information available
+                        Detailed information available
                       </span>
                     </div>
                   )}

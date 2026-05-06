@@ -141,17 +141,17 @@ export default function EventsSection() {
                     </div>
                     <div className="event-card-details">
                       <div className="event-detail-item">
-                        <span className="event-detail-icon">📅</span>
+                        <span className="event-detail-icon text-icon">Date</span>
                         <span>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</span>
                       </div>
                       {event.presenter && (
                         <div className="event-detail-item">
-                          <span className="event-detail-icon">👤</span>
+                          <span className="event-detail-icon text-icon">Guest</span>
                           <span>{event.presenter}</span>
                         </div>
                       )}
                       <div className="event-detail-item">
-                        <span className="event-detail-icon">📍</span>
+                        <span className="event-detail-icon text-icon">Place</span>
                         <span>{event.location}</span>
                       </div>
                     </div>
@@ -182,7 +182,7 @@ export default function EventsSection() {
             {totalCount > 5 && (
               <p className="events-section-view-all">
                 <Link href="/events" className="events-section-view-all-link">
-                  → View all {totalCount} events
+                  View all {totalCount} events
                 </Link>
               </p>
             )}
@@ -194,4 +194,3 @@ export default function EventsSection() {
     </section>
   );
 }
-

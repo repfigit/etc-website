@@ -102,13 +102,13 @@ export default function ResourcesSection() {
                       {resource.description}
                     </p>
                   )}
-                  <span className="resource-link-hint">Visit resource →</span>
+                  <span className="resource-link-hint">Visit resource</span>
                 </a>
               ))}
             </div>
             <p className="resources-section-view-all">
               <Link href="/resources" className="resources-section-view-all-link">
-                → View all {totalCount} resources
+                View all {totalCount} resources
               </Link>
             </p>
           </>
@@ -119,4 +119,3 @@ export default function ResourcesSection() {
     </section>
   );
 }
-
