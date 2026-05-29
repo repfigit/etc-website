@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import Header from '../../components/Header';
@@ -279,7 +280,7 @@ export default function EventDetailClient({ event }: Props) {
           {event.content && (
             <div className="event-detail-content">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkBreaks]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
                   h1: ({node, ...props}) => <h2 {...props} />,

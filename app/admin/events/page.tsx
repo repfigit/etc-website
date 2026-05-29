@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
@@ -797,7 +798,7 @@ export default function AdminEvents() {
           }}>
             {formData.content ? (
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkBreaks]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
                   h1: ({ children }) => <h1 style={{ color: '#4ecdc4', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
