@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { formatTimeWithTimezone } from '@/lib/time-utils';
+import EventDateTime from './EventDateTime';
 
 interface Event {
   _id: string;
@@ -53,15 +53,6 @@ export default function EventsSection() {
     fetchEvents();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
 
   const formatTime = (timeString: string) => {
     // Try to parse and format time nicely
@@ -142,7 +133,7 @@ export default function EventsSection() {
                     <div className="event-card-details">
                       <div className="event-detail-item">
                         <span className="event-detail-icon text-icon">Date</span>
-                        <span>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</span>
+                        <span><EventDateTime date={event.date} time={event.time} variant="full" /></span>
                       </div>
                       {event.presenter && (
                         <div className="event-detail-item">

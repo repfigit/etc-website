@@ -12,6 +12,7 @@ import Footer from '../../components/Footer';
 import ImageCarousel from '../../components/ImageCarousel';
 import ShareButton from '../../components/ShareButton';
 import MarkdownVideo from '../../components/MarkdownVideo';
+import EventDateTime from '../../components/EventDateTime';
 import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
@@ -186,7 +187,7 @@ export default function EventDetailClient({ event }: Props) {
             </h1>
             
             <div className="event-detail-datetime">
-              <strong>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</strong>
+              <strong><EventDateTime date={event.date} time={event.time} variant="full" /></strong>
             </div>
             
             {event.presenter && (

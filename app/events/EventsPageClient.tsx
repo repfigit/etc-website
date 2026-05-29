@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
-import { formatTimeWithTimezone } from '@/lib/time-utils';
+import EventDateTime from '../components/EventDateTime';
 
 interface Event {
   _id: string;
@@ -47,15 +47,6 @@ export default function EventsPageClient() {
     fetchEvents();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
 
   return (
     <div className="container">
@@ -84,7 +75,7 @@ export default function EventsPageClient() {
 
                   {/* Event Details */}
                   <div className="event-details">
-                    <strong className="event-detail-label">Date & Time:</strong> {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}
+                    <strong className="event-detail-label">Date & Time:</strong> <EventDateTime date={event.date} time={event.time} variant="full" />
                   </div>
 
                   {/* Presenter */}

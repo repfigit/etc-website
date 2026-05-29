@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { formatTimeWithTimezone } from '@/lib/time-utils';
+import EventDateTime from './EventDateTime';
 
 interface EventItem {
   _id: string;
@@ -69,14 +69,6 @@ export default function ActivitySection() {
   const featuredResource = resources[0];
   const event = activityEvent.event;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   return (
     <section className="activity-section" aria-labelledby="activity-heading">
@@ -97,7 +89,7 @@ export default function ActivitySection() {
             <strong>{event ? event.topic : 'No upcoming events posted'}</strong>
             {event ? (
               <span className="activity-meta">
-                {formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)} | {event.location}
+                <EventDateTime date={event.date} time={event.time} variant="short" /> | {event.location}
               </span>
             ) : (
               <span className="activity-meta">Check back for future briefings and meetings.</span>

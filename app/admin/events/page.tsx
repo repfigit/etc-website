@@ -9,10 +9,10 @@ import 'highlight.js/styles/github-dark.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import ImageUploadSubform from '@/app/components/ImageUploadSubform';
 import MarkdownVideo from '@/app/components/MarkdownVideo';
+import EventDateTime from '@/app/components/EventDateTime';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 import { uploadFileToBlobClient } from '@/lib/blob-client';
-import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
   _id: string;
@@ -468,10 +468,6 @@ export default function AdminEvents() {
     setFormDirty(true);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  };
 
   if (loading) return <div className="container">Loading...</div>;
 
@@ -931,7 +927,7 @@ export default function AdminEvents() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: '1.1em' }}>{formatDate(event.date)} at {formatTimeWithTimezone(event.date, event.time)}</strong>
+                  <strong style={{ fontSize: '1.1em' }}><EventDateTime date={event.date} time={event.time} variant="long" /></strong>
                   {event.presenter && <div>Presenter: {event.presenter}</div>}
                   <div>Topic: {event.topic}</div>
                   <div>Location: {event.location}</div>
