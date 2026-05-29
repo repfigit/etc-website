@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navigation() {
   const [showEventsMenu, setShowEventsMenu] = useState(false);
@@ -239,13 +240,14 @@ export default function Navigation() {
               </div>
             )}
           </div>
-          <a 
-            href="/#contact" 
+          <a
+            href="/#contact"
             className={activeSection === 'contact' ? 'active' : ''}
             onClick={(e) => { handleSmoothScroll(e, '/#contact'); closeMobileMenu(); }}
           >
             Contact
           </a>
+          <ThemeToggle />
         </div>
       </nav>
     </div>
