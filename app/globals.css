@@ -2770,7 +2770,10 @@ img.logo {
     position: relative;
     align-items: center;
     margin: 0;
-    z-index: 9999;
+    /* Keep below the sticky nav (.sticky-nav, z-index: 100) so the trigger
+       doesn't float over the header when scrolling. The dropdown menu is
+       position: fixed with its own z-index, so it doesn't rely on this. */
+    z-index: 1;
     height: 1.8em;
     vertical-align: middle;
 }
