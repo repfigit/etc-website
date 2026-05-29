@@ -198,8 +198,31 @@ nav {
     align-items: center;
     gap: 0.4em;
     flex-wrap: nowrap;
-    width: auto;
+    /* Size to content (not capped at 50% of the bar by the lone `left`
+       offset) so dropdown labels like "Events ▼" never wrap to two lines
+       and stick out of vertical alignment with the plain links. */
+    width: max-content;
 }
+
+.nav-container.is-sticky .nav-menu-items a {
+    white-space: nowrap;
+}
+}
+
+/* Narrow desktop zone: a menu centered across the full bar collides with the
+   left-pinned logo once the two no longer fit side by side (~1150px and
+   below). Lay the menu out as a normal flex sibling centered in the space
+   beside the logo instead — it wraps to its own row when even that is too
+   tight — so the logo and menu can never overlap. Above this width the menu
+   stays truly centered, matching the non-sticky header so it doesn't shift
+   horizontally when the bar becomes sticky on scroll. */
+@media (min-width: 768px) and (max-width: 1150px) {
+    .nav-container.is-sticky .nav-menu-items {
+        position: static;
+        left: auto;
+        transform: none;
+        margin: 0 auto;
+    }
 }
 
 nav a {
