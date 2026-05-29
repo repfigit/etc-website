@@ -11,6 +11,7 @@ import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import ImageCarousel from '../../components/ImageCarousel';
 import ShareButton from '../../components/ShareButton';
+import MarkdownVideo from '../../components/MarkdownVideo';
 import { formatTimeWithTimezone } from '@/lib/time-utils';
 
 interface Event {
@@ -285,6 +286,9 @@ export default function EventDetailClient({ event }: Props) {
                   h3: ({node, ...props}) => <h4 {...props} />,
                   a: ({node, ...props}) => (
                     <a {...props} target="_blank" rel="noopener noreferrer" />
+                  ),
+                  img: ({node, src, alt}) => (
+                    <MarkdownVideo src={typeof src === 'string' ? src : undefined} alt={alt} />
                   ),
                 }}
               >

@@ -8,6 +8,7 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import ImageUploadSubform from '@/app/components/ImageUploadSubform';
+import MarkdownVideo from '@/app/components/MarkdownVideo';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 import { uploadFileToBlobClient } from '@/lib/blob-client';
@@ -860,6 +861,13 @@ export default function AdminEvents() {
                     >
                       {children}
                     </a>
+                  ),
+                  img: ({ src, alt }) => (
+                    <MarkdownVideo
+                      src={typeof src === 'string' ? src : undefined}
+                      alt={alt}
+                      imgStyle={{ maxWidth: '100%', height: 'auto', borderRadius: '5px', marginBottom: '1em' }}
+                    />
                   ),
                   table: ({ children }) => (
                     <div style={{ overflowX: 'auto', marginBottom: '1em' }}>
