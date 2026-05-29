@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { versionedBlobUrl } from '@/lib/blob';
 
 export async function GET(
   request: NextRequest,
@@ -57,13 +58,17 @@ export async function GET(
       );
     }
 
-    // Redirect to the blob URL
-    return NextResponse.redirect(image.url, {
-      status: 302,
-      headers: {
-        'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
+    // Redirect to the (version-busted) blob URL. The redirect itself must not
+    // be cached, or a later image change would never be picked up.
+    return NextResponse.redirect(
+      versionedBlobUrl(image.url, image.uploadedAt),
+      {
+        status: 302,
+        headers: {
+          'Cache-Control': 'no-store',
+        }
       }
-    });
+    );
   } catch (error) {
     console.error('Error fetching image:', error);
     return NextResponse.json(

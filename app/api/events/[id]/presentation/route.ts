@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Event from '@/lib/models/Event';
+import { versionedBlobUrl } from '@/lib/blob';
 
 export async function GET(
   request: NextRequest,
@@ -23,12 +24,17 @@ export async function GET(
     if (event.presentations && event.presentations.length > 0) {
       const presentation = event.presentations[0];
       if (presentation.url) {
-        return NextResponse.redirect(presentation.url, {
-          status: 302,
-          headers: {
-            'Cache-Control': 'public, max-age=31536000',
+        // Redirect to the (version-busted) blob URL. The redirect itself must
+        // not be cached, or a later file change would never be picked up.
+        return NextResponse.redirect(
+          versionedBlobUrl(presentation.url, presentation.uploadedAt),
+          {
+            status: 302,
+            headers: {
+              'Cache-Control': 'no-store',
+            }
           }
-        });
+        );
       }
     }
     

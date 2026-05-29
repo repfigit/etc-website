@@ -8,6 +8,30 @@ export type BlobFolder = 'events' | 'resources';
 export type BlobSubfolder = 'images' | 'presentations' | 'thumbnail';
 
 /**
+ * Append a version token to a blob URL for cache-busting.
+ *
+ * Blob URLs are uploaded with `addRandomSuffix: false`, so replacing a file
+ * with one of the same name yields an identical URL whose bytes Vercel Blob
+ * serves as `immutable`. Without a version token, browsers keep showing the
+ * old image after a replacement. The token (typically a document/subdocument
+ * timestamp) changes whenever the underlying file changes, giving the browser
+ * a fresh cache key.
+ *
+ * NOTE: the redirect endpoints that point here must NOT be long-cached
+ * (use `Cache-Control: no-store`), otherwise the versioned target would
+ * never be re-resolved after an update.
+ */
+export function versionedBlobUrl(
+  url: string,
+  version?: Date | number | string | null
+): string {
+  if (!url || version === undefined || version === null) return url;
+  const token = version instanceof Date ? version.getTime() : version;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${token}`;
+}
+
+/**
  * Generate a blob path for a file
  * Structure: files/{folder}/{id}/{subfolder}/{filename}
  */
