@@ -137,7 +137,7 @@ export default function AdminContacts() {
           <div>
             <h1>Contact Submissions</h1>
             {unreadCount > 0 && (
-              <p style={{ color: '#d4783e', marginTop: '0.5em' }}>
+              <p style={{ color: 'var(--color-accent-2)', marginTop: '0.5em' }}>
                 {unreadCount} unread submission{unreadCount !== 1 ? 's' : ''}
               </p>
             )}
@@ -194,10 +194,10 @@ export default function AdminContacts() {
                         <span className="unread-badge">New</span>
                       )}
                     </div>
-                    <div style={{ color: '#5db8b0', marginTop: '0.25em' }}>
+                    <div style={{ color: 'var(--color-accent)', marginTop: '0.25em' }}>
                       {contact.email}
                     </div>
-                    <div style={{ color: '#888', fontSize: '0.9em', marginTop: '0.25em' }}>
+                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9em', marginTop: '0.25em' }}>
                       {formatDate(contact.createdAt)}
                     </div>
                   </div>

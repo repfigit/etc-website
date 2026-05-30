@@ -134,9 +134,9 @@ export default function AdminTechList() {
           style={{
             padding: '0.75em 1.5em',
             marginBottom: '2em',
-            background: '#00ffcc',
+            background: 'var(--color-accent)',
             color: '#000',
-            border: '2px solid #00f7ff',
+            border: '2px solid var(--color-accent)',
             cursor: 'pointer',
             fontWeight: 'bold',
             fontFamily: 'inherit'
@@ -162,9 +162,9 @@ export default function AdminTechList() {
                 style={{
                   width: '100%',
                   padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   fontFamily: 'inherit'
                 }}
               />
@@ -180,9 +180,9 @@ export default function AdminTechList() {
                 style={{
                   width: '100%',
                   padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   fontFamily: 'inherit'
                 }}
               />
@@ -220,9 +220,9 @@ export default function AdminTechList() {
                 type="submit"
                 style={{
                   padding: '0.75em 2em',
-                  background: '#00ffcc',
+                  background: 'var(--color-accent)',
                   color: '#000',
-                  border: '2px solid #00f7ff',
+                  border: '2px solid var(--color-accent)',
                   cursor: 'pointer',
                   fontWeight: 'bold',
                   fontFamily: 'inherit'

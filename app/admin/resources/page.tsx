@@ -334,9 +334,9 @@ export default function AdminResources() {
           style={{
             padding: '0.75em 1.5em',
             marginBottom: '2em',
-            background: '#00ffcc',
+            background: 'var(--color-accent)',
             color: '#000',
-            border: '2px solid #00f7ff',
+            border: '2px solid var(--color-accent)',
             cursor: 'pointer',
             fontWeight: 'bold',
             fontFamily: 'inherit'
@@ -362,9 +362,9 @@ export default function AdminResources() {
                 style={{
                   width: '100%',
                   padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   fontFamily: 'inherit'
                 }}
               />
@@ -380,9 +380,9 @@ export default function AdminResources() {
                 style={{
                   width: '100%',
                   padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   fontFamily: 'inherit'
                 }}
               />
@@ -397,9 +397,9 @@ export default function AdminResources() {
                 style={{
                   width: '100%',
                   padding: '0.5em',
-                  background: '#000',
-                  color: '#00ffcc',
-                  border: '2px solid #00ffcc',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   fontFamily: 'inherit',
                   resize: 'vertical'
                 }}
@@ -460,9 +460,9 @@ export default function AdminResources() {
               type="submit"
               style={{
                 padding: '0.75em 2em',
-                background: '#00ffcc',
+                background: 'var(--color-accent)',
                 color: '#000',
-                border: '2px solid #00f7ff',
+                border: '2px solid var(--color-accent)',
                 cursor: 'pointer',
                 fontWeight: 'bold',
                 fontFamily: 'inherit'
@@ -475,7 +475,7 @@ export default function AdminResources() {
         </Modal>
 
         <h2>All Resources ({resources.length})</h2>
-        <div style={{ marginBottom: '1em', fontSize: '0.9em', color: '#d4d8d5' }}>
+        <div style={{ marginBottom: '1em', fontSize: '0.9em', color: 'var(--color-text)' }}>
           💡 Drag and drop to reorder resources. The order field is automatically updated.
         </div>
         

@@ -108,7 +108,7 @@ export default function ImageUpload({ currentImage, onImageChange, onRemoveImage
                 maxWidth: '100%',
                 maxHeight: '200px',
                 objectFit: 'contain',
-                border: '2px solid #4ecdc4',
+                border: '2px solid var(--color-accent)',
                 borderRadius: '4px'
               }}
             />

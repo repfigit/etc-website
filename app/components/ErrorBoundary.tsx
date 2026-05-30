@@ -43,22 +43,22 @@ export class ErrorBoundary extends Component<Props, State> {
           padding: '2em',
           border: '2px solid #e74c3c',
           borderRadius: '4px',
-          backgroundColor: '#2c1e1e',
-          color: '#e8ebe8',
+          backgroundColor: 'rgba(231, 76, 60, 0.12)',
+          color: 'var(--color-text)',
           margin: '1em 0'
         }}>
           <h2 style={{ color: '#e74c3c' }}>⚠️ Something went wrong</h2>
           <p>We're sorry, but something unexpected happened. Please try refreshing the page.</p>
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <details style={{ marginTop: '1em' }}>
-              <summary style={{ cursor: 'pointer', color: '#4ecdc4' }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--color-accent)' }}>
                 Error details (development only)
               </summary>
               <pre style={{
                 marginTop: '0.5em',
                 padding: '1em',
-                backgroundColor: '#0a0f0a',
-                border: '1px solid #4ecdc4',
+                backgroundColor: 'var(--color-surface-inset)',
+                border: '1px solid var(--color-accent)',
                 overflow: 'auto',
                 fontSize: '0.85em'
               }}>
@@ -73,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
             style={{
               marginTop: '1em',
               padding: '0.5em 1em',
-              backgroundColor: '#4ecdc4',
+              backgroundColor: 'var(--color-accent)',
               color: '#0a0f0a',
               border: 'none',
               borderRadius: '4px',

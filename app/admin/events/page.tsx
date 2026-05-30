@@ -507,9 +507,9 @@ export default function AdminEvents() {
                   style={{
                     width: '100%',
                     padding: '0.75em',
-                    background: '#000',
-                    color: '#4ecdc4',
-                    border: '2px solid #4ecdc4',
+                    background: 'var(--color-surface-inset)',
+                    color: 'var(--color-accent)',
+                    border: '2px solid var(--color-accent)',
                     borderRadius: '4px',
                     fontFamily: 'inherit',
                     fontSize: '1em',
@@ -529,9 +529,9 @@ export default function AdminEvents() {
                     style={{
                       flex: '1',
                       padding: '0.75em',
-                      background: '#000',
-                      color: '#4ecdc4',
-                      border: '2px solid #4ecdc4',
+                      background: 'var(--color-surface-inset)',
+                      color: 'var(--color-accent)',
+                      border: '2px solid var(--color-accent)',
                       borderRadius: '4px',
                       fontFamily: 'inherit',
                       fontSize: '1em',
@@ -546,9 +546,9 @@ export default function AdminEvents() {
                     style={{
                       width: '60px',
                       padding: '0.75em',
-                      background: '#000',
-                      color: '#4ecdc4',
-                      border: '2px solid #4ecdc4',
+                      background: 'var(--color-surface-inset)',
+                      color: 'var(--color-accent)',
+                      border: '2px solid var(--color-accent)',
                       borderRadius: '4px',
                       fontFamily: 'inherit',
                       fontSize: '1em',
@@ -556,7 +556,7 @@ export default function AdminEvents() {
                     }}
                   />
                 </div>
-                <small style={{ color: '#888', fontSize: '0.8em', marginTop: '0.25em', display: 'block' }}>
+                <small style={{ color: 'var(--color-text-muted)', fontSize: '0.8em', marginTop: '0.25em', display: 'block' }}>
                   Use 24-hour format (e.g., 14:30)
                 </small>
               </div>
@@ -572,9 +572,9 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -591,9 +591,9 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -610,9 +610,9 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -630,9 +630,9 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -649,9 +649,9 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em'
@@ -666,9 +666,9 @@ export default function AdminEvents() {
                   type="button"
                   onClick={() => setShowMarkdownPreview(true)}
                   style={{
-                    background: '#4ecdc4',
+                    background: 'var(--color-accent)',
                     color: '#000',
-                    border: '1px solid #4ecdc4',
+                    border: '1px solid var(--color-accent)',
                     padding: '0.5em 1em',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
@@ -688,16 +688,16 @@ export default function AdminEvents() {
                 style={{
                   width: '100%',
                   padding: '0.75em',
-                  background: '#000',
-                  color: '#4ecdc4',
-                  border: '2px solid #4ecdc4',
+                  background: 'var(--color-surface-inset)',
+                  color: 'var(--color-accent)',
+                  border: '2px solid var(--color-accent)',
                   borderRadius: '4px',
                   fontFamily: 'inherit',
                   fontSize: '1em',
                   resize: 'vertical'
                 }}
               />
-              <div style={{ fontSize: '0.9em', color: '#999', marginTop: '0.5em' }}>
+              <div style={{ fontSize: '0.9em', color: 'var(--color-text-faint)', marginTop: '0.5em' }}>
                 You can use Markdown syntax for formatting. Supports headers, lists, links, code blocks, and more.
               </div>
             </div>
@@ -735,10 +735,10 @@ export default function AdminEvents() {
               <div style={{
                 marginTop: '1em',
                 padding: '1em',
-                background: 'rgba(78, 205, 196, 0.1)',
-                border: '1px solid #4ecdc4',
+                background: 'rgba(var(--color-accent-rgb), 0.1)',
+                border: '1px solid var(--color-accent)',
                 borderRadius: '4px',
-                color: '#4ecdc4'
+                color: 'var(--color-accent)'
               }}>
                 ⏳ {uploadProgress}
               </div>
@@ -753,7 +753,7 @@ export default function AdminEvents() {
                   padding: '0.75em 2em',
                   background: '#666',
                   color: '#fff',
-                  border: '2px solid #888',
+                  border: '2px solid var(--color-text-muted)',
                   cursor: isUploading ? 'not-allowed' : 'pointer',
                   fontWeight: 'bold',
                   fontFamily: 'inherit',
@@ -767,9 +767,9 @@ export default function AdminEvents() {
                 disabled={isUploading}
                 style={{
                   padding: '0.75em 2em',
-                  background: isUploading ? '#666' : '#4ecdc4',
-                  color: isUploading ? '#999' : '#000',
-                  border: '2px solid #00f7ff',
+                  background: isUploading ? '#666' : 'var(--color-accent)',
+                  color: isUploading ? 'var(--color-text-faint)' : '#000',
+                  border: '2px solid var(--color-accent)',
                   cursor: isUploading ? 'not-allowed' : 'pointer',
                   fontWeight: 'bold',
                   fontFamily: 'inherit'
@@ -791,8 +791,8 @@ export default function AdminEvents() {
             maxHeight: '70vh',
             overflowY: 'auto',
             padding: '1em',
-            background: '#000',
-            color: '#d4d8d5',
+            background: 'var(--color-surface-inset)',
+            color: 'var(--color-text)',
             lineHeight: '1.6',
             fontSize: '1.1em'
           }}>
@@ -801,9 +801,9 @@ export default function AdminEvents() {
                 remarkPlugins={[remarkGfm, remarkBreaks]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
-                  h1: ({ children }) => <h1 style={{ color: '#4ecdc4', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ color: '#4ecdc4', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ color: '#4ecdc4', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
+                  h1: ({ children }) => <h1 style={{ color: 'var(--color-accent)', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ color: 'var(--color-accent)', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: 'var(--color-accent)', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
                   p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
                   ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
                   ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
@@ -812,7 +812,7 @@ export default function AdminEvents() {
                     const isInline = !className;
                     return isInline ? (
                       <code style={{
-                        background: '#333',
+                        background: 'var(--color-border-subtle)',
                         padding: '0.2em 0.4em',
                         borderRadius: '3px',
                         fontSize: '0.9em'
@@ -825,19 +825,19 @@ export default function AdminEvents() {
                   },
                   pre: ({ children }) => (
                     <pre style={{
-                      background: '#1a1a1a',
+                      background: 'var(--color-surface)',
                       padding: '1em',
                       borderRadius: '5px',
                       overflow: 'auto',
                       marginBottom: '1em',
-                      border: '1px solid #333'
+                      border: '1px solid var(--color-border-subtle)'
                     }}>
                       {children}
                     </pre>
                   ),
                   blockquote: ({ children }) => (
                     <blockquote style={{
-                      borderLeft: '4px solid #4ecdc4',
+                      borderLeft: '4px solid var(--color-accent)',
                       paddingLeft: '1em',
                       marginLeft: '0',
                       marginBottom: '1em',
@@ -854,7 +854,7 @@ export default function AdminEvents() {
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#4ecdc4' }}
+                      style={{ color: 'var(--color-accent)' }}
                     >
                       {children}
                     </a>
@@ -871,7 +871,7 @@ export default function AdminEvents() {
                       <table style={{
                         borderCollapse: 'collapse',
                         width: '100%',
-                        border: '1px solid #333'
+                        border: '1px solid var(--color-border-subtle)'
                       }}>
                         {children}
                       </table>
@@ -879,9 +879,9 @@ export default function AdminEvents() {
                   ),
                   th: ({ children }) => (
                     <th style={{
-                      border: '1px solid #333',
+                      border: '1px solid var(--color-border-subtle)',
                       padding: '0.5em',
-                      background: '#333',
+                      background: 'var(--color-border-subtle)',
                       textAlign: 'left'
                     }}>
                       {children}
@@ -889,7 +889,7 @@ export default function AdminEvents() {
                   ),
                   td: ({ children }) => (
                     <td style={{
-                      border: '1px solid #333',
+                      border: '1px solid var(--color-border-subtle)',
                       padding: '0.5em'
                     }}>
                       {children}
@@ -904,7 +904,7 @@ export default function AdminEvents() {
                 padding: '2em',
                 border: '2px dashed #666',
                 textAlign: 'center',
-                color: '#999'
+                color: 'var(--color-text-faint)'
               }}>
                 <p>No content to preview. Start typing in the Detailed Notes field above.</p>
               </div>
@@ -920,9 +920,9 @@ export default function AdminEvents() {
               style={{
                 marginBottom: '1em',
                 padding: '1em',
-                border: '2px solid #4ecdc4',
+                border: '2px solid var(--color-accent)',
                 borderRadius: '12px',
-                background: event.isVisible ? '#121212' : '#333',
+                background: event.isVisible ? 'var(--color-surface)' : 'var(--color-border-subtle)',
                 opacity: event.isVisible ? 1 : 0.6
               }}
             >
@@ -937,7 +937,7 @@ export default function AdminEvents() {
                       <Link
                         href={`/events/${event._id}`}
                         target="_blank"
-                        style={{ color: '#4ecdc4' }}
+                        style={{ color: 'var(--color-accent)' }}
                       >
                         📝 View Event Page
                       </Link>
@@ -954,8 +954,8 @@ export default function AdminEvents() {
                             height: '60px',
                             borderRadius: '4px',
                             overflow: 'hidden',
-                            border: '1px solid #4ecdc4',
-                            background: '#000'
+                            border: '1px solid var(--color-accent)',
+                            background: 'var(--color-media-bg)'
                           }}
                         >
                           <img
@@ -975,12 +975,12 @@ export default function AdminEvents() {
                             width: '60px',
                             height: '60px',
                             borderRadius: '4px',
-                            border: '1px solid #4ecdc4',
-                            background: '#1a1a1a',
+                            border: '1px solid var(--color-accent)',
+                            background: 'var(--color-surface)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#4ecdc4',
+                            color: 'var(--color-accent)',
                             fontSize: '0.9em',
                             fontWeight: 'bold'
                           }}

@@ -13,13 +13,13 @@ export default function LoadingSpinner({ message = 'Loading...' }: { message?: s
         style={{
           width: '50px',
           height: '50px',
-          border: '4px solid #1a1a1a',
-          borderTop: '4px solid #4ecdc4',
+          border: '4px solid var(--color-border-subtle)',
+          borderTop: '4px solid var(--color-accent)',
           borderRadius: '50%',
           animation: 'spin 1s linear infinite'
         }}
       />
-      <p style={{ marginTop: '1em', color: '#4ecdc4' }}>{message}</p>
+      <p style={{ marginTop: '1em', color: 'var(--color-accent)' }}>{message}</p>
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
