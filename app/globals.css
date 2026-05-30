@@ -104,6 +104,10 @@ nav {
         display: flex;
         justify-content: flex-start;
         align-items: center;
+        /* Keep the logo and centered menu on a single row; the base nav
+           rule sets flex-wrap: wrap, which would drop the menu below the
+           logo and overlap them. */
+        flex-wrap: nowrap;
         padding-left: calc((100% - 1200px) / 2 + 1em);
         padding-right: 1em;
         position: relative;
@@ -126,14 +130,19 @@ nav {
 }
 
 .nav-container.is-sticky .nav-menu-items {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Flow after the logo and center within the remaining space instead of
+       absolute-centering on the viewport, which overlapped the logo on
+       narrower (768-1024px) screens and crammed the menu items. */
+    position: static;
+    transform: none;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0.4em;
     flex-wrap: nowrap;
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
     width: auto;
 }
 }
@@ -147,6 +156,8 @@ nav a {
     border: 1px solid transparent;
     border-radius: 6px;
     font-size: 0.95em;
+    /* Keep link text and its dropdown caret (e.g. "Events ▼") on one line. */
+    white-space: nowrap;
 }
 
 nav a:hover {
