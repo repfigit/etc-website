@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ReactMarkdown from 'react-markdown';
+import dynamic from 'next/dynamic';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 import PDFUploadSubform from '@/app/components/PDFUploadSubform';
 import ImageUploadSubform from '@/app/components/ImageUploadSubform';
 import MarkdownVideo from '@/app/components/MarkdownVideo';
@@ -14,6 +15,9 @@ import EventDateTime from '@/app/components/EventDateTime';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
 import { uploadFileToBlobClient } from '@/lib/blob-client';
+
+// MDEditor references `window`/`navigator`, so load it client-side only.
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface Event {
   _id: string;
@@ -53,7 +57,7 @@ export default function AdminEvents() {
   // Force recompilation
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
+  const [editorColorMode, setEditorColorMode] = useState<'light' | 'dark'>('dark');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formDirty, setFormDirty] = useState(false);
   const [formData, setFormData] = useState({
@@ -85,6 +89,18 @@ export default function AdminEvents() {
     type: string;
     preview?: string;
   }>>([]);
+
+  // Match the editor's chrome to the site's active light/dark theme.
+  useEffect(() => {
+    const sync = () =>
+      setEditorColorMode(
+        document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+      );
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -660,45 +676,41 @@ export default function AdminEvents() {
             </div>
 
             <div style={{ marginTop: '1em' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5em' }}>
-                <label style={{ fontWeight: 'bold' }}>Detailed Notes (Markdown)</label>
-                <button
-                  type="button"
-                  onClick={() => setShowMarkdownPreview(true)}
-                  style={{
-                    background: 'var(--color-accent)',
-                    color: '#000',
-                    border: '1px solid var(--color-accent)',
-                    padding: '0.5em 1em',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontWeight: 'bold',
-                    fontSize: '0.9em',
-                    borderRadius: '3px'
+              <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5em' }}>
+                Detailed Notes (Markdown)
+              </label>
+              <div data-color-mode={editorColorMode}>
+                <MDEditor
+                  value={formData.content}
+                  onChange={(val) => updateFormData({ content: val || '' })}
+                  height={400}
+                  preview="live"
+                  textareaProps={{
+                    placeholder: 'Enter detailed event information using Markdown syntax...',
                   }}
-                >
-                  👁️ Preview
-                </button>
+                  previewOptions={{
+                    remarkPlugins: [remarkGfm, remarkBreaks],
+                    rehypePlugins: [rehypeHighlight],
+                    components: {
+                      a: ({ children, href }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer">
+                          {children}
+                        </a>
+                      ),
+                      img: ({ src, alt }) => (
+                        <MarkdownVideo
+                          src={typeof src === 'string' ? src : undefined}
+                          alt={alt}
+                          imgStyle={{ maxWidth: '100%', height: 'auto', borderRadius: '5px', marginBottom: '1em' }}
+                        />
+                      ),
+                    },
+                  }}
+                />
               </div>
-              <textarea
-                value={formData.content}
-                onChange={(e) => updateFormData({ content: e.target.value })}
-                placeholder="Enter detailed event information using Markdown syntax..."
-                rows={8}
-                style={{
-                  width: '100%',
-                  padding: '0.75em',
-                  background: 'var(--color-surface-inset)',
-                  color: 'var(--color-accent)',
-                  border: '2px solid var(--color-accent)',
-                  borderRadius: '4px',
-                  fontFamily: 'inherit',
-                  fontSize: '1em',
-                  resize: 'vertical'
-                }}
-              />
               <div style={{ fontSize: '0.9em', color: 'var(--color-text-faint)', marginTop: '0.5em' }}>
-                You can use Markdown syntax for formatting. Supports headers, lists, links, code blocks, and more.
+                Use the toolbar buttons or Markdown syntax — the preview updates live as you type.
+                Drop a YouTube or Vimeo link in as <code>![](url)</code> to embed a player.
               </div>
             </div>
 
@@ -779,137 +791,6 @@ export default function AdminEvents() {
               </button>
             </div>
           </form>
-        </Modal>
-
-        {/* Markdown Preview Modal */}
-        <Modal
-          isOpen={showMarkdownPreview}
-          onClose={() => setShowMarkdownPreview(false)}
-          title="Markdown Preview"
-        >
-          <div style={{
-            maxHeight: '70vh',
-            overflowY: 'auto',
-            padding: '1em',
-            background: 'var(--color-surface-inset)',
-            color: 'var(--color-text)',
-            lineHeight: '1.6',
-            fontSize: '1.1em'
-          }}>
-            {formData.content ? (
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkBreaks]}
-                rehypePlugins={[rehypeHighlight]}
-                components={{
-                  h1: ({ children }) => <h1 style={{ color: 'var(--color-accent)', marginTop: '2em', marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ color: 'var(--color-accent)', marginTop: '1.5em', marginBottom: '0.8em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ color: 'var(--color-accent)', marginTop: '1.2em', marginBottom: '0.6em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</h3>,
-                  p: ({ children }) => <p style={{ marginBottom: '1em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</p>,
-                  ul: ({ children }) => <ul style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ul>,
-                  ol: ({ children }) => <ol style={{ marginBottom: '1em', paddingLeft: '2em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</ol>,
-                  li: ({ children }) => <li style={{ marginBottom: '0.5em', animation: 'none', textShadow: 'none', transform: 'none' }}>{children}</li>,
-                  code: ({ children, className }) => {
-                    const isInline = !className;
-                    return isInline ? (
-                      <code style={{
-                        background: 'var(--color-border-subtle)',
-                        padding: '0.2em 0.4em',
-                        borderRadius: '3px',
-                        fontSize: '0.9em'
-                      }}>
-                        {children}
-                      </code>
-                    ) : (
-                      <code className={className}>{children}</code>
-                    );
-                  },
-                  pre: ({ children }) => (
-                    <pre style={{
-                      background: 'var(--color-surface)',
-                      padding: '1em',
-                      borderRadius: '5px',
-                      overflow: 'auto',
-                      marginBottom: '1em',
-                      border: '1px solid var(--color-border-subtle)'
-                    }}>
-                      {children}
-                    </pre>
-                  ),
-                  blockquote: ({ children }) => (
-                    <blockquote style={{
-                      borderLeft: '4px solid var(--color-accent)',
-                      paddingLeft: '1em',
-                      marginLeft: '0',
-                      marginBottom: '1em',
-                      fontStyle: 'italic',
-                      animation: 'none',
-                      textShadow: 'none',
-                      transform: 'none'
-                    }}>
-                      {children}
-                    </blockquote>
-                  ),
-                  a: ({ children, href }) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--color-accent)' }}
-                    >
-                      {children}
-                    </a>
-                  ),
-                  img: ({ src, alt }) => (
-                    <MarkdownVideo
-                      src={typeof src === 'string' ? src : undefined}
-                      alt={alt}
-                      imgStyle={{ maxWidth: '100%', height: 'auto', borderRadius: '5px', marginBottom: '1em' }}
-                    />
-                  ),
-                  table: ({ children }) => (
-                    <div style={{ overflowX: 'auto', marginBottom: '1em' }}>
-                      <table style={{
-                        borderCollapse: 'collapse',
-                        width: '100%',
-                        border: '1px solid var(--color-border-subtle)'
-                      }}>
-                        {children}
-                      </table>
-                    </div>
-                  ),
-                  th: ({ children }) => (
-                    <th style={{
-                      border: '1px solid var(--color-border-subtle)',
-                      padding: '0.5em',
-                      background: 'var(--color-border-subtle)',
-                      textAlign: 'left'
-                    }}>
-                      {children}
-                    </th>
-                  ),
-                  td: ({ children }) => (
-                    <td style={{
-                      border: '1px solid var(--color-border-subtle)',
-                      padding: '0.5em'
-                    }}>
-                      {children}
-                    </td>
-                  ),
-                }}
-              >
-                {formData.content}
-              </ReactMarkdown>
-            ) : (
-              <div style={{
-                padding: '2em',
-                border: '2px dashed #666',
-                textAlign: 'center',
-                color: 'var(--color-text-faint)'
-              }}>
-                <p>No content to preview. Start typing in the Detailed Notes field above.</p>
-              </div>
-            )}
-          </div>
         </Modal>
 
         <h2>All Events ({events.length})</h2>
