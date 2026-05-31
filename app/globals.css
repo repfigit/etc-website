@@ -355,6 +355,7 @@ nav a:hover {
     
     .nav-menu-items a {
         width: 100%;
+        box-sizing: border-box;
         padding: 0.8em 1em;
         border-radius: 0;
         text-align: left;
@@ -1172,6 +1173,7 @@ img.logo {
     border-radius: 12px;
     padding: 1em;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .carousel-image-container {
@@ -1717,6 +1719,8 @@ img.logo {
     line-height: 1.65;
     max-width: 75ch;
     margin: 0 auto;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 @media (max-width: 767px) {
